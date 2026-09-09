@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 import { CheckCircle2, Circle, Clock, Award, Trophy, ArrowRight } from "lucide-react";
 
 export default function LearningRoadmap({ onNavigate }) {
@@ -50,7 +50,7 @@ export default function LearningRoadmap({ onNavigate }) {
         </p>
       </div>
 
-      <div className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200/80 shadow-xs">
+      <div className="bg-white rounded-2xl p-4 sm:p-8 border border-slate-200/80 shadow-xs">
         <div className="relative pl-6 sm:pl-8 space-y-8 before:absolute before:left-3 sm:before:left-4 before:top-3 before:bottom-3 before:w-0.5 before:bg-slate-200">
           {roadmapSteps.map((step, idx) => {
             const isCompleted = step.status === "completed";
@@ -140,13 +140,13 @@ export default function LearningRoadmap({ onNavigate }) {
         </div>
 
         {/* Footer Action */}
-        <div className="mt-8 pt-5 border-t border-slate-100 flex items-center justify-between">
+        <div className="mt-8 pt-5 border-t border-slate-100 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
           <span className="text-xs text-slate-500">
             Estimated completion: <strong className="text-slate-800">10 Weeks</strong>
           </span>
           <button
             onClick={() => onNavigate("opportunities")}
-            className="flex items-center gap-2 px-4 py-2 bg-[#1E60D5] hover:bg-blue-700 text-white rounded-lg text-xs font-semibold shadow-sm transition"
+            className="flex items-center justify-center gap-2 px-5 py-2.5 bg-[#1E60D5] hover:bg-blue-700 text-white rounded-xl text-xs font-semibold shadow-sm transition min-h-[42px] cursor-pointer"
           >
             <span>Explore Matching Internships</span>
             <ArrowRight className="w-3.5 h-3.5" />

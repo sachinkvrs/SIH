@@ -1,4 +1,4 @@
-﻿import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import BrandLogo from "./BrandLogo";
 import {
   LayoutDashboard,
@@ -18,7 +18,8 @@ import {
   Shield,
   Clock,
   History,
-  ChevronUp
+  ChevronUp,
+  X
 } from "lucide-react";
 
 export default function Sidebar({
@@ -33,7 +34,9 @@ export default function Sidebar({
     targetRole: "Data Analyst",
     readinessScore: 82,
     avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80"
-  }
+  },
+  mobileOpen = false,
+  onCloseMobile
 }) {
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const profileDropdownRef = useRef(null);
@@ -100,7 +103,10 @@ export default function Sidebar({
       }
     };
     const handleKeyDown = (e) => {
-      if (e.key === "Escape") setProfileDropdownOpen(false);
+      if (e.key === "Escape") {
+        setProfileDropdownOpen(false);
+        if (onCloseMobile) onCloseMobile();
+      }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
@@ -109,37 +115,67 @@ export default function Sidebar({
       document.removeEventListener("mousedown", handleClickOutside);
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, []);
+  }, [onCloseMobile]);
 
   const handleLogout = () => {
     setProfileDropdownOpen(false);
+    if (onCloseMobile) onCloseMobile();
     if (onNavigate) onNavigate("login");
   };
 
+  const handleNavClick = (id) => {
+    if (onNavigate) onNavigate(id);
+    if (onCloseMobile) onCloseMobile();
+  };
+
   return (
-    <aside className="w-56 lg:w-60 bg-[#0B1727] text-white flex flex-col justify-between h-full min-h-screen py-4 px-3 border-r border-slate-800 shrink-0 select-none overflow-y-auto scrollbar-none relative">
-      <div>
-        {/* Brand Header */}
-        <div className="px-2 mb-5 cursor-pointer" onClick={() => onNavigate("landing")}>
-          <BrandLogo variant="dark" />
-        </div>
+    <>
+      {/* Dark & Blurred Backdrop for Mobile Drawer */}
+      {mobileOpen && (
+        <div
+          onClick={onCloseMobile}
+          className="fixed inset-0 bg-slate-950/70 backdrop-blur-xs z-40 lg:hidden transition-opacity duration-300"
+          aria-hidden="true"
+        />
+      )}
 
-        {/* Navigation Items */}
-        <nav className="space-y-0.5">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = activeScreen === item.id;
+      {/* Sidebar: Slide-out drawer on Mobile (<1024px), Static visible sidebar on Desktop (>=1024px) */}
+      <aside
+        className={`fixed lg:static inset-y-0 left-0 z-50 w-64 lg:w-60 bg-[#0B1727] text-white flex flex-col justify-between h-full min-h-screen py-4 px-3 border-r border-slate-800 shrink-0 select-none overflow-y-auto scrollbar-none transition-transform duration-300 ease-in-out ${
+          mobileOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full lg:translate-x-0"
+        } ${!mobileOpen ? "hidden lg:flex" : "flex"}`}
+      >
+        <div>
+          {/* Brand Header & Mobile Close Button */}
+          <div className="flex items-center justify-between px-2 mb-5">
+            <div className="cursor-pointer" onClick={() => handleNavClick("landing")}>
+              <BrandLogo variant="dark" />
+            </div>
+            <button
+              onClick={onCloseMobile}
+              className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 lg:hidden cursor-pointer"
+              title="Close navigation"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
 
-            return (
-              <button
-                key={item.id}
-                onClick={() => onNavigate && onNavigate(item.id)}
-                className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium transition cursor-pointer ${
-                  isActive
-                    ? "bg-[#1E60D5] text-white shadow-xs font-semibold"
-                    : "text-slate-300 hover:text-white hover:bg-slate-800/60"
-                }`}
-              >
+          {/* Navigation Items */}
+          <nav className="space-y-0.5">
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = activeScreen === item.id;
+
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => handleNavClick(item.id)}
+                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition cursor-pointer ${
+                    isActive
+                      ? "bg-[#1E60D5] text-white shadow-xs font-semibold"
+                      : "text-slate-300 hover:text-white hover:bg-slate-800/60"
+                  }`}
+                >
                 <div className="flex items-center gap-3">
                   <Icon className={`w-4 h-4 shrink-0 ${isActive ? "text-white" : "text-slate-400"}`} />
                   <span className="truncate">{item.label}</span>
@@ -267,5 +303,6 @@ export default function Sidebar({
         </div>
       </div>
     </aside>
+  </>
   );
 }

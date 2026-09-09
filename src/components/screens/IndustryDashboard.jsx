@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 import { Briefcase, Users, FileCheck, Sparkles, ArrowRight, CheckCircle2, Clock } from "lucide-react";
 
 export default function IndustryDashboard({ onNavigate }) {
@@ -47,7 +47,7 @@ export default function IndustryDashboard({ onNavigate }) {
       </div>
 
       {/* 4 Stats Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {stats.map((s, idx) => {
           const Icon = s.icon;
           return (
@@ -67,16 +67,58 @@ export default function IndustryDashboard({ onNavigate }) {
         })}
       </div>
 
-      {/* Recent Applications Table */}
-      <div className="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-xs space-y-4">
+      {/* Recent Applications Table & Mobile Cards */}
+      <div className="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200/80 shadow-xs space-y-4">
         <div className="flex items-center justify-between pb-3 border-b border-slate-100">
           <h3 className="text-sm font-bold text-slate-800">Recent Applications</h3>
-          <button className="text-xs font-semibold text-blue-600 hover:underline">
+          <button className="text-xs font-semibold text-blue-600 hover:underline cursor-pointer">
             View All
           </button>
         </div>
 
-        <div className="overflow-x-auto">
+        {/* Mobile Candidate Cards (< md) */}
+        <div className="block md:hidden space-y-3">
+          {applications.map((app, idx) => (
+            <div
+              key={idx}
+              className="p-3.5 rounded-xl border border-slate-200/90 bg-slate-50/50 space-y-3"
+            >
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2.5">
+                  <img
+                    src={app.avatar}
+                    alt={app.name}
+                    className="w-8 h-8 rounded-full object-cover ring-1 ring-slate-200"
+                  />
+                  <div>
+                    <h4 className="text-xs font-bold text-slate-900">{app.name}</h4>
+                    <p className="text-[11px] text-slate-500">{app.role}</p>
+                  </div>
+                </div>
+
+                <span className="px-2 py-0.5 text-xs font-bold text-blue-600 bg-blue-50 rounded-md border border-blue-200">
+                  Match {app.match}
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between pt-2 border-t border-slate-200/60 text-xs">
+                <span className={`px-2 py-0.5 text-[10.5px] font-bold rounded-md border ${app.statusColor}`}>
+                  {app.status}
+                </span>
+
+                <button
+                  onClick={() => alert(`Review candidate application: ${app.name}`)}
+                  className="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold text-xs transition cursor-pointer min-h-[34px]"
+                >
+                  View
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Desktop Table View (>= md) */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left text-xs">
             <thead>
               <tr className="text-slate-400 font-bold uppercase tracking-wider border-b border-slate-100">

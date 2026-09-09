@@ -1,4 +1,4 @@
-﻿import React, { useState } from "react";
+import React, { useState } from "react";
 import BrandLogo from "../common/BrandLogo";
 import { Sparkles, Users, Award, Calendar, ExternalLink, ArrowRight } from "lucide-react";
 
@@ -39,12 +39,12 @@ export default function IndustryCollaboration() {
       </div>
 
       {/* Filter Tabs */}
-      <div className="flex items-center gap-2 border-b border-slate-200 pb-1 overflow-x-auto">
+      <div className="flex items-center gap-2 border-b border-slate-200 pb-1 overflow-x-auto scrollbar-none">
         {filterTabs.map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`px-4 py-2 text-xs font-semibold rounded-lg transition whitespace-nowrap ${
+            className={`px-4 py-2 text-xs font-semibold rounded-lg transition whitespace-nowrap cursor-pointer ${
               activeTab === tab
                 ? "bg-blue-50 text-blue-600 border border-blue-200 shadow-xs"
                 : "text-slate-500 hover:text-slate-800 hover:bg-slate-50"
@@ -62,7 +62,7 @@ export default function IndustryCollaboration() {
           {collaborations.map((item, idx) => (
             <div
               key={idx}
-              className="bg-white rounded-xl p-5 border border-slate-200/80 shadow-xs hover:shadow-md transition flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+              className="bg-white rounded-xl p-4 sm:p-5 border border-slate-200/80 shadow-xs hover:shadow-md transition flex flex-col sm:flex-row sm:items-center justify-between gap-4"
             >
               <div className="flex items-start gap-3.5">
                 <div className={`w-10 h-10 rounded-xl ${item.iconBg} flex items-center justify-center shrink-0`}>
@@ -89,10 +89,10 @@ export default function IndustryCollaboration() {
                 </div>
               </div>
 
-              <div className="sm:self-center shrink-0">
+              <div className="w-full sm:w-auto sm:self-center shrink-0 pt-2 sm:pt-0 border-t sm:border-none border-slate-100">
                 <button
                   onClick={() => alert(`Submitted action for ${item.title}`)}
-                  className="px-5 py-2 bg-[#1E60D5] hover:bg-blue-700 text-white font-semibold text-xs rounded-lg shadow-sm transition"
+                  className="w-full sm:w-auto px-5 py-2.5 bg-[#1E60D5] hover:bg-blue-700 text-white font-semibold text-xs rounded-lg shadow-sm transition min-h-[42px] cursor-pointer"
                 >
                   {item.btnText}
                 </button>

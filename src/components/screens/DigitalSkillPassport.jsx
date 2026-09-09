@@ -35,11 +35,11 @@ export default function DigitalSkillPassport({ profileData, onNavigate }) {
         </p>
       </div>
 
-      <div className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200/80 shadow-xs space-y-6">
+      <div className="bg-white rounded-2xl p-4 sm:p-8 border border-slate-200/80 shadow-xs space-y-6">
         {/* Profile Card Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-100">
           <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-2xl bg-linear-to-tr from-blue-600 to-indigo-600 text-white font-extrabold text-2xl flex items-center justify-center ring-2 ring-blue-500/30 shadow-xs">
+            <div className="w-16 h-16 rounded-2xl bg-linear-to-tr from-blue-600 to-indigo-600 text-white font-extrabold text-2xl flex items-center justify-center ring-2 ring-blue-500/30 shadow-xs shrink-0">
               {studentName.charAt(0)}
             </div>
             <div>
@@ -64,12 +64,12 @@ export default function DigitalSkillPassport({ profileData, onNavigate }) {
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex items-center gap-2 border-b border-slate-100 pb-1 overflow-x-auto">
+        <div className="flex items-center gap-2 border-b border-slate-100 pb-1 overflow-x-auto scrollbar-none">
           {tabs.map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`px-4 py-2 text-xs font-semibold rounded-lg transition whitespace-nowrap ${
+              className={`px-4 py-2 text-xs font-semibold rounded-lg transition whitespace-nowrap cursor-pointer ${
                 activeTab === tab
                   ? "bg-blue-50 text-blue-600 border border-blue-200 shadow-xs"
                   : "text-slate-500 hover:text-slate-800 hover:bg-slate-50"
@@ -111,20 +111,20 @@ export default function DigitalSkillPassport({ profileData, onNavigate }) {
         </div>
 
         {/* Action Buttons */}
-        <div className="pt-6 border-t border-slate-100 flex flex-wrap items-center justify-end gap-3">
+        <div className="pt-6 border-t border-slate-100 flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-3">
           <button
             onClick={() => alert("Downloading Verified Skill Passport PDF...")}
-            className="flex items-center gap-2 px-4 py-2 border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-semibold transition"
+            className="flex items-center justify-center gap-2 px-5 py-2.5 min-h-[44px] border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-xl text-xs font-semibold transition cursor-pointer"
           >
-            <Download className="w-3.5 h-3.5" />
+            <Download className="w-4 h-4" />
             <span>Download PDF</span>
           </button>
 
           <button
             onClick={handleShare}
-            className="flex items-center gap-2 px-5 py-2 bg-[#1E60D5] hover:bg-blue-700 text-white rounded-lg text-xs font-semibold shadow-sm transition"
+            className="flex items-center justify-center gap-2 px-6 py-2.5 min-h-[44px] bg-[#1E60D5] hover:bg-blue-700 text-white rounded-xl text-xs font-semibold shadow-sm transition cursor-pointer"
           >
-            <Share2 className="w-3.5 h-3.5" />
+            <Share2 className="w-4 h-4" />
             <span>{copied ? "Link Copied!" : "Share Profile"}</span>
           </button>
         </div>

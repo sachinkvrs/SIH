@@ -1,4 +1,4 @@
-﻿import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   Search,
   Bell,
@@ -13,7 +13,8 @@ import {
   BookOpen,
   ArrowRight,
   ExternalLink,
-  Sparkles
+  Sparkles,
+  Menu
 } from "lucide-react";
 
 export default function TopHeader({
@@ -29,7 +30,8 @@ export default function TopHeader({
     targetRole: "Data Analyst / AI Engineer",
     readinessScore: 82,
     avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80"
-  }
+  },
+  onToggleMobileMenu
 }) {
   const [notifOpen, setNotifOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
@@ -97,23 +99,41 @@ export default function TopHeader({
   };
 
   return (
-    <header className="h-14 bg-white border-b border-slate-200/80 px-4 sm:px-6 flex items-center justify-between sticky top-0 z-30 select-none shadow-xs">
-      <div>
-        {title ? (
-          <h1 className="text-xs font-semibold text-slate-800">
-            {title}
-            {subtitle && <span className="text-slate-400 font-normal ml-2">| {subtitle}</span>}
-          </h1>
-        ) : (
-          <div className="flex items-center gap-2 text-xs font-bold text-slate-700">
+    <header className="h-14 bg-white border-b border-slate-200/80 px-3 sm:px-6 flex items-center justify-between sticky top-0 z-30 select-none shadow-xs">
+      <div className="flex items-center gap-2 sm:gap-3">
+        {/* Mobile Hamburger Button */}
+        <button
+          onClick={onToggleMobileMenu}
+          className="p-1.5 -ml-1 rounded-xl text-slate-700 hover:text-slate-900 hover:bg-slate-100 lg:hidden cursor-pointer transition flex items-center justify-center min-w-[38px] min-h-[38px]"
+          title="Open Menu"
+          aria-label="Open Navigation Menu"
+        >
+          <Menu className="w-5 h-5" />
+        </button>
+
+        {/* SkillBridge Logo on Mobile / Title on Desktop */}
+        <div className="flex items-center gap-2">
+          <div
+            className="lg:hidden flex items-center gap-1.5 cursor-pointer"
+            onClick={() => onNavigate && onNavigate("student_dashboard")}
+          >
+            <div className="w-6 h-6 rounded-md bg-gradient-to-tr from-blue-600 via-indigo-600 to-cyan-400 flex items-center justify-center text-white font-black text-xs shadow-xs">
+              S
+            </div>
+            <span className="font-extrabold text-sm text-slate-900 tracking-tight">
+              Skill<span className="text-blue-600">Bridge</span>
+            </span>
+          </div>
+
+          <div className="hidden lg:flex items-center gap-2 text-xs font-bold text-slate-700">
             <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
             <span className="text-slate-800">SkillBridge Career Intelligence System</span>
           </div>
-        )}
+        </div>
       </div>
 
-      <div className="flex items-center gap-2.5 sm:gap-3 ml-auto">
-        {/* Search bar */}
+      <div className="flex items-center gap-2 sm:gap-3 ml-auto">
+        {/* Search bar (Desktop & Tablet) */}
         <div className="relative hidden md:block">
           <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
@@ -127,7 +147,7 @@ export default function TopHeader({
         <div className="relative" ref={notifRef}>
           <button
             onClick={toggleNotif}
-            className={`relative p-2 rounded-xl transition cursor-pointer ${
+            className={`relative p-2 rounded-xl transition cursor-pointer min-w-[40px] min-h-[40px] flex items-center justify-center ${
               notifOpen
                 ? "bg-blue-50 text-blue-600"
                 : "text-slate-600 hover:text-blue-600 hover:bg-slate-100"
@@ -143,9 +163,9 @@ export default function TopHeader({
             )}
           </button>
 
-          {/* NOTIFICATION DROPDOWN POPOVER */}
+          {/* NOTIFICATION DROPDOWN POPOVER (Bounded to viewport width on mobile) */}
           {notifOpen && (
-            <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-150">
+            <div className="fixed sm:absolute top-14 sm:top-auto right-2 sm:right-0 mt-1 sm:mt-2 w-[calc(100vw-1rem)] sm:w-96 max-w-sm bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-150">
               {/* Dropdown Header */}
               <div className="p-3.5 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -260,9 +280,9 @@ export default function TopHeader({
             </span>
           </button>
 
-          {/* PROFILE DROPDOWN POPOVER */}
+          {/* PROFILE DROPDOWN POPOVER (Bounded to viewport on mobile) */}
           {profileOpen && (
-            <div className="absolute right-0 mt-2 w-72 bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-150">
+            <div className="fixed sm:absolute top-14 sm:top-auto right-2 sm:right-0 mt-1 sm:mt-2 w-[calc(100vw-1rem)] sm:w-72 max-w-xs bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-150">
               {/* Profile Summary Header */}
               <div className="p-4 bg-gradient-to-br from-slate-900 to-blue-950 text-white">
                 <div className="flex items-center gap-3">

@@ -1,4 +1,4 @@
-﻿import React, { useState } from "react";
+import React, { useState } from "react";
 import {
   Bell,
   CheckCheck,
@@ -43,7 +43,7 @@ export default function Notifications({
   return (
     <div className="space-y-6 max-w-4xl">
       {/* Notifications Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white rounded-2xl p-6 border border-slate-200/80 shadow-xs">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white rounded-2xl p-4 sm:p-6 border border-slate-200/80 shadow-xs">
         <div>
           <div className="flex items-center gap-2.5">
             <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
@@ -63,7 +63,7 @@ export default function Notifications({
         {unreadCount > 0 && (
           <button
             onClick={onMarkAllAsRead}
-            className="flex items-center gap-1.5 px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold transition shrink-0 cursor-pointer"
+            className="flex items-center justify-center gap-1.5 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold transition shrink-0 cursor-pointer min-h-[38px]"
           >
             <CheckCheck className="w-4 h-4 text-slate-600" />
             <span>Mark all as read</span>
@@ -109,28 +109,28 @@ export default function Notifications({
           <div
             key={notif.id}
             onClick={() => handleNotificationClick(notif)}
-            className={`p-4 sm:p-5 transition cursor-pointer flex items-start gap-4 ${
+            className={`p-3.5 sm:p-5 transition cursor-pointer flex items-start gap-3 sm:gap-4 ${
               !notif.read
                 ? "bg-blue-50/40 hover:bg-blue-50/70 border-l-4 border-l-blue-600"
                 : "hover:bg-slate-50/80"
             }`}
           >
             {/* Category Icon */}
-            <div className={`w-10 h-10 rounded-xl ${notif.iconBg} flex items-center justify-center shrink-0 shadow-xs mt-0.5 text-xs font-bold`}>
+            <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl ${notif.iconBg} flex items-center justify-center shrink-0 shadow-xs mt-0.5 text-xs font-bold`}>
               {notif.category === "Applications" ? (
-                <FolderKanban className="w-5 h-5" />
+                <FolderKanban className="w-4 h-4 sm:w-5 sm:h-5" />
               ) : notif.category === "Internships" ? (
-                <Briefcase className="w-5 h-5" />
+                <Briefcase className="w-4 h-4 sm:w-5 sm:h-5" />
               ) : notif.category === "Skills" ? (
-                <TrendingUp className="w-5 h-5" />
+                <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5" />
               ) : (
-                <BookOpen className="w-5 h-5" />
+                <BookOpen className="w-4 h-4 sm:w-5 sm:h-5" />
               )}
             </div>
 
             {/* Notification Content */}
             <div className="flex-1 min-w-0">
-              <div className="flex items-center justify-between gap-2">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-0.5 sm:gap-2">
                 <div className="flex items-center gap-2">
                   <span className="text-xs font-bold text-slate-900 truncate">
                     {notif.title}
@@ -139,7 +139,7 @@ export default function Notifications({
                     <span className="w-2 h-2 rounded-full bg-blue-600 shrink-0"></span>
                   )}
                 </div>
-                <span className="text-[11px] text-slate-400 font-medium whitespace-nowrap">
+                <span className="text-[10.5px] text-slate-400 font-medium whitespace-nowrap">
                   {notif.timestamp}
                 </span>
               </div>

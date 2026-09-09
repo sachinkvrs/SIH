@@ -1,4 +1,4 @@
-﻿import React, { useState } from "react";
+import React, { useState } from "react";
 import {
   Zap,
   CheckCircle2,
@@ -241,17 +241,17 @@ export default function MySkills({ onNavigate }) {
           </p>
         </div>
 
-        <div className="flex items-center gap-2.5 shrink-0">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
           <button
             onClick={() => onNavigate("skill_assessment")}
-            className="flex items-center gap-2 px-4 py-2 bg-[#1E60D5] hover:bg-blue-700 text-white text-xs font-semibold rounded-xl shadow-xs transition cursor-pointer"
+            className="flex items-center gap-2 px-4 py-2 bg-[#1E60D5] hover:bg-blue-700 text-white text-xs font-semibold rounded-xl shadow-xs transition cursor-pointer min-h-[38px]"
           >
             <RefreshCw className="w-3.5 h-3.5" />
             <span>Retake Assessment</span>
           </button>
           <button
             onClick={() => onNavigate("skill_passport")}
-            className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition cursor-pointer"
+            className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition cursor-pointer min-h-[38px]"
           >
             Verified Skill Passport
           </button>
@@ -259,20 +259,20 @@ export default function MySkills({ onNavigate }) {
       </div>
 
       {/* SECTION 3 — Dedicated Skill Gap Analysis Visual Section (High, Med, Low Priority) */}
-      <div className="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-xs space-y-4">
-        <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+      <div className="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200/80 shadow-xs space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-100">
           <div>
             <h2 className="text-sm font-bold text-slate-900 tracking-wide uppercase">
               Section 3 — Priority Skill Gap Hierarchy
             </h2>
             <p className="text-xs text-slate-500">Skills categorized by immediate impact on your target role</p>
           </div>
-          <span className="text-xs font-bold text-rose-600 bg-rose-50 px-2.5 py-1 rounded-md border border-rose-200">
+          <span className="text-xs font-bold text-rose-600 bg-rose-50 px-2.5 py-1 rounded-md border border-rose-200 self-start sm:self-auto">
             3 Gaps Detected
           </span>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {skillGapsPriorities.map((gap, idx) => (
             <div
               key={idx}
@@ -304,7 +304,7 @@ export default function MySkills({ onNavigate }) {
               <div className="pt-2 flex items-center gap-2">
                 <button
                   onClick={() => onNavigate("skill_assessment")}
-                  className="flex-1 py-1.5 bg-[#1E60D5] hover:bg-blue-700 text-white rounded-lg text-xs font-semibold transition cursor-pointer"
+                  className="flex-1 py-2 min-h-[38px] bg-[#1E60D5] hover:bg-blue-700 text-white rounded-lg text-xs font-semibold transition cursor-pointer"
                 >
                   Improve Skill
                 </button>
@@ -315,7 +315,7 @@ export default function MySkills({ onNavigate }) {
       </div>
 
       {/* SECTION 1 — Skill Categories Filter */}
-      <div className="flex items-center justify-between gap-3 border-b border-slate-200 pb-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-3">
         <div>
           <h2 className="text-sm font-bold text-slate-900 tracking-wide uppercase">
             Section 1 & 2 — Competency Breakdown by Category
@@ -324,7 +324,7 @@ export default function MySkills({ onNavigate }) {
         </div>
 
         {/* Category Tabs */}
-        <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none">
+        <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none w-full sm:w-auto pb-1 sm:pb-0">
           {categoriesList.map((cat) => (
             <button
               key={cat}
@@ -344,7 +344,7 @@ export default function MySkills({ onNavigate }) {
       {/* SECTION 2 — Individual Skill Analysis Matrix */}
       <div className="space-y-6">
         {displayedCategories.map((category) => (
-          <div key={category.name} className="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-xs space-y-4">
+          <div key={category.name} className="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200/80 shadow-xs space-y-4">
             <div className="flex items-center justify-between pb-2 border-b border-slate-100">
               <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-blue-600"></span>
@@ -355,7 +355,7 @@ export default function MySkills({ onNavigate }) {
               </span>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {category.skills.map((skill, sIdx) => {
                 const isGap = skill.gap > 0;
                 return (

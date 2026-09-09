@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 import { Users, TrendingUp, Briefcase, GraduationCap } from "lucide-react";
 
 export default function InstitutionAnalytics() {
@@ -38,7 +38,7 @@ export default function InstitutionAnalytics() {
       </div>
 
       {/* 4 KPI Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {kpis.map((kpi, idx) => {
           const Icon = kpi.icon;
           return (
@@ -61,7 +61,7 @@ export default function InstitutionAnalytics() {
       {/* 2 Analytics Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
         {/* Most Demanded Skills Horizontal Bar Chart */}
-        <div className="lg:col-span-6 bg-white rounded-2xl p-6 border border-slate-200/80 shadow-xs space-y-4">
+        <div className="lg:col-span-6 bg-white rounded-2xl p-4 sm:p-6 border border-slate-200/80 shadow-xs space-y-4">
           <div className="flex items-center justify-between pb-2 border-b border-slate-100">
             <h3 className="text-sm font-bold text-slate-800">Most Demanded Skills</h3>
           </div>
@@ -85,7 +85,7 @@ export default function InstitutionAnalytics() {
         </div>
 
         {/* Curriculum vs Industry Gap Grouped Bar Chart */}
-        <div className="lg:col-span-6 bg-white rounded-2xl p-6 border border-slate-200/80 shadow-xs space-y-4">
+        <div className="lg:col-span-6 bg-white rounded-2xl p-4 sm:p-6 border border-slate-200/80 shadow-xs space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-slate-100">
             <h3 className="text-sm font-bold text-slate-800">Curriculum vs Industry Gap</h3>
             {/* Legend */}
@@ -100,24 +100,24 @@ export default function InstitutionAnalytics() {
           </div>
 
           {/* Grouped SVG/Flex Bar Visualizer */}
-          <div className="pt-4 flex items-end justify-between h-48 px-2 border-b border-slate-100">
+          <div className="pt-4 flex items-end justify-between h-48 px-1 sm:px-2 border-b border-slate-100 overflow-x-auto min-w-0">
             {gapComparison.map((item, idx) => (
-              <div key={idx} className="flex flex-col items-center gap-1.5 group">
+              <div key={idx} className="flex flex-col items-center gap-1.5 group px-1">
                 <div className="flex items-end gap-1 h-36">
                   {/* Curriculum Bar */}
                   <div
-                    className="w-4 sm:w-5 bg-blue-300 rounded-t-sm transition-all group-hover:opacity-80"
+                    className="w-3 sm:w-5 bg-blue-300 rounded-t-sm transition-all group-hover:opacity-80"
                     style={{ height: `${(item.curriculum / 100) * 140}px` }}
                     title={`Curriculum: ${item.curriculum}%`}
                   ></div>
                   {/* Industry Bar */}
                   <div
-                    className="w-4 sm:w-5 bg-blue-600 rounded-t-sm transition-all group-hover:opacity-80"
+                    className="w-3 sm:w-5 bg-blue-600 rounded-t-sm transition-all group-hover:opacity-80"
                     style={{ height: `${(item.industry / 100) * 140}px` }}
                     title={`Industry: ${item.industry}%`}
                   ></div>
                 </div>
-                <span className="text-[11px] font-semibold text-slate-600 mt-1">
+                <span className="text-[10px] sm:text-[11px] font-semibold text-slate-600 mt-1">
                   {item.skill}
                 </span>
               </div>

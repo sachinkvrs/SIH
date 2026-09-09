@@ -1,4 +1,4 @@
-﻿import React, { useState } from "react";
+import React, { useState } from "react";
 import {
   User,
   Briefcase,
@@ -124,9 +124,9 @@ export default function Settings({ onNavigate }) {
       </div>
 
       {/* Two-Column Settings Interface */}
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
-        {/* Left Side Navigation Menu */}
-        <div className="md:col-span-4 bg-white rounded-2xl p-3 border border-slate-200/80 shadow-xs space-y-1">
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-5 md:gap-6 items-start">
+        {/* Left Side Navigation Menu (Scrollable pills on mobile, stacked list on desktop) */}
+        <div className="md:col-span-4 bg-white rounded-2xl p-2.5 sm:p-3 border border-slate-200/80 shadow-xs flex md:flex-col overflow-x-auto md:overflow-x-visible gap-1.5 md:gap-1 scrollbar-none">
           {sections.map((sec) => {
             const Icon = sec.icon;
             const isActive = activeSection === sec.id;
@@ -134,13 +134,13 @@ export default function Settings({ onNavigate }) {
               <button
                 key={sec.id}
                 onClick={() => setActiveSection(sec.id)}
-                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition cursor-pointer text-left ${
+                className={`flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition cursor-pointer text-left whitespace-nowrap shrink-0 md:shrink md:w-full min-h-[40px] ${
                   isActive
                     ? "bg-[#1E60D5] text-white shadow-xs"
-                    : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                    : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 bg-slate-50 md:bg-transparent"
                 }`}
               >
-                <Icon className={`w-4 h-4 ${isActive ? "text-white" : "text-slate-400"}`} />
+                <Icon className={`w-4 h-4 shrink-0 ${isActive ? "text-white" : "text-slate-400"}`} />
                 <span>{sec.label}</span>
               </button>
             );
@@ -148,7 +148,7 @@ export default function Settings({ onNavigate }) {
         </div>
 
         {/* Right Form Content Panel */}
-        <div className="md:col-span-8 bg-white rounded-2xl p-6 sm:p-8 border border-slate-200/80 shadow-xs">
+        <div className="md:col-span-8 bg-white rounded-2xl p-4 sm:p-8 border border-slate-200/80 shadow-xs">
           <form onSubmit={handleSave} className="space-y-6">
             {/* 1. PROFILE SECTION */}
             {activeSection === "profile" && (

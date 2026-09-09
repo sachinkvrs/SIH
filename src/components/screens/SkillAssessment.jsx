@@ -1,4 +1,4 @@
-﻿import React, { useState } from "react";
+import React, { useState } from "react";
 import { ArrowLeft, ArrowRight, CheckCircle2 } from "lucide-react";
 
 export default function SkillAssessment({ onNavigate }) {
@@ -44,24 +44,24 @@ export default function SkillAssessment({ onNavigate }) {
               <div
                 key={opt.value}
                 onClick={() => setSelectedOption(opt.value)}
-                className={`flex items-center justify-between p-3.5 rounded-xl border transition-all cursor-pointer ${
+                className={`flex items-center justify-between p-4 min-h-[52px] rounded-xl border transition-all cursor-pointer ${
                   isSelected
                     ? "border-blue-600 bg-blue-50/40 shadow-xs ring-1 ring-blue-600/30"
                     : "border-slate-200 hover:border-slate-300 bg-white"
                 }`}
               >
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3.5">
                   <div
-                    className={`w-4 h-4 rounded-full border flex items-center justify-center ${
+                    className={`w-5 h-5 rounded-full border flex items-center justify-center shrink-0 ${
                       isSelected
                         ? "border-blue-600 bg-blue-600"
                         : "border-slate-300 bg-white"
                     }`}
                   >
-                    {isSelected && <div className="w-1.5 h-1.5 rounded-full bg-white"></div>}
+                    {isSelected && <div className="w-2 h-2 rounded-full bg-white"></div>}
                   </div>
                   <span
-                    className={`text-xs font-semibold ${
+                    className={`text-xs sm:text-sm font-semibold ${
                       isSelected ? "text-blue-900" : "text-slate-700"
                     }`}
                   >
@@ -74,21 +74,21 @@ export default function SkillAssessment({ onNavigate }) {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center justify-between pt-8 mt-6 border-t border-slate-100">
+        <div className="flex items-center justify-between pt-6 sm:pt-8 mt-6 border-t border-slate-100 gap-3">
           <button
             onClick={() => onNavigate("student_dashboard")}
-            className="flex items-center gap-2 px-4 py-2 border border-slate-200 hover:bg-slate-50 rounded-lg text-xs font-semibold text-slate-700 transition"
+            className="flex items-center justify-center gap-2 px-5 py-2.5 min-h-[44px] border border-slate-200 hover:bg-slate-50 rounded-xl text-xs font-semibold text-slate-700 transition cursor-pointer"
           >
-            <ArrowLeft className="w-3.5 h-3.5" />
+            <ArrowLeft className="w-4 h-4" />
             <span>Back</span>
           </button>
 
           <button
             onClick={() => onNavigate("skill_gap")}
-            className="flex items-center gap-2 px-5 py-2 bg-[#1E60D5] hover:bg-blue-700 text-white rounded-lg text-xs font-semibold shadow-sm transition"
+            className="flex items-center justify-center gap-2 px-6 py-2.5 min-h-[44px] bg-[#1E60D5] hover:bg-blue-700 text-white rounded-xl text-xs font-semibold shadow-sm transition cursor-pointer"
           >
             <span>Next</span>
-            <ArrowRight className="w-3.5 h-3.5" />
+            <ArrowRight className="w-4 h-4" />
           </button>
         </div>
       </div>

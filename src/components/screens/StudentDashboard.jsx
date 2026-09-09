@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 import {
   TrendingUp,
   Award,
@@ -133,17 +133,17 @@ export default function StudentDashboard({ onNavigate }) {
         </div>
 
         {/* Quick Action Buttons */}
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <button
             onClick={() => onNavigate("skill_assessment")}
-            className="px-3.5 py-2 bg-[#1E60D5] hover:bg-blue-700 text-white rounded-xl text-xs font-semibold shadow-xs transition flex items-center gap-1.5 cursor-pointer"
+            className="px-3.5 py-2 bg-[#1E60D5] hover:bg-blue-700 text-white rounded-xl text-xs font-semibold shadow-xs transition flex items-center gap-1.5 cursor-pointer min-h-[38px]"
           >
             <Zap className="w-3.5 h-3.5" />
             <span>Take Assessment</span>
           </button>
           <button
             onClick={() => onNavigate("skill_gap")}
-            className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 cursor-pointer"
+            className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 cursor-pointer min-h-[38px]"
           >
             <AlertCircle className="w-3.5 h-3.5" />
             <span>View Skill Gap</span>
@@ -152,7 +152,7 @@ export default function StudentDashboard({ onNavigate }) {
       </div>
 
       {/* TOP SUMMARY: 4 Stat Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {topMetrics.map((metric, idx) => {
           const Icon = metric.icon;
           return (
@@ -309,7 +309,7 @@ export default function StudentDashboard({ onNavigate }) {
       {/* Bottom Row: RECOMMENDATIONS FOR YOU */}
       <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs">
         <h3 className="text-sm font-bold text-slate-900 mb-3">Recommendations for You</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {recommendations.map((rec, idx) => (
             <div
               key={idx}

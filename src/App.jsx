@@ -22,7 +22,7 @@ import InstitutionAnalytics from "./components/screens/InstitutionAnalytics";
 import IndustryCollaboration from "./components/screens/IndustryCollaboration";
 
 export default function App() {
-  const [currentScreen, setCurrentScreen] = useState("student_dashboard");
+  const [currentScreen, setCurrentScreen] = useState("landing");
 
   // Shared Profile State
   const [profileData, setProfileData] = useState({
@@ -114,6 +114,7 @@ export default function App() {
   };
 
   const unreadCount = notifications.filter((n) => !n.read).length;
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Determine portal type for sidebar items and active user
   const getPortalType = () => {
@@ -122,63 +123,68 @@ export default function App() {
     return "student";
   };
 
+  const navigateToScreen = (screen) => {
+    setCurrentScreen(screen);
+    setMobileMenuOpen(false);
+  };
+
   // Render individual screen content
   const renderScreenContent = () => {
     switch (currentScreen) {
       case "landing":
-        return <LandingPage onNavigate={setCurrentScreen} />;
+        return <LandingPage onNavigate={navigateToScreen} />;
       case "login":
-        return <LoginPage onNavigate={setCurrentScreen} />;
+        return <LoginPage onNavigate={navigateToScreen} />;
       case "student_dashboard":
-        return <StudentDashboard onNavigate={setCurrentScreen} />;
+        return <StudentDashboard onNavigate={navigateToScreen} />;
       case "my_skills":
-        return <MySkills onNavigate={setCurrentScreen} />;
+        return <MySkills onNavigate={navigateToScreen} />;
       case "applications":
-        return <Applications onNavigate={setCurrentScreen} />;
+        return <Applications onNavigate={navigateToScreen} />;
       case "notifications":
         return (
           <Notifications
-            onNavigate={setCurrentScreen}
+            onNavigate={navigateToScreen}
             notifications={notifications}
             onMarkAllAsRead={markAllAsRead}
             onMarkAsRead={markAsRead}
           />
         );
       case "activity":
-        return <Activity onNavigate={setCurrentScreen} />;
+        return <Activity onNavigate={navigateToScreen} />;
       case "profile":
         return (
           <Profile
             profileData={profileData}
             onUpdateProfile={setProfileData}
-            onNavigate={setCurrentScreen}
+            onNavigate={navigateToScreen}
           />
         );
       case "settings":
-        return <Settings onNavigate={setCurrentScreen} />;
+        return <Settings onNavigate={navigateToScreen} />;
       case "skill_assessment":
-        return <SkillAssessment onNavigate={setCurrentScreen} />;
+        return <SkillAssessment onNavigate={navigateToScreen} />;
       case "skill_gap":
-        return <SkillGapAnalysis onNavigate={setCurrentScreen} />;
+        return <SkillGapAnalysis onNavigate={navigateToScreen} />;
       case "roadmap":
-        return <LearningRoadmap onNavigate={setCurrentScreen} />;
+        return <LearningRoadmap onNavigate={navigateToScreen} />;
       case "opportunities":
-        return <InternshipOpportunities onNavigate={setCurrentScreen} />;
+        return <InternshipOpportunities onNavigate={navigateToScreen} />;
       case "skill_passport":
         return (
           <DigitalSkillPassport
             profileData={profileData}
-            onNavigate={setCurrentScreen}
+            onNavigate={navigateToScreen}
           />
         );
       case "industry_dashboard":
-        return <IndustryDashboard onNavigate={setCurrentScreen} />;
+        return <IndustryDashboard onNavigate={navigateToScreen} />;
       case "institution_analytics":
-        return <InstitutionAnalytics onNavigate={setCurrentScreen} />;
+        return <InstitutionAnalytics onNavigate={navigateToScreen} />;
       case "industry_collaboration":
-        return <IndustryCollaboration onNavigate={setCurrentScreen} />;
+        return <IndustryCollaboration onNavigate={navigateToScreen} />;
       default:
-        return <StudentDashboard onNavigate={setCurrentScreen} />;
+        return <StudentDashboard onNavigate={navigateToScreen} />;
     }
   };
 
@@ -191,23 +197,26 @@ export default function App() {
         </div>
       ) : (
         /* App Portal Shell (Sidebar + TopHeader + Content) */
-        <div className="flex h-screen overflow-hidden">
+        <div className="flex h-screen overflow-hidden relative">
           <Sidebar
             activeScreen={currentScreen}
-            onNavigate={setCurrentScreen}
+            onNavigate={navigateToScreen}
             portalType={getPortalType()}
             unreadCount={unreadCount}
             profileData={profileData}
+            mobileOpen={mobileMenuOpen}
+            onCloseMobile={() => setMobileMenuOpen(false)}
           />
           <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
             <TopHeader
-              onNavigate={setCurrentScreen}
+              onNavigate={navigateToScreen}
               notifications={notifications}
               onMarkAllAsRead={markAllAsRead}
               onMarkAsRead={markAsRead}
               profileData={profileData}
+              onToggleMobileMenu={() => setMobileMenuOpen((prev) => !prev)}
             />
-            <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-[#F8FAFC]">
+            <main className="flex-1 overflow-y-auto p-3.5 sm:p-6 lg:p-8 bg-[#F8FAFC]">
               {renderScreenContent()}
             </main>
           </div>

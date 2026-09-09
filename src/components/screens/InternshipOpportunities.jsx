@@ -1,9 +1,10 @@
 import React, { useState } from "react";
-import { Search, MapPin, Clock, Building2, SlidersHorizontal, CheckCircle2 } from "lucide-react";
+import { Search, MapPin, Clock, Building2, SlidersHorizontal, CheckCircle2, Filter, X } from "lucide-react";
 
 export default function InternshipOpportunities({ onNavigate }) {
   const [remoteOnly, setRemoteOnly] = useState(false);
   const [appliedJobs, setAppliedJobs] = useState({});
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   const opportunities = [
     {
@@ -46,7 +47,7 @@ export default function InternshipOpportunities({ onNavigate }) {
   };
 
   const filtered = remoteOnly
-    ? opportunities.filter((o) => o.isRemote)
+    ? opportunities.filter((opp) => opp.isRemote)
     : opportunities;
 
   return (
@@ -60,50 +61,126 @@ export default function InternshipOpportunities({ onNavigate }) {
       </div>
 
       {/* Search & Filter Toolbar */}
-      <div className="bg-white rounded-xl p-4 border border-slate-200/80 shadow-xs flex flex-wrap items-center gap-3">
-        {/* Search Input */}
-        <div className="relative flex-1 min-w-[200px]">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-          <input
-            type="text"
-            placeholder="Search jobs, skills, or companies..."
-            className="w-full pl-9 pr-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 text-slate-800"
-          />
+      <div className="bg-white rounded-xl p-3 sm:p-4 border border-slate-200/80 shadow-xs space-y-3">
+        <div className="flex items-center gap-2 sm:gap-3">
+          {/* Search Input */}
+          <div className="relative flex-1">
+            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              placeholder="Search internships, roles, companies..."
+              className="w-full pl-9 pr-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 text-slate-800"
+            />
+          </div>
+
+          {/* Mobile Filter Toggle Button (< md) */}
+          <button
+            onClick={() => setMobileFiltersOpen((prev) => !prev)}
+            className={`flex md:hidden items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-lg border transition cursor-pointer shrink-0 min-h-[38px] ${
+              mobileFiltersOpen || remoteOnly
+                ? "bg-blue-50 border-blue-300 text-blue-700"
+                : "bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100"
+            }`}
+          >
+            <SlidersHorizontal className="w-3.5 h-3.5" />
+            <span>Filters</span>
+            {remoteOnly && (
+              <span className="w-1.5 h-1.5 rounded-full bg-blue-600"></span>
+            )}
+          </button>
+
+          {/* Desktop Filter Dropdowns (>= md) */}
+          <div className="hidden md:flex items-center gap-2.5">
+            <select className="px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-700 focus:outline-none">
+              <option>Type (All)</option>
+              <option>Full-time Intern</option>
+              <option>Part-time</option>
+              <option>Project-based</option>
+            </select>
+
+            <select className="px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-700 focus:outline-none">
+              <option>Location (All)</option>
+              <option>Bangalore</option>
+              <option>Mumbai</option>
+              <option>Delhi NCR</option>
+              <option>Hyderabad</option>
+            </select>
+
+            <select className="px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-700 focus:outline-none">
+              <option>Skills (All)</option>
+              <option>Python</option>
+              <option>SQL</option>
+              <option>Machine Learning</option>
+            </select>
+
+            <label className="flex items-center gap-2 cursor-pointer select-none text-xs font-semibold text-slate-600 px-2 py-1.5 bg-slate-50 rounded-lg border border-slate-200">
+              <input
+                type="checkbox"
+                checked={remoteOnly}
+                onChange={(e) => setRemoteOnly(e.target.checked)}
+                className="w-3.5 h-3.5 text-blue-600 rounded"
+              />
+              <span>Remote Only</span>
+            </label>
+          </div>
         </div>
 
-        {/* Dropdowns */}
-        <select className="px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-700 focus:outline-none">
-          <option>Type (All)</option>
-          <option>Full-time Intern</option>
-          <option>Part-time</option>
-          <option>Project-based</option>
-        </select>
+        {/* Mobile Collapsible Filter Panel (< md) */}
+        {mobileFiltersOpen && (
+          <div className="md:hidden pt-3 border-t border-slate-100 space-y-3 animate-in fade-in duration-150">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-500 mb-1">Opportunity Type</label>
+                <select className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-700 focus:outline-none">
+                  <option>Type (All)</option>
+                  <option>Full-time Intern</option>
+                  <option>Part-time</option>
+                  <option>Project-based</option>
+                </select>
+              </div>
 
-        <select className="px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-700 focus:outline-none">
-          <option>Location (All)</option>
-          <option>Bangalore</option>
-          <option>Mumbai</option>
-          <option>Delhi NCR</option>
-          <option>Hyderabad</option>
-        </select>
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-500 mb-1">Location</label>
+                <select className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-700 focus:outline-none">
+                  <option>Location (All)</option>
+                  <option>Bangalore</option>
+                  <option>Mumbai</option>
+                  <option>Delhi NCR</option>
+                  <option>Hyderabad</option>
+                </select>
+              </div>
 
-        <select className="px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-700 focus:outline-none">
-          <option>Skills (All)</option>
-          <option>Python</option>
-          <option>SQL</option>
-          <option>Machine Learning</option>
-        </select>
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-500 mb-1">Skill</label>
+                <select className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-700 focus:outline-none">
+                  <option>Skills (All)</option>
+                  <option>Python</option>
+                  <option>SQL</option>
+                  <option>Machine Learning</option>
+                </select>
+              </div>
+            </div>
 
-        {/* Remote Toggle */}
-        <label className="flex items-center gap-2 cursor-pointer select-none text-xs font-semibold text-slate-600 px-2 py-1 bg-slate-50 rounded-lg border border-slate-200">
-          <input
-            type="checkbox"
-            checked={remoteOnly}
-            onChange={(e) => setRemoteOnly(e.target.checked)}
-            className="w-3.5 h-3.5 text-blue-600 rounded"
-          />
-          <span>Remote Only</span>
-        </label>
+            <div className="flex items-center justify-between pt-1">
+              <label className="flex items-center gap-2 cursor-pointer select-none text-xs font-semibold text-slate-700">
+                <input
+                  type="checkbox"
+                  checked={remoteOnly}
+                  onChange={(e) => setRemoteOnly(e.target.checked)}
+                  className="w-4 h-4 text-blue-600 rounded"
+                />
+                <span>Remote Only Internships</span>
+              </label>
+
+              <button
+                onClick={() => setMobileFiltersOpen(false)}
+                className="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg"
+              >
+                Close Filters
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Opportunities List */}
@@ -149,21 +226,21 @@ export default function InternshipOpportunities({ onNavigate }) {
             </div>
 
             {/* Right Action */}
-            <div className="flex md:flex-col items-center md:items-end justify-between gap-3 shrink-0">
-              <span className="px-2.5 py-1 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-lg border border-emerald-200">
+            <div className="w-full md:w-auto flex flex-row md:flex-col items-center md:items-end justify-between gap-3 shrink-0 pt-3 md:pt-0 border-t border-slate-100 md:border-none">
+              <span className="px-2.5 py-1 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-lg border border-emerald-200 shrink-0">
                 Match {opp.match}
               </span>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 w-auto">
                 <button
                   onClick={() => onNavigate && onNavigate("applications")}
-                  className="px-3.5 py-2 text-xs font-semibold rounded-lg text-slate-700 bg-slate-100 hover:bg-slate-200 transition"
+                  className="px-3.5 py-2 min-h-[38px] text-xs font-semibold rounded-lg text-slate-700 bg-slate-100 hover:bg-slate-200 transition cursor-pointer"
                 >
                   View Details
                 </button>
                 <button
                   onClick={() => handleApply(opp.id)}
-                  className={`px-5 py-2 text-xs font-semibold rounded-lg transition shadow-xs ${
+                  className={`px-5 py-2 min-h-[38px] text-xs font-semibold rounded-lg transition shadow-xs cursor-pointer ${
                     appliedJobs[opp.id]
                       ? "bg-emerald-600 text-white hover:bg-emerald-700"
                       : "bg-[#1E60D5] hover:bg-blue-700 text-white"

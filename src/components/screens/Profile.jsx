@@ -1,4 +1,4 @@
-﻿import React, { useState } from "react";
+import React, { useState } from "react";
 import {
   User,
   Mail,
@@ -55,9 +55,9 @@ export default function Profile({ profileData, onUpdateProfile, onNavigate }) {
       )}
 
       {/* Profile Header Card */}
-      <div className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200/80 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <div className="bg-white rounded-2xl p-4 sm:p-8 border border-slate-200/80 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="flex flex-col sm:flex-row sm:items-center gap-5">
-          <div className="relative shrink-0">
+          <div className="relative shrink-0 self-start sm:self-center">
             <img
               src={profileData.avatar}
               alt={profileData.fullName}
@@ -87,11 +87,11 @@ export default function Profile({ profileData, onUpdateProfile, onNavigate }) {
               {profileData.college} • Class of {profileData.gradYear}
             </p>
 
-            <div className="flex flex-wrap items-center gap-3 pt-1 text-xs">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3 pt-1 text-xs">
               <span className="px-2.5 py-0.5 bg-blue-50 text-blue-700 font-bold rounded-md border border-blue-200">
                 Target: {profileData.targetRole}
               </span>
-              <span className="text-slate-400">|</span>
+              <span className="hidden sm:inline text-slate-400">|</span>
               <span className="font-semibold text-slate-600">
                 Readiness: <strong className="text-blue-600">{profileData.readinessScore}%</strong>
               </span>
@@ -99,20 +99,20 @@ export default function Profile({ profileData, onUpdateProfile, onNavigate }) {
           </div>
         </div>
 
-        <div className="flex sm:flex-col items-center sm:items-end gap-2 shrink-0">
+        <div className="w-full md:w-auto flex flex-row md:flex-col items-center md:items-end gap-2 shrink-0 pt-2 md:pt-0 border-t md:border-none border-slate-100">
           <button
             onClick={() => {
               setEditForm(profileData);
               setIsEditing(true);
             }}
-            className="flex items-center gap-2 px-4 py-2 bg-[#1E60D5] hover:bg-blue-700 text-white text-xs font-semibold rounded-xl shadow-xs transition cursor-pointer"
+            className="flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2.5 bg-[#1E60D5] hover:bg-blue-700 text-white text-xs font-semibold rounded-xl shadow-xs transition cursor-pointer min-h-[42px]"
           >
             <Edit3 className="w-3.5 h-3.5" />
             <span>Edit Profile</span>
           </button>
           <button
             onClick={() => onNavigate("settings")}
-            className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition cursor-pointer"
+            className="flex-1 md:flex-none flex items-center justify-center px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition cursor-pointer min-h-[42px]"
           >
             Preferences
           </button>
@@ -295,7 +295,7 @@ export default function Profile({ profileData, onUpdateProfile, onNavigate }) {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block font-semibold text-slate-700 mb-1">Email</label>
                   <input
@@ -329,7 +329,7 @@ export default function Profile({ profileData, onUpdateProfile, onNavigate }) {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block font-semibold text-slate-700 mb-1">Degree & Course</label>
                   <input
