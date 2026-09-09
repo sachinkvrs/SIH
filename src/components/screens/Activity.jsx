@@ -1,4 +1,4 @@
-﻿import React, { useState } from "react";
+import React, { useState } from "react";
 import {
   History,
   FileCheck2,
@@ -14,7 +14,7 @@ import {
   ChevronDown
 } from "lucide-react";
 
-export default function Activity({ onNavigate }) {
+export default function Activity({ onNavigate, activityTimeline = [] }) {
   const [selectedFilter, setSelectedFilter] = useState("All Activity");
   const [visibleCount, setVisibleCount] = useState(10);
 
@@ -27,8 +27,43 @@ export default function Activity({ onNavigate }) {
     "Profile"
   ];
 
+  // Icon mapping helper
+  const getIconForType = (type) => {
+    switch (type) {
+      case "Assessments":
+        return FileCheck2;
+      case "Skills":
+        return Zap;
+      case "Learning":
+        return BookOpen;
+      case "Applications":
+        return Briefcase;
+      case "Profile":
+        return User;
+      default:
+        return History;
+    }
+  };
+
+  const getIconColorForType = (type) => {
+    switch (type) {
+      case "Assessments":
+        return "bg-blue-600 text-white";
+      case "Skills":
+        return "bg-emerald-600 text-white";
+      case "Learning":
+        return "bg-amber-500 text-white";
+      case "Applications":
+        return "bg-indigo-600 text-white";
+      case "Profile":
+        return "bg-slate-700 text-white";
+      default:
+        return "bg-blue-600 text-white";
+    }
+  };
+
   // Chronological activity history (Things the STUDENT has DONE)
-  const timelineData = [
+  const baseTimelineData = [
     {
       dateGroup: "Today",
       items: [
@@ -91,7 +126,7 @@ export default function Activity({ onNavigate }) {
           type: "Profile",
           title: "Updated career preferences",
           time: "11:15 AM",
-          desc: "Set target job role to 'Data Analyst / AI Engineer' with Hybrid work preference.",
+          desc: "Set target job role to 'Data Analyst' with Hybrid work preference.",
           meta: "Profile Updated",
           metaColor: "bg-slate-100 text-slate-800 border-slate-200",
           icon: User,
@@ -137,6 +172,23 @@ export default function Activity({ onNavigate }) {
         }
       ]
     }
+  ];
+
+  // Merge extra live items from activityTimeline
+  const extraLiveToday = activityTimeline
+    .filter((act) => !baseTimelineData[0].items.some((item) => item.id === act.id))
+    .map((act) => ({
+      ...act,
+      icon: getIconForType(act.type),
+      iconColor: getIconColorForType(act.type)
+    }));
+
+  const timelineData = [
+    {
+      dateGroup: "Today",
+      items: [...extraLiveToday, ...baseTimelineData[0].items]
+    },
+    ...baseTimelineData.slice(1)
   ];
 
   // Filter items

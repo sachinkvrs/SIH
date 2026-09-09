@@ -16,7 +16,13 @@ import {
   EyeOff
 } from "lucide-react";
 
-export default function Settings({ onNavigate }) {
+import { CAREER_GOALS } from "../../data/careerIntelligence";
+
+export default function Settings({
+  onNavigate,
+  careerGoal = "Data Analyst",
+  onChangeCareerGoal
+}) {
   const [activeSection, setActiveSection] = useState("profile");
   const [savedToast, setSavedToast] = useState(false);
 
@@ -33,7 +39,7 @@ export default function Settings({ onNavigate }) {
 
   // 2. CAREER PREFERENCES
   const [career, setCareer] = useState({
-    targetRole: "Data Analyst / AI Engineer",
+    targetRole: careerGoal,
     preferredIndustry: "Information Technology & Artificial Intelligence",
     preferredLocation: "Bangalore, Hyderabad, Remote",
     workMode: "Hybrid",
@@ -86,6 +92,9 @@ export default function Settings({ onNavigate }) {
 
   const handleSave = (e) => {
     e.preventDefault();
+    if (onChangeCareerGoal && career.targetRole !== careerGoal) {
+      onChangeCareerGoal(career.targetRole);
+    }
     setSavedToast(true);
     setTimeout(() => setSavedToast(false), 2500);
   };
@@ -259,12 +268,17 @@ export default function Settings({ onNavigate }) {
 
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 mb-1">Target Job Role</label>
-                  <input
-                    type="text"
+                  <select
                     value={career.targetRole}
                     onChange={(e) => setCareer({ ...career, targetRole: e.target.value })}
-                    className="w-full px-3.5 py-2 text-xs bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 text-slate-800"
-                  />
+                    className="w-full px-3.5 py-2 text-xs bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 text-slate-800 font-semibold"
+                  >
+                    {CAREER_GOALS.map((role) => (
+                      <option key={role} value={role}>
+                        {role}
+                      </option>
+                    ))}
+                  </select>
                 </div>
 
                 <div>

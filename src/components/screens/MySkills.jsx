@@ -10,11 +10,32 @@ import {
   BookOpen,
   Filter,
   RefreshCw,
-  Award
+  Award,
+  TrendingUp,
+  History
 } from "lucide-react";
 
-export default function MySkills({ onNavigate }) {
+export default function MySkills({
+  onNavigate,
+  careerGoal = "Data Analyst",
+  careerData
+}) {
   const [selectedCategory, setSelectedCategory] = useState("All");
+
+  const skillProgressHistory = careerData?.skillProgressHistory || [
+    { skill: "Python", before: 68, current: 85, delta: 17, verified: true },
+    { skill: "SQL", before: 48, current: 65, delta: 17, verified: true },
+    { skill: "Power BI", before: 30, current: 45, delta: 15, verified: false },
+    { skill: "Statistics", before: 55, current: 70, delta: 15, verified: true },
+    { skill: "Excel", before: 65, current: 80, delta: 15, verified: true }
+  ];
+
+  const readinessHistory = careerData?.readinessProgressHistory || {
+    before: 64,
+    current: 82,
+    delta: 18,
+    duration: "Past 60 days"
+  };
 
   const skillCategories = [
     {
@@ -183,48 +204,15 @@ export default function MySkills({ onNavigate }) {
     },
   ];
 
-  const skillGapsPriorities = [
-    {
-      priority: "HIGH PRIORITY",
-      skill: "Power BI",
-      gap: "25% gap",
-      current: "45%",
-      target: "70%",
-      color: "border-rose-300 bg-rose-50/70 text-rose-900",
-      badgeColor: "bg-rose-600 text-white",
-      course: "End-to-End Power BI Desktop & DAX Modeling (Microsoft Learn)",
-    },
-    {
-      priority: "MEDIUM PRIORITY",
-      skill: "SQL",
-      gap: "15% gap",
-      current: "65%",
-      target: "80%",
-      color: "border-amber-300 bg-amber-50/70 text-amber-900",
-      badgeColor: "bg-amber-600 text-white",
-      course: "Advanced SQL Queries & Window Functions (Mode Analytics)",
-    },
-    {
-      priority: "LOW PRIORITY",
-      skill: "Machine Learning",
-      gap: "8% gap",
-      current: "72%",
-      target: "80%",
-      color: "border-blue-300 bg-blue-50/70 text-blue-900",
-      badgeColor: "bg-blue-600 text-white",
-      course: "Applied Machine Learning with Scikit-Learn (DeepLearning.AI)",
-    },
-  ];
-
-  // Flatten skills or filter by category
   const categoriesList = ["All", ...skillCategories.map((c) => c.name)];
 
-  const displayedCategories = selectedCategory === "All"
-    ? skillCategories
-    : skillCategories.filter((c) => c.name === selectedCategory);
+  const displayedCategories =
+    selectedCategory === "All"
+      ? skillCategories
+      : skillCategories.filter((c) => c.name === selectedCategory);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 max-w-5xl mx-auto pb-8">
       {/* HEADER */}
       <div className="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
@@ -233,15 +221,15 @@ export default function MySkills({ onNavigate }) {
               My Skills
             </h1>
             <span className="px-2.5 py-0.5 bg-blue-50 text-blue-700 text-xs font-bold rounded-full border border-blue-200">
-              Personal Skill Analytics
+              Target: {careerGoal}
             </span>
           </div>
           <p className="text-xs sm:text-sm text-slate-600 mt-1">
-            Track, assess and improve your professional skills.
+            Track, verify, and measure your competency improvements over time.
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
+        <div className="flex flex-wrap items-center gap-2">
           <button
             onClick={() => onNavigate("skill_assessment")}
             className="flex items-center gap-2 px-4 py-2 bg-[#1E60D5] hover:bg-blue-700 text-white text-xs font-semibold rounded-xl shadow-xs transition cursor-pointer min-h-[38px]"
@@ -253,74 +241,98 @@ export default function MySkills({ onNavigate }) {
             onClick={() => onNavigate("skill_passport")}
             className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition cursor-pointer min-h-[38px]"
           >
-            Verified Skill Passport
+            Digital Skill Passport
           </button>
         </div>
       </div>
 
-      {/* SECTION 3 — Dedicated Skill Gap Analysis Visual Section (High, Med, Low Priority) */}
-      <div className="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200/80 shadow-xs space-y-4">
+      {/* 📈 SECTION 8 — SKILL PROGRESS (Before vs After Historical Improvement) */}
+      <div className="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200/80 shadow-xs space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-100">
-          <div>
-            <h2 className="text-sm font-bold text-slate-900 tracking-wide uppercase">
-              Section 3 — Priority Skill Gap Hierarchy
-            </h2>
-            <p className="text-xs text-slate-500">Skills categorized by immediate impact on your target role</p>
+          <div className="flex items-center gap-2">
+            <TrendingUp className="w-5 h-5 text-emerald-600" />
+            <div>
+              <h2 className="text-sm font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
+                📈 Skill Progress & Historical Growth
+                <span className="text-[10px] font-bold px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded-full">
+                  Verified Trajectory
+                </span>
+              </h2>
+              <p className="text-xs text-slate-500">
+                SkillBridge helps you systematically improve, not just evaluate. ({readinessHistory.duration})
+              </p>
+            </div>
           </div>
-          <span className="text-xs font-bold text-rose-600 bg-rose-50 px-2.5 py-1 rounded-md border border-rose-200 self-start sm:self-auto">
-            3 Gaps Detected
-          </span>
+
+          {/* Composite Readiness Lift Card */}
+          <div className="p-3 bg-linear-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-xl flex items-center gap-3 shrink-0 self-start sm:self-auto">
+            <div>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-800 block">
+                Industry Readiness Gain
+              </span>
+              <div className="flex items-baseline gap-2">
+                <span className="text-xs text-slate-500 line-through">Before: {readinessHistory.before}%</span>
+                <span className="text-lg font-black text-emerald-900">Now: {readinessHistory.current}%</span>
+                <span className="text-xs font-black text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded">
+                  +{readinessHistory.delta}%
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {skillGapsPriorities.map((gap, idx) => (
+        {/* Before vs After Skill Cards Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+          {skillProgressHistory.map((item, idx) => (
             <div
               key={idx}
-              className={`p-4 rounded-xl border ${gap.color} flex flex-col justify-between space-y-3 transition hover:shadow-xs`}
+              className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 hover:bg-emerald-50/30 hover:border-emerald-200 transition flex flex-col justify-between space-y-2"
             >
-              <div>
-                <div className="flex items-center justify-between">
-                  <span className={`text-[10px] font-black px-2 py-0.5 rounded-md uppercase tracking-wider ${gap.badgeColor}`}>
-                    {gap.priority}
-                  </span>
-                  <span className="text-xs font-black text-rose-600">
-                    -{gap.gap}
-                  </span>
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-slate-900">{item.skill}</span>
+                <span className="text-[11px] font-black text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded-md">
+                  +{item.delta}%
+                </span>
+              </div>
+
+              <div className="space-y-1">
+                <div className="flex justify-between text-[11px] text-slate-500">
+                  <span>Before: <strong>{item.before}%</strong></span>
+                  <span className="text-slate-900 font-bold">Now: {item.current}%</span>
                 </div>
 
-                <h3 className="text-sm font-bold text-slate-900 mt-2">
-                  {gap.skill}
-                </h3>
-                <p className="text-xs text-slate-600 mt-0.5">
-                  Current: <strong>{gap.current}</strong> vs Required: <strong>{gap.target}</strong>
-                </p>
-
-                <div className="mt-3 p-2.5 bg-white/80 rounded-lg border border-slate-200/60 text-[11px] text-slate-700">
-                  <span className="font-bold block text-slate-900 mb-0.5">Recommended Course:</span>
-                  {gap.course}
+                <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden relative">
+                  {/* Baseline marker */}
+                  <div
+                    className="absolute top-0 bottom-0 bg-slate-400 w-0.5 z-10"
+                    style={{ left: `${item.before}%` }}
+                    title={`Baseline: ${item.before}%`}
+                  />
+                  <div
+                    className="bg-emerald-500 h-full rounded-full transition-all duration-700"
+                    style={{ width: `${item.current}%` }}
+                  />
                 </div>
               </div>
 
-              <div className="pt-2 flex items-center gap-2">
-                <button
-                  onClick={() => onNavigate("skill_assessment")}
-                  className="flex-1 py-2 min-h-[38px] bg-[#1E60D5] hover:bg-blue-700 text-white rounded-lg text-xs font-semibold transition cursor-pointer"
-                >
-                  Improve Skill
-                </button>
+              <div className="text-[10px] text-slate-400 font-medium pt-1 border-t border-slate-200/60 flex items-center justify-between">
+                <span>Assessment Validated</span>
+                {item.verified && <span className="text-emerald-600 font-bold">✓ Verified</span>}
               </div>
             </div>
           ))}
         </div>
       </div>
 
-      {/* SECTION 1 — Skill Categories Filter */}
+      {/* CATEGORY FILTER */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-3">
         <div>
-          <h2 className="text-sm font-bold text-slate-900 tracking-wide uppercase">
-            Section 1 & 2 — Competency Breakdown by Category
+          <h2 className="text-xs font-bold text-slate-400 tracking-wider uppercase">
+            Competency Breakdown by Category
           </h2>
-          <p className="text-xs text-slate-500">Programming, Data & Analytics, AI/ML, and Professional Skills</p>
+          <p className="text-xs text-slate-500">
+            Click categories to filter your verified skills
+          </p>
         </div>
 
         {/* Category Tabs */}
@@ -341,10 +353,13 @@ export default function MySkills({ onNavigate }) {
         </div>
       </div>
 
-      {/* SECTION 2 — Individual Skill Analysis Matrix */}
+      {/* INDIVIDUAL SKILL MATRIX */}
       <div className="space-y-6">
         {displayedCategories.map((category) => (
-          <div key={category.name} className="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200/80 shadow-xs space-y-4">
+          <div
+            key={category.name}
+            className="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200/80 shadow-xs space-y-4"
+          >
             <div className="flex items-center justify-between pb-2 border-b border-slate-100">
               <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-blue-600"></span>
@@ -408,24 +423,24 @@ export default function MySkills({ onNavigate }) {
 
                         <div className="flex items-center justify-between text-[11px] pt-1">
                           <span
-                            className={`font-bold px-1.5 py-0.2 rounded ${
+                            className={`font-bold px-1.5 py-0.5 rounded ${
                               isGap
-                                ? "bg-rose-50 text-rose-700"
-                                : "bg-emerald-50 text-emerald-700"
+                                ? "bg-rose-50 text-rose-700 border border-rose-200"
+                                : "bg-emerald-50 text-emerald-700 border border-emerald-200"
                             }`}
                           >
                             {skill.status}
                           </span>
                           {isGap && (
                             <span className="text-rose-600 font-bold">
-                              Gap: {skill.gap}%
+                              Gap: -{skill.gap}%
                             </span>
                           )}
                         </div>
                       </div>
                     </div>
 
-                    {/* SECTION 4 — Improve Skills Action Buttons */}
+                    {/* Actions */}
                     <div className="mt-4 pt-3 border-t border-slate-200/60 space-y-2">
                       {isGap ? (
                         <div className="flex gap-2">
@@ -436,7 +451,7 @@ export default function MySkills({ onNavigate }) {
                             Take Assessment
                           </button>
                           <button
-                            onClick={() => alert(`Starting learning module: ${skill.resource}`)}
+                            onClick={() => onNavigate("roadmap")}
                             className="flex-1 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg text-xs font-semibold transition cursor-pointer"
                           >
                             Start Learning
@@ -447,7 +462,7 @@ export default function MySkills({ onNavigate }) {
                           onClick={() => onNavigate("skill_passport")}
                           className="w-full py-1.5 bg-emerald-50 text-emerald-700 rounded-lg text-xs font-semibold border border-emerald-200 cursor-pointer"
                         >
-                          View Credential ✓
+                          View in Digital Passport ✓
                         </button>
                       )}
                     </div>

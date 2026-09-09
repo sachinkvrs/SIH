@@ -16,23 +16,17 @@ import {
   X
 } from "lucide-react";
 
-export default function Applications({ onNavigate }) {
+export default function Applications({
+  onNavigate,
+  applicationsList = [],
+  onSetApplicationsList
+}) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("All");
   const [selectedRole, setSelectedRole] = useState("All");
   const [sortBy, setSortBy] = useState("latest"); // "latest" or "oldest"
   const [viewMode, setViewMode] = useState("pipeline"); // "pipeline" or "list"
   const [activeModalApp, setActiveModalApp] = useState(null);
-
-  // Top Summary Data strictly matching requirements
-  const summary = {
-    total: 12,
-    underReview: 5,
-    shortlisted: 3,
-    interview: 2,
-    selected: 1,
-    rejected: 1,
-  };
 
   // Realistic applications matching user specs
   const applications = [
@@ -256,6 +250,27 @@ export default function Applications({ onNavigate }) {
     },
   ];
 
+  // Merge live applicationsList with base applications
+  const allApplications = [
+    ...applicationsList,
+    ...applications.filter(
+      (a) =>
+        !applicationsList.some(
+          (p) => p.id === a.id || (p.company === a.company && p.position === a.position)
+        )
+    ),
+  ];
+
+  // Dynamic summary calculation
+  const summary = {
+    total: allApplications.length,
+    underReview: allApplications.filter((a) => a.status === "Under Review").length,
+    shortlisted: allApplications.filter((a) => a.status === "Shortlisted").length,
+    interview: allApplications.filter((a) => a.status === "Interview").length,
+    selected: allApplications.filter((a) => a.status === "Selected").length,
+    rejected: allApplications.filter((a) => a.status === "Rejected").length,
+  };
+
   // Pipeline stages
   const pipelineStages = [
     { key: "Applied", label: "Applied", badgeBg: "bg-blue-100 text-blue-700 border-blue-200" },
@@ -266,7 +281,7 @@ export default function Applications({ onNavigate }) {
   ];
 
   // Filter and sort logic
-  const filteredApps = applications
+  const filteredApps = allApplications
     .filter((app) => {
       const matchSearch =
         app.company.toLowerCase().includes(searchQuery.toLowerCase()) ||

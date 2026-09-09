@@ -19,7 +19,9 @@ import {
   Clock,
   History,
   ChevronUp,
-  X
+  X,
+  TrendingUp,
+  AlertCircle
 } from "lucide-react";
 
 export default function Sidebar({
@@ -55,16 +57,22 @@ export default function Sidebar({
     { id: "settings", label: "Settings", icon: SettingsIcon },
   ];
 
-  // Industry Navigation
+  // Industry Navigation: Comprehensive recruiter & employer workflow
   const industryNavItems = [
-    { id: "industry_dashboard", label: "Industry Dashboard", icon: LayoutDashboard },
+    { id: "industry_dashboard", label: "Overview", icon: LayoutDashboard },
+    { id: "post_jobs", label: "Post Jobs & Roles", icon: Briefcase },
+    { id: "candidate_matching", label: "Candidate AI Match", icon: Users },
+    { id: "feedback", label: "Recruiter Feedback", icon: FileText },
     { id: "industry_collaboration", label: "Industry Collaboration", icon: Sparkles },
     { id: "student_dashboard", label: "← Student Portal", icon: User },
   ];
 
-  // Institution Navigation
+  // Institution Navigation: Comprehensive college & TPO intelligence workflow
   const institutionNavItems = [
-    { id: "institution_analytics", label: "Institution Analytics", icon: BarChart3 },
+    { id: "institution_analytics", label: "Analytics Overview", icon: BarChart3 },
+    { id: "skill_demand", label: "Skill Demand Trends", icon: TrendingUp },
+    { id: "curriculum_gap", label: "Curriculum Gap", icon: AlertCircle },
+    { id: "placements", label: "Internships & Placements", icon: Award },
     { id: "industry_collaboration", label: "Industry Collaboration", icon: Sparkles },
     { id: "student_dashboard", label: "← Student Portal", icon: User },
   ];

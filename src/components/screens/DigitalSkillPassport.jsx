@@ -1,134 +1,425 @@
 import React, { useState } from "react";
-import { Award, CheckCircle2, Download, Share2, ExternalLink, ShieldCheck } from "lucide-react";
+import {
+  Award,
+  CheckCircle2,
+  Download,
+  Share2,
+  ExternalLink,
+  ShieldCheck,
+  QrCode,
+  Sparkles,
+  FileCheck2,
+  Briefcase,
+  FolderKanban,
+  Trophy,
+  X,
+  Copy,
+  Check
+} from "lucide-react";
 
-export default function DigitalSkillPassport({ profileData, onNavigate }) {
+export default function DigitalSkillPassport({
+  profileData,
+  careerGoal = "Data Analyst",
+  careerData,
+  onNavigate
+}) {
   const [activeTab, setActiveTab] = useState("Skills");
   const [copied, setCopied] = useState(false);
+  const [publicModalOpen, setPublicModalOpen] = useState(false);
+  const [downloadSuccess, setDownloadSuccess] = useState(false);
 
   const studentName = profileData?.fullName || "Sachin";
-  const courseName = profileData?.course || "Computer Science Engineering";
+  const courseName = profileData?.course || "Computer Science & Engineering";
   const collegeName = profileData?.college || "ABC Institute of Technology";
+  const readiness = profileData?.readinessScore || careerData?.readinessScore || 82;
+  const credentialId = "SB-2026-88492-V";
 
-  const tabs = ["Skills", "Certifications", "Projects", "Internships", "Achievements"];
+  const tabs = [
+    "Skills",
+    "Certifications",
+    "Projects",
+    "Internships",
+    "Achievements",
+    "Assessment History"
+  ];
 
-  const skills = [
-    { name: "Python", verified: true },
-    { name: "SQL", verified: true },
-    { name: "Machine Learning", verified: true },
-    { name: "JavaScript", verified: true },
-    { name: "Power BI", verified: false },
-    { name: "Communication", verified: false },
+  const verifiedSkills = [
+    { name: "Python", proficiency: "85%", verified: true, date: "02 Sep 2026", issuer: "SkillBridge Code Lab" },
+    { name: "SQL", proficiency: "65%", verified: true, date: "28 Aug 2026", issuer: "SkillBridge Proctored Test" },
+    { name: "Machine Learning", proficiency: "72%", verified: true, date: "04 Sep 2026", issuer: "DeepLearning.AI Benchmark" },
+    { name: "JavaScript", proficiency: "78%", verified: true, date: "20 Aug 2026", issuer: "SkillBridge Web Exam" },
+    { name: "Communication", proficiency: "80%", verified: true, date: "25 Aug 2026", issuer: "Campus Interview Evaluation" },
+    { name: "Excel & Power Query", proficiency: "80%", verified: true, date: "01 Sep 2026", issuer: "Microsoft Learn Assessment" },
+    { name: "Power BI", proficiency: "45%", verified: false, date: "In Progress", issuer: "Self-Reported" }
+  ];
+
+  const certifications = [
+    { title: "Verified Data Analyst Diagnostic", issuer: "SkillBridge & NASSCOM Industry Partners", date: "Sep 2026", grade: "Top 15%" },
+    { title: "Relational Database SQL Competency", issuer: "ABC Institute of Technology & SkillBridge", date: "Aug 2026", grade: "88/100" },
+    { title: "Applied Python for Scientific Computing", issuer: "Coursera / University Partner", date: "Jul 2026", grade: "94%" }
+  ];
+
+  const projects = [
+    { title: "E-Commerce Customer Churn Intelligence", stack: "Python, Scikit-Learn, Streamlit", desc: "Predictive model deployed with 88% precision to identify at-risk enterprise accounts." },
+    { title: "Automated ETL Pipeline & Power BI Dashboard", stack: "SQL, Power BI, Python", desc: "Automated data ingestion from PostgreSQL to analytical dashboards with dynamic DAX filters." }
+  ];
+
+  const internships = [
+    { role: "Data Science Trainee", org: "Cognitive Insights AI", duration: "Jun 2026 – Aug 2026", outcome: "Optimized feature engineering pipeline; reduced model latency by 24%." }
+  ];
+
+  const achievements = [
+    { title: "Smart India Hackathon Finalist", org: "Ministry of Education / AICTE", date: "2026" },
+    { title: "Academic Excellence Dean's List", org: "ABC Institute of Technology", date: "2025 – 2026" }
+  ];
+
+  const assessmentHistory = [
+    { test: "SQL Diagnostic Assessment", date: "28 Aug 2026", score: "66/100", status: "Verified" },
+    { test: "Python Data Analysis Assessment", date: "02 Sep 2026", score: "88/100", status: "Verified" },
+    { test: "Machine Learning Fundamentals", date: "04 Sep 2026", score: "74/100", status: "Verified" }
   ];
 
   const handleShare = () => {
-    navigator.clipboard?.writeText(window.location.href);
+    navigator.clipboard?.writeText(`https://skillbridge.edu.in/verify/${credentialId}`);
     setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    setTimeout(() => setCopied(false), 2500);
+  };
+
+  const handleDownload = () => {
+    setDownloadSuccess(true);
+    setTimeout(() => setDownloadSuccess(false), 3000);
   };
 
   return (
-    <div className="space-y-6 max-w-4xl">
-      <div>
-        <h2 className="text-xl font-bold text-slate-900 tracking-tight">Digital Skill Passport</h2>
-        <p className="text-xs text-slate-500 mt-1">
-          Cryptographically signed, institution & industry verified portfolio of competency.
-        </p>
-      </div>
-
-      <div className="bg-white rounded-2xl p-4 sm:p-8 border border-slate-200/80 shadow-xs space-y-6">
-        {/* Profile Card Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-100">
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-2xl bg-linear-to-tr from-blue-600 to-indigo-600 text-white font-extrabold text-2xl flex items-center justify-center ring-2 ring-blue-500/30 shadow-xs shrink-0">
-              {studentName.charAt(0)}
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h3 className="text-lg font-extrabold text-slate-900">{studentName}</h3>
-              </div>
-              <p className="text-xs font-semibold text-slate-600 mt-0.5">
-                {courseName}
-              </p>
-              <p className="text-[11px] text-slate-400">
-                {collegeName}
-              </p>
-            </div>
-          </div>
-
-          <div>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-full border border-emerald-200 shadow-xs">
-              <ShieldCheck className="w-4 h-4 text-emerald-600" />
-              <span>Verified Profile</span>
+    <div className="space-y-6 max-w-4xl mx-auto pb-8">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-2">
+            <h2 className="text-xl font-bold text-slate-900 tracking-tight">Digital Skill Passport</h2>
+            <span className="px-2.5 py-0.5 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-full border border-emerald-200 flex items-center gap-1">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+              Verified by SkillBridge
             </span>
           </div>
+          <p className="text-xs text-slate-500 mt-1">
+            Industry and institution verified digital credential showcasing validated student competencies.
+          </p>
         </div>
 
-        {/* Tab Navigation */}
-        <div className="flex items-center gap-2 border-b border-slate-100 pb-1 overflow-x-auto scrollbar-none">
-          {tabs.map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`px-4 py-2 text-xs font-semibold rounded-lg transition whitespace-nowrap cursor-pointer ${
-                activeTab === tab
-                  ? "bg-blue-50 text-blue-600 border border-blue-200 shadow-xs"
-                  : "text-slate-500 hover:text-slate-800 hover:bg-slate-50"
-              }`}
-            >
-              {tab}
-            </button>
-          ))}
-        </div>
-
-        {/* Verified Skills Grid */}
-        <div>
-          <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">
-            Verified Competencies & Tags
-          </h4>
-
-          <div className="flex flex-wrap gap-2.5">
-            {skills.map((skill, idx) => (
-              <div
-                key={idx}
-                className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold transition border ${
-                  skill.verified
-                    ? "bg-slate-50 border-blue-200 text-slate-800 shadow-xs"
-                    : "bg-slate-50/60 border-slate-200 text-slate-600"
-                }`}
-              >
-                <span>{skill.name}</span>
-                {skill.verified ? (
-                  <span className="inline-flex items-center gap-1 text-[10px] font-bold px-1.5 py-0.5 bg-emerald-100 text-emerald-700 rounded-md">
-                    <CheckCircle2 className="w-3 h-3" />
-                    Verified
-                  </span>
-                ) : (
-                  <span className="text-[10px] text-slate-400 font-medium">Self-reported</span>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="pt-6 border-t border-slate-100 flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-3">
+        <div className="flex items-center gap-2">
           <button
-            onClick={() => alert("Downloading Verified Skill Passport PDF...")}
-            className="flex items-center justify-center gap-2 px-5 py-2.5 min-h-[44px] border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-xl text-xs font-semibold transition cursor-pointer"
+            onClick={() => setPublicModalOpen(true)}
+            className="flex items-center gap-1.5 px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold transition cursor-pointer"
           >
-            <Download className="w-4 h-4" />
-            <span>Download PDF</span>
-          </button>
-
-          <button
-            onClick={handleShare}
-            className="flex items-center justify-center gap-2 px-6 py-2.5 min-h-[44px] bg-[#1E60D5] hover:bg-blue-700 text-white rounded-xl text-xs font-semibold shadow-sm transition cursor-pointer"
-          >
-            <Share2 className="w-4 h-4" />
-            <span>{copied ? "Link Copied!" : "Share Profile"}</span>
+            <ExternalLink className="w-3.5 h-3.5" />
+            <span>View Public Profile</span>
           </button>
         </div>
       </div>
+
+      {/* Download Alert Toast */}
+      {downloadSuccess && (
+        <div className="p-3.5 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-xl text-xs font-semibold flex items-center justify-between animate-in fade-in">
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+            <span>Verified Digital Skill Passport PDF generated and ready for download!</span>
+          </div>
+          <button onClick={() => setDownloadSuccess(false)} className="text-emerald-700 font-bold">✕</button>
+        </div>
+      )}
+
+      {/* Main Digital Passport Certificate Card */}
+      <div className="bg-white rounded-2xl border border-slate-200/90 shadow-sm overflow-hidden space-y-6">
+        {/* Credential Header Banner */}
+        <div className="p-6 sm:p-8 bg-linear-to-r from-slate-900 via-blue-950 to-slate-900 text-white relative overflow-hidden">
+          <div className="absolute -right-10 -bottom-10 w-48 h-48 bg-blue-500/10 rounded-full blur-2xl"></div>
+
+          <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="flex items-center gap-4">
+              <div className="w-20 h-20 rounded-2xl bg-linear-to-tr from-blue-600 to-indigo-500 text-white font-black text-2xl flex items-center justify-center ring-4 ring-white/10 shadow-lg shrink-0">
+                {studentName.charAt(0)}
+              </div>
+
+              <div className="space-y-1">
+                <div className="flex flex-wrap items-center gap-2.5">
+                  <h1 className="text-2xl font-black tracking-tight text-white">{studentName}</h1>
+                  <span className="px-2.5 py-0.5 bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-xs font-bold rounded-full">
+                    ✓ Verified by SkillBridge
+                  </span>
+                </div>
+                <p className="text-xs font-semibold text-slate-300">{courseName}</p>
+                <p className="text-[11px] text-slate-400">{collegeName}</p>
+              </div>
+            </div>
+
+            {/* QR Code & Credential ID Block */}
+            <div className="flex items-center gap-3 p-3 bg-white/10 backdrop-blur-xs rounded-xl border border-white/10 shrink-0 self-start md:self-auto">
+              <div className="w-12 h-12 bg-white rounded-lg p-1 flex items-center justify-center shrink-0">
+                <QrCode className="w-10 h-10 text-slate-900" />
+              </div>
+              <div className="text-left space-y-0.5">
+                <span className="text-[10px] font-bold text-slate-300 uppercase tracking-wider block">
+                  Credential ID
+                </span>
+                <span className="font-mono text-xs font-bold text-white block">{credentialId}</span>
+                <span className="text-[9.5px] text-emerald-300 font-semibold block">
+                  {readiness}% Industry Ready ({careerGoal})
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Passport Body */}
+        <div className="p-6 sm:p-8 space-y-6">
+          {/* Tab Navigation */}
+          <div className="flex items-center gap-2 border-b border-slate-100 pb-2 overflow-x-auto scrollbar-none">
+            {tabs.map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`px-3.5 py-2 text-xs font-bold rounded-xl transition whitespace-nowrap cursor-pointer ${
+                  activeTab === tab
+                    ? "bg-blue-50 text-blue-700 border border-blue-200 shadow-2xs"
+                    : "text-slate-500 hover:text-slate-800 hover:bg-slate-50"
+                }`}
+              >
+                {tab}
+              </button>
+            ))}
+          </div>
+
+          {/* Tab Content: Skills */}
+          {activeTab === "Skills" && (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                  Verified Competencies & Evaluation Matrix
+                </h4>
+                <span className="text-xs text-slate-500">
+                  {verifiedSkills.filter((s) => s.verified).length} of {verifiedSkills.length} Verified
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+                {verifiedSkills.map((skill, idx) => (
+                  <div
+                    key={idx}
+                    className={`p-3.5 rounded-xl border flex flex-col justify-between space-y-2 ${
+                      skill.verified
+                        ? "bg-slate-50/70 border-slate-200/80"
+                        : "bg-slate-50/30 border-slate-200/50"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-slate-900">{skill.name}</span>
+                      <span className="text-xs font-black text-blue-600">{skill.proficiency}</span>
+                    </div>
+
+                    <div className="text-[10.5px] text-slate-400 space-y-0.5">
+                      <span>Evaluator: {skill.issuer}</span>
+                      <span className="block">Date: {skill.date}</span>
+                    </div>
+
+                    <div className="pt-2 border-t border-slate-200/60 flex items-center justify-between">
+                      {skill.verified ? (
+                        <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                          <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                          Verified by SkillBridge
+                        </span>
+                      ) : (
+                        <span className="text-[10px] text-slate-400 font-medium">Self-reported</span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Tab Content: Certifications */}
+          {activeTab === "Certifications" && (
+            <div className="space-y-3">
+              {certifications.map((cert, idx) => (
+                <div
+                  key={idx}
+                  className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs"
+                >
+                  <div className="space-y-0.5">
+                    <h4 className="font-bold text-slate-900">{cert.title}</h4>
+                    <p className="text-slate-500 text-[11px]">{cert.issuer} • {cert.date}</p>
+                  </div>
+                  <span className="px-3 py-1 bg-blue-50 text-blue-700 font-bold rounded-lg border border-blue-200 shrink-0 self-start sm:self-auto">
+                    Grade: {cert.grade}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Tab Content: Projects */}
+          {activeTab === "Projects" && (
+            <div className="space-y-3">
+              {projects.map((proj, idx) => (
+                <div
+                  key={idx}
+                  className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 space-y-1.5 text-xs"
+                >
+                  <div className="flex items-center justify-between">
+                    <h4 className="font-bold text-slate-900">{proj.title}</h4>
+                    <span className="text-[10.5px] font-mono text-blue-600 bg-blue-50 px-2 py-0.5 rounded">
+                      {proj.stack}
+                    </span>
+                  </div>
+                  <p className="text-slate-600 text-[11px] leading-relaxed">{proj.desc}</p>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Tab Content: Internships */}
+          {activeTab === "Internships" && (
+            <div className="space-y-3">
+              {internships.map((intern, idx) => (
+                <div
+                  key={idx}
+                  className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 space-y-1 text-xs"
+                >
+                  <div className="flex items-center justify-between">
+                    <h4 className="font-bold text-slate-900">{intern.role}</h4>
+                    <span className="text-[11px] text-slate-400">{intern.duration}</span>
+                  </div>
+                  <p className="text-slate-700 font-semibold">{intern.org}</p>
+                  <p className="text-slate-500 text-[11px]">{intern.outcome}</p>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Tab Content: Achievements */}
+          {activeTab === "Achievements" && (
+            <div className="space-y-3">
+              {achievements.map((ach, idx) => (
+                <div
+                  key={idx}
+                  className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 flex items-center justify-between gap-3 text-xs"
+                >
+                  <div>
+                    <h4 className="font-bold text-slate-900">{ach.title}</h4>
+                    <p className="text-slate-500 text-[11px]">{ach.org}</p>
+                  </div>
+                  <span className="text-slate-400 font-medium">{ach.date}</span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Tab Content: Assessment History */}
+          {activeTab === "Assessment History" && (
+            <div className="space-y-3">
+              {assessmentHistory.map((test, idx) => (
+                <div
+                  key={idx}
+                  className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 flex items-center justify-between gap-3 text-xs"
+                >
+                  <div>
+                    <h4 className="font-bold text-slate-900">{test.test}</h4>
+                    <p className="text-slate-400 text-[11px]">{test.date}</p>
+                  </div>
+                  <div className="text-right">
+                    <span className="font-bold text-slate-900 block">{test.score}</span>
+                    <span className="text-[10px] text-emerald-600 font-semibold">{test.status}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Footer Action Buttons */}
+          <div className="pt-6 border-t border-slate-100 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+            <div className="text-[11px] text-slate-400">
+              Verified by SkillBridge Evaluation Algorithm & Academic Registry
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+              <button
+                onClick={handleDownload}
+                className="flex items-center justify-center gap-2 px-4 py-2.5 border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-xl text-xs font-bold transition cursor-pointer min-h-[40px]"
+              >
+                <Download className="w-4 h-4" />
+                <span>Download PDF</span>
+              </button>
+
+              <button
+                onClick={handleShare}
+                className="flex items-center justify-center gap-2 px-5 py-2.5 bg-[#1E60D5] hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-xs transition cursor-pointer min-h-[40px]"
+              >
+                {copied ? <Check className="w-4 h-4" /> : <Share2 className="w-4 h-4" />}
+                <span>{copied ? "Link Copied!" : "Share Passport"}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* PUBLIC VERIFICATION MODAL */}
+      {publicModalOpen && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-lg w-full p-6 space-y-5 animate-in zoom-in-95 duration-150">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="w-5 h-5 text-emerald-600" />
+                <h3 className="text-base font-bold text-slate-900">Public Verification Profile</h3>
+              </div>
+              <button
+                onClick={() => setPublicModalOpen(false)}
+                className="p-1 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-slate-700 cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2 text-xs">
+              <div className="flex items-center justify-between">
+                <span className="text-slate-500">Candidate Name:</span>
+                <strong className="text-slate-900">{studentName}</strong>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-slate-500">Institution:</span>
+                <strong className="text-slate-900">{collegeName}</strong>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-slate-500">Target Role:</span>
+                <strong className="text-blue-600">{careerGoal}</strong>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-slate-500">Industry Readiness:</span>
+                <strong className="text-emerald-700">{readiness}% Verified</strong>
+              </div>
+              <div className="flex items-center justify-between pt-1 border-t border-slate-200">
+                <span className="text-slate-500">Verification URL:</span>
+                <span className="font-mono text-[10.5px] text-slate-600">skillbridge.edu.in/verify/{credentialId}</span>
+              </div>
+            </div>
+
+            <div className="pt-2 flex justify-end gap-2">
+              <button
+                onClick={handleShare}
+                className="px-4 py-2 bg-blue-50 text-blue-700 hover:bg-blue-100 font-bold rounded-lg text-xs cursor-pointer"
+              >
+                {copied ? "Link Copied!" : "Copy Public Link"}
+              </button>
+              <button
+                onClick={() => setPublicModalOpen(false)}
+                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-lg text-xs cursor-pointer"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

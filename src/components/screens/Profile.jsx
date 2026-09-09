@@ -18,8 +18,15 @@ import {
   ArrowRight,
   Zap
 } from "lucide-react";
+import { CAREER_GOALS } from "../../data/careerIntelligence";
 
-export default function Profile({ profileData, onUpdateProfile, onNavigate }) {
+export default function Profile({
+  profileData,
+  onUpdateProfile,
+  careerGoal = "Data Analyst",
+  onChangeCareerGoal,
+  onNavigate
+}) {
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditForm] = useState(profileData);
   const [saveSuccess, setSaveSuccess] = useState(false);
@@ -36,6 +43,9 @@ export default function Profile({ profileData, onUpdateProfile, onNavigate }) {
   const handleSave = (e) => {
     e.preventDefault();
     onUpdateProfile(editForm);
+    if (onChangeCareerGoal && editForm.targetRole !== careerGoal) {
+      onChangeCareerGoal(editForm.targetRole);
+    }
     setIsEditing(false);
     setSaveSuccess(true);
     setTimeout(() => setSaveSuccess(false), 3000);
@@ -354,13 +364,18 @@ export default function Profile({ profileData, onUpdateProfile, onNavigate }) {
 
               <div>
                 <label className="block font-semibold text-slate-700 mb-1">Target Career Role</label>
-                <input
-                  type="text"
+                <select
                   value={editForm.targetRole}
                   onChange={(e) => setEditForm({ ...editForm, targetRole: e.target.value })}
                   required
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 text-slate-800"
-                />
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 text-slate-800 text-xs font-semibold"
+                >
+                  {CAREER_GOALS.map((role) => (
+                    <option key={role} value={role}>
+                      {role}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
