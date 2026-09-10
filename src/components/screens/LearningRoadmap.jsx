@@ -20,32 +20,64 @@ import {
   Cpu,
   Wrench,
   Compass,
-  FileCheck2
+  FileCheck2,
+  Target
 } from "lucide-react";
 import { ROADMAP_MODULES, ACADEMIC_DOMAINS_DATA } from "../../data/roadmapData";
-import { getResourcesForModule } from "../../services/learningRecommendationService";
+import { getRoleData } from "../../data/roleCompetencies";
+import { getResourcesForRoleAndModule } from "../../services/strictResourceService";
+import { getRoadmapOverallProgress, MODULE_STATUS } from "../../services/canonicalLearningService";
 
 export default function LearningRoadmap({
   onNavigate,
   careerGoal = "Data Analyst",
   careerData,
   completedModuleIds = {},
+  canonicalLearningProgress = {},
   onCompleteModule,
   onOpenResource,
+  onOpenRoleSelector,
   highlightedStepId
 }) {
   const [selectedDomain, setSelectedDomain] = useState("cs_it");
   const [showDomainDrawer, setShowDomainDrawer] = useState(false);
   const highlightedRef = useRef(null);
 
-  // Filter modules: exclude internship-ready from regular course count
-  const learningCourses = ROADMAP_MODULES.filter((m) => m.id !== "internship-ready");
-  const completedCount = learningCourses.filter((m) => completedModuleIds[m.id]).length;
-  const totalCourses = learningCourses.length;
-  const overallProgress = Math.round((completedCount / totalCourses) * 100);
+  // Dynamically load active role configuration and milestones
+  const activeRoleData = getRoleData(careerGoal);
+  const baseModules = (activeRoleData?.roadmap && activeRoleData.roadmap.length > 0)
+    ? activeRoleData.roadmap
+    : ROADMAP_MODULES.filter((m) => m.id !== "internship-ready");
 
-  // All prerequisites completed check for Internship Ready milestone
-  const allCoursesCompleted = completedCount === totalCourses;
+  // Construct unified modules list with target capstone milestone
+  const modulesList = [
+    ...baseModules,
+    {
+      id: "internship-ready",
+      title: "Internship & Industry Ready",
+      category: "Milestone Target",
+      duration: "Target Achieved",
+      difficulty: "Milestone",
+      skills: ["Direct Hiring Fast-Track", "Verified Candidate Pool", "Employer Referrals"],
+      provider: "SkillBridge Placement Cell",
+      prerequisiteId: baseModules[baseModules.length - 1]?.id || null,
+      reason: "Achieved once all prerequisite milestones, hands-on projects, and verified assessments are completed.",
+      description: `Congratulations! You have completed all validated learning milestones for ${careerGoal}. Your verified Digital Skill Passport is active, boosting your candidacy across partner employer job postings.`,
+      learningObjectives: [
+        "Access high-affinity recruiter direct application queues.",
+        "Share cryptographically verifiable Digital Skill Passport with employers.",
+        "Fast-track through Round 1 resume screening."
+      ]
+    }
+  ];
+
+  // Derive mathematical overall progress across modules using canonical single source of truth
+  const learningCourses = modulesList.filter((m) => m.id !== "internship-ready");
+  const overallMetrics = getRoadmapOverallProgress(modulesList, canonicalLearningProgress);
+  const totalCourses = learningCourses.length;
+  const completedCount = overallMetrics.completedCount;
+  const overallProgress = overallMetrics.overallProgress;
+  const allCoursesCompleted = overallMetrics.isInternshipReady;
   const isInternshipReady = allCoursesCompleted;
 
   useEffect(() => {
@@ -94,11 +126,22 @@ export default function LearningRoadmap({
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <h2 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">Personalized Career Roadmap</h2>
             <span className="px-2.5 py-0.5 bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 text-xs font-bold rounded-full border border-blue-200 dark:border-blue-800">
               Role: {careerGoal}
             </span>
+            {onOpenRoleSelector && (
+              <button
+                onClick={onOpenRoleSelector}
+                className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold rounded-lg border border-slate-200 dark:border-slate-700 transition cursor-pointer"
+                title="Switch Target Career Role"
+              >
+                <Target className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                <span>Switch Role</span>
+                <ChevronDown className="w-3 h-3 text-slate-400" />
+              </button>
+            )}
           </div>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
             Structured step-by-step milestones to systematically close skill gaps and achieve verified industry readiness.
@@ -250,10 +293,16 @@ export default function LearningRoadmap({
       <div className="bg-white dark:bg-[#111827] rounded-2xl p-4 sm:p-8 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-6">
         {/* Timeline Path */}
         <div className="relative pl-6 sm:pl-8 space-y-8 before:absolute before:left-3 sm:before:left-4 before:top-3 before:bottom-3 before:w-0.5 before:bg-slate-200 dark:before:bg-slate-800">
-          {ROADMAP_MODULES.map((step, idx) => {
-            const isCompleted = !!completedModuleIds[step.id];
+          {modulesList.map((step, idx) => {
+            const moduleProgressObj = canonicalLearningProgress[step.id];
+            const isCompleted =
+              !!completedModuleIds[step.id] ||
+              moduleProgressObj?.status === MODULE_STATUS.COMPLETED ||
+              moduleProgressObj?.progressPercent === 100;
+            const modProgress = moduleProgressObj?.progressPercent ?? (isCompleted ? 100 : 0);
+            const assessment = moduleProgressObj?.assessmentResult;
             const prereqModule = step.prerequisiteId
-              ? ROADMAP_MODULES.find((m) => m.id === step.prerequisiteId)
+              ? modulesList.find((m) => m.id === step.prerequisiteId)
               : null;
             const isUnlocked = !step.prerequisiteId || !!completedModuleIds[step.prerequisiteId];
             const isTarget = step.id === "internship-ready";
@@ -393,18 +442,34 @@ export default function LearningRoadmap({
                         <span>•</span>
                         <span>
                           Progress:{" "}
-                          <strong className="text-blue-600 dark:text-blue-400">
-                            {isCompleted ? 100 : isCurrent ? 50 : 0}%
+                          <strong className={isCompleted ? "text-emerald-600 dark:text-emerald-400" : "text-blue-600 dark:text-blue-400"}>
+                            {modProgress}%
                           </strong>
                         </span>
+                        {assessment && (
+                          <>
+                            <span>•</span>
+                            {assessment.passed ? (
+                              <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-md border border-emerald-200 dark:border-emerald-900">
+                                <CheckCircle2 className="w-3 h-3 text-emerald-500" />
+                                <span>Passed ({assessment.score}%)</span>
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center gap-1 text-amber-600 dark:text-amber-400 font-bold bg-amber-50 dark:bg-amber-950/60 px-2 py-0.5 rounded-md border border-amber-200 dark:border-amber-900">
+                                <AlertCircle className="w-3 h-3 text-amber-500" />
+                                <span>Assessment: {assessment.score}% (70% required)</span>
+                              </span>
+                            )}
+                          </>
+                        )}
                         {(() => {
-                          const resCount = getResourcesForModule(step.id)?.totalCount || 0;
+                          const resCount = getResourcesForRoleAndModule({ roleName: careerGoal, moduleId: step.id })?.resources?.length || 0;
                           return resCount > 0 ? (
                             <>
                               <span>•</span>
                               <span className="inline-flex items-center gap-1 text-blue-600 dark:text-blue-400 font-bold bg-blue-50 dark:bg-blue-950/60 px-2 py-0.5 rounded-md border border-blue-200 dark:border-blue-900">
-                                <Sparkles className="w-3 h-3 text-amber-500" />
-                                <span>{resCount} ML Resources</span>
+                                <BookOpen className="w-3 h-3 text-blue-500" />
+                                <span>{resCount} Study Resources</span>
                               </span>
                             </>
                           ) : null;
@@ -421,7 +486,7 @@ export default function LearningRoadmap({
                           isCompleted ? "bg-emerald-500" : "bg-blue-600"
                         }`}
                         style={{
-                          width: `${isCompleted ? 100 : isCurrent ? 50 : 0}%`
+                          width: `${modProgress}%`
                         }}
                       />
                     </div>

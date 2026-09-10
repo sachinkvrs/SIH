@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 
 export default function BrandLogo({ variant = "light", size = "md" }) {
   const isDark = variant === "dark";
@@ -30,9 +30,9 @@ export default function BrandLogo({ variant = "light", size = "md" }) {
         <span
           className={`font-extrabold tracking-tight ${
             size === "lg" ? "text-xl" : "text-base"
-          } ${isDark ? "text-white" : "text-slate-900"}`}
+          }`}
         >
-          Skill<span className="text-blue-600">Bridge</span>
+          <span className="text-[#FF3B4E]">Skill</span><span className="text-blue-600">Bridge</span>
         </span>
         <span
           className={`text-[9.5px] font-semibold tracking-wider uppercase ${

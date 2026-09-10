@@ -21,6 +21,7 @@ import {
   Sparkles,
   ShieldCheck
 } from "lucide-react";
+import heroImage from "../../assets/hero-skillbridge.jpg";
 
 export default function LandingPage({ onNavigate }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -306,11 +307,10 @@ export default function LandingPage({ onNavigate }) {
           <div className="lg:col-span-6 relative">
             <div className="relative rounded-2xl overflow-hidden shadow-lg border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900">
               <img
-                src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=900&auto=format&fit=crop&q=80"
-                alt="Students collaborating"
-                className="w-full h-72 sm:h-80 md:h-96 object-cover"
+                src={heroImage}
+                alt="SkillBridge Career Intelligence & Opportunity Ecosystem"
+                className="w-full h-auto aspect-[3/2] object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 via-transparent to-transparent"></div>
 
               {/* Floating Badge */}
               <div className="absolute top-4 left-4 bg-white/90 dark:bg-[#111827]/90 backdrop-blur-md px-3.5 py-2 rounded-xl shadow-md border border-white/40 dark:border-slate-700/60 text-[11px] font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-2">

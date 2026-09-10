@@ -4,14 +4,17 @@
 export const CAREER_GOALS = [
   "Data Analyst",
   "Data Scientist",
+  "Software Engineer",
   "Software Developer",
   "ML Engineer",
   "Business Analyst",
+  "Financial Analyst",
   "Cybersecurity Analyst",
   "UI/UX Designer",
   "Embedded Systems Engineer",
   "Power Systems Engineer",
   "Mechanical Design Engineer",
+  "Structural Engineer",
   "BIM & Structural Engineer"
 ];
 

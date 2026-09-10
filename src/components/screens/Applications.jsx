@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   FolderKanban,
   Search,
@@ -20,7 +20,7 @@ import {
 export default function Applications({
   onNavigate,
   applicationsList = [],
-  onSetApplicationsList
+  focusedAppId = null
 }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("All");
@@ -29,238 +29,20 @@ export default function Applications({
   const [viewMode, setViewMode] = useState("pipeline"); // "pipeline" or "list"
   const [activeModalApp, setActiveModalApp] = useState(null);
 
-  // Realistic applications matching user specs
-  const applications = [
-    {
-      id: "app-1",
-      company: "TCS",
-      position: "Data Analyst Intern",
-      appliedDate: "04 Sep 2026",
-      appliedTimestamp: 1725408000000,
-      deadline: "20 Sep 2026",
-      status: "Under Review",
-      location: "Remote",
-      roleCategory: "Data Analyst",
-      nextAction: "HR resume review in progress. Recruiter feedback expected by 12 Sep 2026.",
-      history: [
-        { stage: "Applied", date: "04 Sep 2026", done: true },
-        { stage: "Resume Viewed", date: "06 Sep 2026", done: true },
-        { stage: "Under Review", date: "07 Sep 2026", done: true },
-        { stage: "Interview", date: "Pending", done: false },
-        { stage: "Selection", date: "Pending", done: false },
-      ],
-      logoBg: "bg-blue-600 text-white"
-    },
-    {
-      id: "app-2",
-      company: "Infosys",
-      position: "AI/ML Intern",
-      appliedDate: "01 Sep 2026",
-      appliedTimestamp: 1725148800000,
-      deadline: "18 Sep 2026",
-      status: "Shortlisted",
-      location: "Bangalore",
-      roleCategory: "AI/ML",
-      nextAction: "Technical Round 1 scheduled for 15 Sep 2026 at 2:00 PM via Google Meet.",
-      history: [
-        { stage: "Applied", date: "01 Sep 2026", done: true },
-        { stage: "Profile Screened", date: "03 Sep 2026", done: true },
-        { stage: "Shortlisted", date: "05 Sep 2026", done: true },
-        { stage: "Interview Round 1", date: "15 Sep 2026", done: false },
-        { stage: "Selection", date: "Pending", done: false },
-      ],
-      logoBg: "bg-indigo-600 text-white"
-    },
-    {
-      id: "app-3",
-      company: "Accenture",
-      position: "Software Developer Intern",
-      appliedDate: "28 Aug 2026",
-      appliedTimestamp: 1724803200000,
-      deadline: "10 Sep 2026",
-      status: "Interview",
-      location: "Hyderabad",
-      roleCategory: "Software Developer",
-      nextAction: "Technical interview Round 2 on 12 Sep 2026 at 11:00 AM.",
-      history: [
-        { stage: "Applied", date: "28 Aug 2026", done: true },
-        { stage: "Online Assessment", date: "31 Aug 2026", done: true },
-        { stage: "Shortlisted", date: "03 Sep 2026", done: true },
-        { stage: "Interview Round 1", date: "08 Sep 2026", done: true },
-        { stage: "Managerial Round", date: "12 Sep 2026", done: false },
-      ],
-      logoBg: "bg-purple-600 text-white"
-    },
-    {
-      id: "app-4",
-      company: "Wipro",
-      position: "Cloud Analytics Intern",
-      appliedDate: "22 Aug 2026",
-      appliedTimestamp: 1724284800000,
-      deadline: "05 Sep 2026",
-      status: "Selected",
-      location: "Pune (Hybrid)",
-      roleCategory: "Cloud Analytics",
-      nextAction: "Offer letter generated. Download and return signed copy before 18 Sep 2026.",
-      history: [
-        { stage: "Applied", date: "22 Aug 2026", done: true },
-        { stage: "Assessment", date: "25 Aug 2026", done: true },
-        { stage: "Shortlisted", date: "29 Aug 2026", done: true },
-        { stage: "Interview", date: "03 Sep 2026", done: true },
-        { stage: "Selected & Offered", date: "08 Sep 2026", done: true },
-      ],
-      logoBg: "bg-emerald-600 text-white"
-    },
-    {
-      id: "app-5",
-      company: "Google",
-      position: "Software Engineering Intern",
-      appliedDate: "15 Aug 2026",
-      appliedTimestamp: 1723680000000,
-      deadline: "30 Aug 2026",
-      status: "Rejected",
-      location: "Bangalore",
-      roleCategory: "Software Developer",
-      nextAction: "Application cycle closed. Eligible to reapply after 6-month cooldown.",
-      history: [
-        { stage: "Applied", date: "15 Aug 2026", done: true },
-        { stage: "OA Screen", date: "18 Aug 2026", done: true },
-        { stage: "Closed", date: "25 Aug 2026", done: true },
-      ],
-      logoBg: "bg-rose-600 text-white"
-    },
-    {
-      id: "app-6",
-      company: "Cognizant",
-      position: "Business Intelligence Intern",
-      appliedDate: "06 Sep 2026",
-      appliedTimestamp: 1725580800000,
-      deadline: "25 Sep 2026",
-      status: "Applied",
-      location: "Chennai",
-      roleCategory: "Data Analyst",
-      nextAction: "Application submitted. Awaiting initial recruiter screening.",
-      history: [
-        { stage: "Applied", date: "06 Sep 2026", done: true },
-        { stage: "Recruiter Review", date: "Pending", done: false },
-      ],
-      logoBg: "bg-cyan-600 text-white"
-    },
-    {
-      id: "app-7",
-      company: "HCLTech",
-      position: "Python Backend Intern",
-      appliedDate: "03 Sep 2026",
-      appliedTimestamp: 1725321600000,
-      deadline: "22 Sep 2026",
-      status: "Under Review",
-      location: "Noida",
-      roleCategory: "Software Developer",
-      nextAction: "Technical team reviewing portfolio and GitHub repo.",
-      history: [
-        { stage: "Applied", date: "03 Sep 2026", done: true },
-        { stage: "Under Review", date: "05 Sep 2026", done: true },
-      ],
-      logoBg: "bg-slate-700 text-white"
-    },
-    {
-      id: "app-8",
-      company: "Deloitte",
-      position: "Risk & Analytics Analyst",
-      appliedDate: "29 Aug 2026",
-      appliedTimestamp: 1724889600000,
-      deadline: "15 Sep 2026",
-      status: "Under Review",
-      location: "Mumbai",
-      roleCategory: "Data Analyst",
-      nextAction: "Aptitude score verified. Resume under department review.",
-      history: [
-        { stage: "Applied", date: "29 Aug 2026", done: true },
-        { stage: "Under Review", date: "02 Sep 2026", done: true },
-      ],
-      logoBg: "bg-green-700 text-white"
-    },
-    {
-      id: "app-9",
-      company: "Amazon",
-      position: "Applied Scientist Intern",
-      appliedDate: "02 Sep 2026",
-      appliedTimestamp: 1725235200000,
-      deadline: "20 Sep 2026",
-      status: "Shortlisted",
-      location: "Hyderabad",
-      roleCategory: "AI/ML",
-      nextAction: "Online coding assessment invitation sent to email.",
-      history: [
-        { stage: "Applied", date: "02 Sep 2026", done: true },
-        { stage: "Shortlisted", date: "06 Sep 2026", done: true },
-      ],
-      logoBg: "bg-amber-600 text-white"
-    },
-    {
-      id: "app-10",
-      company: "TechCorp",
-      position: "Associate Data Analyst",
-      appliedDate: "30 Aug 2026",
-      appliedTimestamp: 1724976000000,
-      deadline: "16 Sep 2026",
-      status: "Under Review",
-      location: "Remote",
-      roleCategory: "Data Analyst",
-      nextAction: "SkillBridge matched application being evaluated by team lead.",
-      history: [
-        { stage: "Applied", date: "30 Aug 2026", done: true },
-        { stage: "Under Review", date: "04 Sep 2026", done: true },
-      ],
-      logoBg: "bg-teal-600 text-white"
-    },
-    {
-      id: "app-11",
-      company: "InnovateAI Labs",
-      position: "Computer Vision Intern",
-      appliedDate: "25 Aug 2026",
-      appliedTimestamp: 1724544000000,
-      deadline: "12 Sep 2026",
-      status: "Interview",
-      location: "Bangalore",
-      roleCategory: "AI/ML",
-      nextAction: "Research paper discussion round scheduled for 14 Sep 2026.",
-      history: [
-        { stage: "Applied", date: "25 Aug 2026", done: true },
-        { stage: "Shortlisted", date: "29 Aug 2026", done: true },
-        { stage: "Interview", date: "14 Sep 2026", done: false },
-      ],
-      logoBg: "bg-violet-600 text-white"
-    },
-    {
-      id: "app-12",
-      company: "Capgemini",
-      position: "Database Engineer Intern",
-      appliedDate: "05 Sep 2026",
-      appliedTimestamp: 1725494400000,
-      deadline: "24 Sep 2026",
-      status: "Under Review",
-      location: "Pune",
-      roleCategory: "Data Analyst",
-      nextAction: "Initial credentials verified by campus placement cell.",
-      history: [
-        { stage: "Applied", date: "05 Sep 2026", done: true },
-        { stage: "Under Review", date: "07 Sep 2026", done: true },
-      ],
-      logoBg: "bg-sky-600 text-white"
-    },
-  ];
+  // Use centralized cross-domain applications from App.jsx state
+  const allApplications = applicationsList;
 
-  // Merge live applicationsList with base applications
-  const allApplications = [
-    ...applicationsList,
-    ...applications.filter(
-      (a) =>
-        !applicationsList.some(
-          (p) => p.id === a.id || (p.company === a.company && p.position === a.position)
-        )
-    ),
-  ];
+  // Auto-focus matching application when navigated from Communication Center
+  useEffect(() => {
+    if (focusedAppId) {
+      const match = allApplications.find(
+        (a) => a.id === focusedAppId || a.id?.toLowerCase() === focusedAppId.toLowerCase()
+      );
+      if (match) {
+        setActiveModalApp(match);
+      }
+    }
+  }, [focusedAppId, allApplications]);
 
   // Dynamic summary calculation
   const summary = {
@@ -272,13 +54,15 @@ export default function Applications({
     rejected: allApplications.filter((a) => a.status === "Rejected").length,
   };
 
-  // Pipeline stages
+  // Pipeline stages including Forwarded to Industry and Rejected
   const pipelineStages = [
     { key: "Applied", label: "Applied", badgeBg: "bg-blue-100 text-blue-700 border-blue-200" },
     { key: "Under Review", label: "Under Review", badgeBg: "bg-amber-100 text-amber-700 border-amber-200" },
+    { key: "Forwarded to Industry", label: "Endorsed", badgeBg: "bg-cyan-100 text-cyan-700 border-cyan-200" },
     { key: "Shortlisted", label: "Shortlisted", badgeBg: "bg-indigo-100 text-indigo-700 border-indigo-200" },
     { key: "Interview", label: "Interview", badgeBg: "bg-purple-100 text-purple-700 border-purple-200" },
     { key: "Selected", label: "Selected", badgeBg: "bg-emerald-100 text-emerald-700 border-emerald-200" },
+    { key: "Rejected", label: "Rejected", badgeBg: "bg-rose-100 text-rose-700 border-rose-200" },
   ];
 
   // Filter and sort logic
@@ -288,7 +72,13 @@ export default function Applications({
         app.company.toLowerCase().includes(searchQuery.toLowerCase()) ||
         app.position.toLowerCase().includes(searchQuery.toLowerCase());
       const matchStatus = selectedStatus === "All" || app.status === selectedStatus;
-      const matchRole = selectedRole === "All" || app.roleCategory === selectedRole;
+      const matchRole =
+        selectedRole === "All" ||
+        app.roleCategory === selectedRole ||
+        (selectedRole === "Software Engineer" && (app.roleCategory === "Software Developer" || app.roleCategory === "Software Engineer")) ||
+        (selectedRole === "Software Developer" && (app.roleCategory === "Software Developer" || app.roleCategory === "Software Engineer")) ||
+        (selectedRole === "Data Analyst" && (app.roleCategory === "Data Analyst" || app.roleCategory === "Data Science")) ||
+        (selectedRole === "Structural Engineer" && (app.roleCategory === "Structural Engineer" || app.roleCategory === "BIM Engineer"));
       return matchSearch && matchStatus && matchRole;
     })
     .sort((a, b) => {
@@ -431,13 +221,39 @@ export default function Applications({
         <select
           value={selectedRole}
           onChange={(e) => setSelectedRole(e.target.value)}
-          className="px-3 py-1.5 text-xs bg-slate-50 dark:bg-slate-850 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-700 dark:text-slate-200 focus:outline-none cursor-pointer"
+          className="px-3 py-1.5 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-700 dark:text-slate-200 focus:outline-none cursor-pointer max-w-[200px]"
         >
-          <option value="All">All Roles</option>
-          <option value="Data Analyst">Data Analyst</option>
-          <option value="AI/ML">AI/ML</option>
-          <option value="Software Developer">Software Developer</option>
-          <option value="Cloud Analytics">Cloud Analytics</option>
+          <option value="All">All Domains &amp; Roles</option>
+          <optgroup label="CSE / IT">
+            <option value="Data Analyst">Data Analyst</option>
+            <option value="Software Engineer">Software Engineer</option>
+            <option value="Software Developer">Software Developer</option>
+            <option value="AI/ML Engineer">AI/ML Engineer</option>
+            <option value="Data Science">Data Science</option>
+            <option value="Business Analyst">Business Analyst</option>
+            <option value="Cloud & DevOps">Cloud &amp; DevOps</option>
+          </optgroup>
+          <optgroup label="ECE">
+            <option value="Embedded Systems Engineer">Embedded Systems</option>
+            <option value="VLSI / Chip Design Engineer">VLSI / Chip Design</option>
+            <option value="IoT Engineer">IoT Engineer</option>
+          </optgroup>
+          <optgroup label="EEE">
+            <option value="Power Systems Engineer">Power Systems</option>
+            <option value="Renewable Energy Engineer">Renewable Energy</option>
+          </optgroup>
+          <optgroup label="Mechanical">
+            <option value="Mechanical Design Engineer">Mechanical Design</option>
+            <option value="Manufacturing Engineer">Manufacturing</option>
+          </optgroup>
+          <optgroup label="Civil">
+            <option value="Structural Engineer">Structural Engineering</option>
+            <option value="BIM Engineer">BIM Engineering</option>
+          </optgroup>
+          <optgroup label="Finance & Management">
+            <option value="Financial Analyst">Financial Analyst</option>
+            <option value="Business Analyst">Business Analyst</option>
+          </optgroup>
         </select>
 
         {/* Sort by Latest/Oldest */}
@@ -580,7 +396,9 @@ export default function Applications({
                   </div>
                   <div>
                     <span className="text-[10px] text-slate-400 dark:text-slate-500 block">Match Score</span>
-                    <span className="font-bold text-emerald-600 dark:text-emerald-400">88%</span>
+                    <span className="font-bold text-emerald-600 dark:text-emerald-400">
+                      {app.matchScore ? `${app.matchScore}%` : "85%"}
+                    </span>
                   </div>
                 </div>
 
@@ -709,23 +527,63 @@ export default function Applications({
                 Application Progression History
               </h4>
               <div className="space-y-2.5 relative pl-6 before:absolute before:left-2.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-200 dark:before:bg-slate-700">
-                {activeModalApp.history.map((step, sIdx) => (
-                  <div key={sIdx} className="relative flex items-center justify-between text-xs">
+                {(activeModalApp.history || []).map((step, sIdx) => (
+                  <div key={sIdx} className="relative flex items-start justify-between text-xs gap-2">
                     <div
-                      className={`absolute -left-6 top-1 w-4 h-4 rounded-full flex items-center justify-center ${
+                      className={`absolute -left-6 top-0.5 w-4 h-4 rounded-full flex items-center justify-center ${
                         step.done ? "bg-emerald-500 text-white" : "bg-slate-200 dark:bg-slate-700 text-slate-400 dark:text-slate-500"
                       }`}
                     >
                       {step.done && <CheckCircle2 className="w-3 h-3" />}
                     </div>
-                    <span className={step.done ? "font-semibold text-slate-900 dark:text-white" : "text-slate-400 dark:text-slate-500"}>
-                      {step.stage}
-                    </span>
-                    <span className="text-[11px] text-slate-400 dark:text-slate-500">{step.date}</span>
+                    <div>
+                      <span className={step.done ? "font-semibold text-slate-900 dark:text-white" : "text-slate-400 dark:text-slate-500"}>
+                        {step.stage}
+                      </span>
+                      {step.actor && (
+                        <span className="text-[10px] text-slate-400 dark:text-slate-500 ml-1.5 font-medium">
+                          by {step.actor}
+                        </span>
+                      )}
+                      {step.note && (
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 leading-snug">
+                          {step.note}
+                        </p>
+                      )}
+                    </div>
+                    <span className="text-[10.5px] text-slate-400 dark:text-slate-500 shrink-0 font-medium">{step.date}</span>
                   </div>
                 ))}
               </div>
             </div>
+
+            {/* Structured Recruiter & Institution Feedback Section */}
+            {activeModalApp.feedback && activeModalApp.feedback.length > 0 && (
+              <div className="pt-2">
+                <h4 className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-blue-600"></span>
+                  <span>Recruiter & Institution Feedback</span>
+                </h4>
+                <div className="space-y-2">
+                  {activeModalApp.feedback.map((fb, fbIdx) => (
+                    <div
+                      key={fb.id || fbIdx}
+                      className="p-3 bg-purple-50/60 dark:bg-purple-950/30 border border-purple-200 dark:border-purple-900/50 rounded-xl space-y-1 text-xs"
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-purple-900 dark:text-purple-300">
+                          {fb.authorName || "Hiring Team"} • {fb.category || "Evaluation"}
+                        </span>
+                        <span className="text-[10.5px] text-purple-600 dark:text-purple-400">{fb.timestamp || "Recent"}</span>
+                      </div>
+                      <p className="text-xs text-purple-950 dark:text-purple-200 leading-relaxed">
+                        "{fb.message}"
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end gap-2">
               <button

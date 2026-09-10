@@ -15,6 +15,7 @@ import {
   TrendingUp,
   History
 } from "lucide-react";
+import { getRoleData } from "../../data/roleCompetencies";
 
 export default function MySkills({
   onNavigate,
@@ -23,22 +24,54 @@ export default function MySkills({
 }) {
   const [selectedCategory, setSelectedCategory] = useState("All");
 
-  const skillProgressHistory = careerData?.skillProgressHistory || [
-    { skill: "Python", before: 68, current: 85, delta: 17, verified: true },
-    { skill: "SQL", before: 48, current: 65, delta: 17, verified: true },
-    { skill: "Power BI", before: 30, current: 45, delta: 15, verified: false },
-    { skill: "Statistics", before: 55, current: 70, delta: 15, verified: true },
-    { skill: "Excel", before: 65, current: 80, delta: 15, verified: true }
-  ];
+  const activeRoleData = getRoleData(careerGoal);
+  const activeGaps = (careerData?.skillGaps && careerData.skillGaps.length > 0)
+    ? careerData.skillGaps
+    : (activeRoleData?.skillGaps || []);
+
+  const dynamicRoleSkills = activeGaps.map((gap) => ({
+    name: gap.name,
+    proficiency: gap.current,
+    assessmentScore: `${gap.current}/100`,
+    industryReq: gap.required,
+    gap: gap.gap,
+    status: gap.gap === 0 ? "Strong" : "Needs Improvement",
+    verified: gap.gap === 0,
+    lastAssessed: "Recently Assessed",
+    resource: gap.recommendedAction || `Master ${gap.name}`,
+    resourceProvider: "SkillBridge Verified Lab"
+  }));
+
+  const skillProgressHistory = careerData?.skillProgressHistory || (
+    activeGaps.length > 0
+      ? activeGaps.map((g) => ({
+          skill: g.name,
+          before: Math.max(15, g.current - 15),
+          current: g.current,
+          delta: 15,
+          verified: g.gap === 0
+        }))
+      : [
+          { skill: "Core Track Fundamentals", before: 50, current: 75, delta: 25, verified: true }
+        ]
+  );
 
   const readinessHistory = careerData?.readinessProgressHistory || {
-    before: 64,
-    current: 82,
-    delta: 18,
+    before: Math.max(50, (careerData?.readinessScore || activeRoleData?.readinessScore || 80) - 15),
+    current: careerData?.readinessScore || activeRoleData?.readinessScore || 80,
+    delta: 15,
     duration: "Past 60 days"
   };
 
   const skillCategories = [
+    ...(dynamicRoleSkills.length > 0
+      ? [
+          {
+            name: `${careerGoal} Core`,
+            skills: dynamicRoleSkills
+          }
+        ]
+      : []),
     {
       name: "Programming",
       skills: [

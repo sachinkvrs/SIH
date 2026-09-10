@@ -9,17 +9,28 @@ import {
   Zap,
   Target,
   Clock,
-  Award
+  Award,
+  ChevronDown,
+  Wrench,
+  ExternalLink,
+  Sparkles
 } from "lucide-react";
+import { getRoleData } from "../../data/roleCompetencies";
 
 export default function SkillGapAnalysis({
   onNavigate,
   careerGoal = "Data Analyst",
   careerData,
-  onStartLearning
+  onStartLearning,
+  onOpenRoleSelector
 }) {
-  const skillGaps = careerData?.skillGaps || [];
+  const activeRoleData = getRoleData(careerGoal);
+  const skillGaps = (careerData?.skillGaps && careerData.skillGaps.length > 0)
+    ? careerData.skillGaps
+    : activeRoleData.skillGaps || [];
+
   const topPriorityGap = skillGaps.find((g) => g.priority === "HIGH") || skillGaps[0];
+  const experiments = activeRoleData.handsOnExperiments || [];
 
   const handleStart = (stepId) => {
     if (onStartLearning) {
@@ -27,6 +38,13 @@ export default function SkillGapAnalysis({
     } else {
       onNavigate("roadmap");
     }
+  };
+
+  const getGapColor = (gapItem) => {
+    if (gapItem.gapColor) return gapItem.gapColor;
+    if (gapItem.gap === 0) return "text-emerald-600 bg-emerald-50 border-emerald-200 dark:text-emerald-400 dark:bg-emerald-950/40 dark:border-emerald-900/50";
+    if (gapItem.priority === "HIGH") return "text-rose-600 bg-rose-50 border-rose-200 dark:text-rose-400 dark:bg-rose-950/40 dark:border-rose-900/50";
+    return "text-amber-600 bg-amber-50 border-amber-200 dark:text-amber-400 dark:bg-amber-950/40 dark:border-amber-900/50";
   };
 
   return (
@@ -55,14 +73,25 @@ export default function SkillGapAnalysis({
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <h2 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">Skill Gap Analysis</h2>
             <span className="px-2.5 py-0.5 bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 text-xs font-bold rounded-full border border-blue-200 dark:border-blue-800">
               Target: {careerGoal}
             </span>
+            {onOpenRoleSelector && (
+              <button
+                onClick={onOpenRoleSelector}
+                className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold rounded-lg border border-slate-200 dark:border-slate-700 transition cursor-pointer"
+                title="Switch Target Career Role"
+              >
+                <Target className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                <span>Switch Role</span>
+                <ChevronDown className="w-3 h-3 text-slate-400" />
+              </button>
+            )}
           </div>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-            Compare your current assessed skills against validated industry requirements for <strong>{careerGoal}</strong>.
+            Compare your current assessed skills against validated industry requirements for <strong>{careerGoal}</strong> ({activeRoleData.domainName}).
           </p>
         </div>
 
@@ -122,10 +151,10 @@ export default function SkillGapAnalysis({
                   <span
                     className={`inline-block px-2 py-0.5 text-[10px] font-bold rounded-md border ${
                       item.priority === "HIGH"
-                        ? "bg-rose-100 text-rose-700 border-rose-200"
+                        ? "bg-rose-100 text-rose-700 border-rose-200 dark:bg-rose-950/60 dark:text-rose-300 dark:border-rose-800"
                         : item.priority === "MEDIUM"
-                        ? "bg-amber-100 text-amber-700 border-amber-200"
-                        : "bg-emerald-100 text-emerald-700 border-emerald-200"
+                        ? "bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800"
+                        : "bg-emerald-100 text-emerald-700 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800"
                     }`}
                   >
                     {item.priority} PRIORITY
@@ -135,8 +164,12 @@ export default function SkillGapAnalysis({
                 {/* Visual Bars */}
                 <div className="col-span-4 space-y-1 pr-3">
                   <div className="flex items-center justify-between text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-0.5">
-                    <span>Current: <strong className="text-blue-600 dark:text-blue-400 font-bold">{item.current}%</strong></span>
-                    <span>Req: <strong className="text-slate-700 dark:text-slate-300">{item.required}%</strong></span>
+                    <span>
+                      Current: <strong className="text-blue-600 dark:text-blue-400 font-bold">{item.current}%</strong>
+                    </span>
+                    <span>
+                      Req: <strong className="text-slate-700 dark:text-slate-300">{item.required}%</strong>
+                    </span>
                   </div>
                   {/* Bar */}
                   <div className="w-full bg-slate-100 dark:bg-slate-700 h-2.5 rounded-full overflow-hidden relative">
@@ -161,7 +194,7 @@ export default function SkillGapAnalysis({
                 {/* Gap Badge */}
                 <div className="col-span-2 text-center">
                   <span
-                    className={`inline-block px-2.5 py-1 text-xs font-black rounded-lg border ${item.gapColor}`}
+                    className={`inline-block px-2.5 py-1 text-xs font-black rounded-lg border ${getGapColor(item)}`}
                   >
                     {item.gap === 0 ? "Target Met ✓" : `-${item.gap}% Gap`}
                   </span>
@@ -169,7 +202,10 @@ export default function SkillGapAnalysis({
 
                 {/* Recommended Action with deep link */}
                 <div className="col-span-3 text-right space-y-1">
-                  <span className="text-[11px] text-slate-600 dark:text-slate-300 font-semibold block truncate" title={item.recommendedAction}>
+                  <span
+                    className="text-[11px] text-slate-600 dark:text-slate-300 font-semibold block truncate"
+                    title={item.recommendedAction}
+                  >
                     {item.recommendedAction}
                   </span>
                   {item.gap > 0 ? (
@@ -205,8 +241,8 @@ export default function SkillGapAnalysis({
                     {item.priority} Priority
                   </span>
                 </div>
-                <span className={`px-2.5 py-1 text-xs font-black rounded-lg border ${item.gapColor}`}>
-                  {item.gap === 0 ? "0% Gap" : `-${item.gap}% Gap`}
+                <span className={`px-2.5 py-1 text-xs font-black rounded-lg border ${getGapColor(item)}`}>
+                  {item.gap === 0 ? "Target Met ✓" : `-${item.gap}% Gap`}
                 </span>
               </div>
 
@@ -237,7 +273,9 @@ export default function SkillGapAnalysis({
 
               <div className="pt-2 border-t border-slate-200/60 dark:border-slate-700 space-y-2">
                 <div>
-                  <span className="text-[10px] font-bold uppercase text-slate-400 dark:text-slate-500 block">Recommended Action:</span>
+                  <span className="text-[10px] font-bold uppercase text-slate-400 dark:text-slate-500 block">
+                    Recommended Action:
+                  </span>
                   <p className="text-xs font-semibold text-slate-800 dark:text-slate-200">{item.recommendedAction}</p>
                 </div>
 
@@ -254,6 +292,76 @@ export default function SkillGapAnalysis({
             </div>
           ))}
         </div>
+
+        {/* HANDS-ON INDUSTRIAL LEARNING & EXPERIMENTS */}
+        {experiments.length > 0 && (
+          <div className="pt-5 border-t border-slate-100 dark:border-slate-800 space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 rounded-lg bg-blue-100 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold text-xs">
+                  <Wrench className="w-3.5 h-3.5" />
+                </div>
+                <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+                  Hands-On Industrial Projects & Experiments ({careerGoal})
+                </h3>
+              </div>
+              <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+                Industry-standard deliverables
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+              {experiments.map((exp) => (
+                <div
+                  key={exp.id}
+                  className="p-4 rounded-xl bg-slate-50/80 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 flex flex-col justify-between space-y-3"
+                >
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-100 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300">
+                        {exp.domain}
+                      </span>
+                      <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300">
+                        {exp.difficulty}
+                      </span>
+                    </div>
+
+                    <h4 className="text-xs font-bold text-slate-900 dark:text-white leading-snug">
+                      {exp.title}
+                    </h4>
+
+                    {/* Where is this used in industry? */}
+                    <div className="p-2 rounded-lg bg-white dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800 text-[11px] text-slate-600 dark:text-slate-300 space-y-0.5">
+                      <strong className="text-blue-700 dark:text-blue-300 block">
+                        📍 Where is this used in industry?
+                      </strong>
+                      <p className="leading-relaxed text-[10.5px]">
+                        {exp.industryContext}
+                      </p>
+                    </div>
+
+                    <div className="text-[11px] text-slate-500 dark:text-slate-400">
+                      <strong>Tools:</strong> {exp.tools}
+                    </div>
+                  </div>
+
+                  <div className="pt-2 border-t border-slate-200/60 dark:border-slate-700 flex items-center justify-between text-xs">
+                    <span className="text-[10.5px] text-slate-400 dark:text-slate-500 truncate max-w-[200px]">
+                      Deliverable: {exp.deliverables}
+                    </span>
+                    <button
+                      onClick={() => onNavigate("roadmap")}
+                      className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 shrink-0 cursor-pointer"
+                    >
+                      <span>Queue in Roadmap</span>
+                      <ArrowRight className="w-3 h-3" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Recommended Learning Path Section */}
         <div className="pt-3 border-t border-slate-100 dark:border-slate-800">

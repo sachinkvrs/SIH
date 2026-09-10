@@ -44,29 +44,42 @@ export default function DigitalSkillPassport({
     "Assessment History"
   ];
 
+  const defaultVerifiedSkills = [
+    { name: "Communication", proficiency: "80%", verified: true, date: "25 Aug 2026", issuer: "Campus Evaluation" },
+    { name: "Problem Solving", proficiency: "85%", verified: true, date: "02 Sep 2026", issuer: "SkillBridge Lab" }
+  ];
+
+  const roleSkills = (careerData?.skillGaps || []).map((g) => ({
+    name: g.name,
+    proficiency: `${g.current}%`,
+    verified: g.gap === 0 || g.current >= 70,
+    date: "04 Sep 2026",
+    issuer: "SkillBridge Proctored Benchmark"
+  }));
+
   const verifiedSkills = [
-    { name: "Python", proficiency: "85%", verified: true, date: "02 Sep 2026", issuer: "SkillBridge Code Lab" },
-    { name: "SQL", proficiency: "65%", verified: true, date: "28 Aug 2026", issuer: "SkillBridge Proctored Test" },
-    { name: "Machine Learning", proficiency: "72%", verified: true, date: "04 Sep 2026", issuer: "DeepLearning.AI Benchmark" },
-    { name: "JavaScript", proficiency: "78%", verified: true, date: "20 Aug 2026", issuer: "SkillBridge Web Exam" },
-    { name: "Communication", proficiency: "80%", verified: true, date: "25 Aug 2026", issuer: "Campus Interview Evaluation" },
-    { name: "Excel & Power Query", proficiency: "80%", verified: true, date: "01 Sep 2026", issuer: "Microsoft Learn Assessment" },
-    { name: "Power BI", proficiency: "45%", verified: false, date: "In Progress", issuer: "Self-Reported" }
+    ...roleSkills,
+    ...defaultVerifiedSkills.filter((s) => !roleSkills.some((r) => r.name.toLowerCase() === s.name.toLowerCase()))
   ];
 
   const certifications = [
-    { title: "Verified Data Analyst Diagnostic", issuer: "SkillBridge & NASSCOM Industry Partners", date: "Sep 2026", grade: "Top 15%" },
-    { title: "Relational Database SQL Competency", issuer: "ABC Institute of Technology & SkillBridge", date: "Aug 2026", grade: "88/100" },
-    { title: "Applied Python for Scientific Computing", issuer: "Coursera / University Partner", date: "Jul 2026", grade: "94%" }
+    { title: `Verified ${careerGoal} Diagnostic`, issuer: "SkillBridge & Industry Partners", date: "Sep 2026", grade: "Top 15%" },
+    { title: `${careerGoal} Core Competency`, issuer: "SkillBridge Verified Credentials", date: "Aug 2026", grade: "Certified" },
+    { title: "Applied Problem Solving & Ethics", issuer: "SkillBridge Council", date: "Jul 2026", grade: "94%" }
   ];
 
-  const projects = [
-    { title: "E-Commerce Customer Churn Intelligence", stack: "Python, Scikit-Learn, Streamlit", desc: "Predictive model deployed with 88% precision to identify at-risk enterprise accounts." },
-    { title: "Automated ETL Pipeline & Power BI Dashboard", stack: "SQL, Power BI, Python", desc: "Automated data ingestion from PostgreSQL to analytical dashboards with dynamic DAX filters." }
-  ];
+  const projects = (careerData?.handsOnExperiments && careerData.handsOnExperiments.length > 0)
+    ? careerData.handsOnExperiments.map((exp) => ({
+        title: exp.title,
+        stack: Array.isArray(exp.tools) ? exp.tools.join(", ") : "Production Tooling",
+        desc: exp.industryContext || exp.description || `Hands-on capstone project for ${careerGoal}.`
+      }))
+    : [
+        { title: `${careerGoal} Industrial Capstone`, stack: "Production Toolchain", desc: `Comprehensive milestone project demonstrating hands-on proficiency in ${careerGoal}.` }
+      ];
 
   const internships = [
-    { role: "Data Science Trainee", org: "Cognitive Insights AI", duration: "Jun 2026 – Aug 2026", outcome: "Optimized feature engineering pipeline; reduced model latency by 24%." }
+    { role: `${careerGoal} Trainee`, org: "SkillBridge Industry Lab", duration: "Jun 2026 – Aug 2026", outcome: "Optimized workflow pipeline; verified hands-on milestone execution." }
   ];
 
   const achievements = [

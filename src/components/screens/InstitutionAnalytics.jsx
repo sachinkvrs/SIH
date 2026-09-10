@@ -1,7 +1,39 @@
-import React, { useState, useEffect } from "react";
-import { Users, TrendingUp, Briefcase, GraduationCap, BarChart3, AlertCircle, CheckCircle2, Download, FileSpreadsheet } from "lucide-react";
+// src/components/screens/InstitutionAnalytics.jsx
+// SkillBridge Institution Intelligence & Analytics Portal
+// Connected to Canonical Applications State & Student Endorsement Queue
 
-export default function InstitutionAnalytics({ onNavigate, activeSection = "institution_analytics" }) {
+import React, { useState, useEffect } from "react";
+import {
+  Users,
+  TrendingUp,
+  Briefcase,
+  GraduationCap,
+  BarChart3,
+  AlertCircle,
+  CheckCircle2,
+  Download,
+  FileSpreadsheet,
+  Send,
+  UserCheck,
+  Building2,
+  ExternalLink,
+  ShieldCheck,
+  ChevronRight
+} from "lucide-react";
+import {
+  APPLICATION_STATUS,
+  ACTOR_ROLES,
+  canTransition,
+  STATUS_UI_META
+} from "../../services/canonicalApplicationService";
+
+export default function InstitutionAnalytics({
+  onNavigate,
+  activeSection = "institution_analytics",
+  applicationsList = [],
+  onUpdateApplicationStatus,
+  onAddFeedback
+}) {
   const [currentTab, setCurrentTab] = useState(
     activeSection === "skill_demand"
       ? "skill_demand"
@@ -9,6 +41,8 @@ export default function InstitutionAnalytics({ onNavigate, activeSection = "inst
       ? "curriculum_gap"
       : activeSection === "placements"
       ? "placements"
+      : activeSection === "students" || activeSection === "endorsements"
+      ? "endorsements"
       : "overview"
   );
 
@@ -16,14 +50,63 @@ export default function InstitutionAnalytics({ onNavigate, activeSection = "inst
     if (activeSection === "skill_demand") setCurrentTab("skill_demand");
     else if (activeSection === "curriculum_gap") setCurrentTab("curriculum_gap");
     else if (activeSection === "placements") setCurrentTab("placements");
+    else if (activeSection === "students" || activeSection === "endorsements") setCurrentTab("endorsements");
     else if (activeSection === "institution_analytics") setCurrentTab("overview");
   }, [activeSection]);
 
+  const [endorsementMessage, setEndorsementMessage] = useState("");
+  const [selectedStudentApp, setSelectedStudentApp] = useState(null);
+
+  // Institution student applications
+  const institutionApplications = applicationsList.filter((app) => {
+    return (
+      app.college === "ABC Institute of Technology" ||
+      app.studentEmail?.includes("example.edu.in") ||
+      !app.college // fallback
+    );
+  });
+
+  const uniqueStudentsCount = new Set(
+    institutionApplications.map((a) => a.studentId || a.studentEmail || a.studentName || a.id)
+  ).size;
+
+  const avgReadiness =
+    institutionApplications.length > 0
+      ? Math.round(
+          institutionApplications.reduce((acc, a) => acc + (a.matchScore || 80), 0) /
+            institutionApplications.length
+        )
+      : 0;
+
+  const placedCount = institutionApplications.filter(
+    (a) => a.status === APPLICATION_STATUS.SELECTED
+  ).length;
+
   const kpis = [
-    { label: "Total Students", value: "1,240", icon: Users, color: "text-blue-600 bg-blue-50 border-blue-100" },
-    { label: "Average Readiness", value: "78%", icon: TrendingUp, color: "text-emerald-600 bg-emerald-50 border-emerald-100" },
-    { label: "Internship Participation", value: "320", icon: Briefcase, color: "text-purple-600 bg-purple-50 border-purple-100" },
-    { label: "Placement Rate", value: "85%", icon: GraduationCap, color: "text-cyan-600 bg-cyan-50 border-cyan-100" },
+    {
+      label: "Active Student Applicants",
+      value: uniqueStudentsCount.toString(),
+      icon: Users,
+      color: "text-blue-600 bg-blue-50 border-blue-100"
+    },
+    {
+      label: "Average Match / Readiness",
+      value: institutionApplications.length > 0 ? `${avgReadiness}%` : "0%",
+      icon: TrendingUp,
+      color: "text-emerald-600 bg-emerald-50 border-emerald-100"
+    },
+    {
+      label: "Active Applications",
+      value: institutionApplications.length.toString(),
+      icon: Briefcase,
+      color: "text-purple-600 bg-purple-50 border-purple-100"
+    },
+    {
+      label: "Verified Placed / Selected",
+      value: placedCount.toString(),
+      icon: GraduationCap,
+      color: "text-cyan-600 bg-cyan-50 border-cyan-100"
+    }
   ];
 
   const demandedSkills = [
@@ -42,51 +125,129 @@ export default function InstitutionAnalytics({ onNavigate, activeSection = "inst
     { skill: "Security", curriculum: 40, industry: 72, gap: 32 },
   ];
 
-  const placementsByBranch = [
-    { branch: "CSE & IT", students: 420, placed: 378, percentage: 90 },
-    { branch: "ECE (Electronics)", students: 280, placed: 232, percentage: 83 },
-    { branch: "EEE (Electrical)", students: 180, placed: 144, percentage: 80 },
-    { branch: "Mechanical", students: 210, placed: 162, percentage: 77 },
-    { branch: "Civil", students: 150, placed: 112, percentage: 75 },
+  const branches = [
+    { key: "cs_it", branch: "CSE & IT", matchRole: ["Data Analyst", "Data Science", "Software Developer", "AI/ML Engineer"] },
+    { key: "ece", branch: "ECE (Electronics)", matchRole: ["Embedded Systems Engineer", "VLSI / Chip Design Engineer", "IoT Engineer"] },
+    { key: "eee", branch: "EEE (Electrical)", matchRole: ["Power Systems Engineer", "Renewable Energy Engineer"] },
+    { key: "mech", branch: "Mechanical", matchRole: ["Mechanical Design Engineer", "CAD Design Intern", "CAD/CAM Engineer"] },
+    { key: "civil", branch: "Civil", matchRole: ["Structural Engineer", "Civil Site Engineer", "BIM Engineer"] },
   ];
 
+  const placementsByBranch = branches.map((b) => {
+    const branchApps = institutionApplications.filter((app) =>
+      app.domainId === b.key ||
+      b.matchRole.some((r) => app.roleCategory?.includes(r) || app.position?.includes(r) || app.role?.includes(r))
+    );
+    const branchStudents = new Set(branchApps.map((a) => a.studentId || a.id)).size;
+    const branchPlaced = branchApps.filter((a) => a.status === APPLICATION_STATUS.SELECTED).length;
+    const percentage = branchStudents > 0 ? Math.round((branchPlaced / branchStudents) * 100) : 0;
+    return {
+      branch: b.branch,
+      students: branchStudents,
+      placed: branchPlaced,
+      percentage
+    };
+  });
+
+  const totalStudentsCount = placementsByBranch.reduce((acc, b) => acc + b.students, 0);
+  const totalPlacedCount = placementsByBranch.reduce((acc, b) => acc + b.placed, 0);
+  const overallPlacementRate = totalStudentsCount > 0 ? Math.round((totalPlacedCount / totalStudentsCount) * 100) : 0;
+
+  // Execute institutional endorsement & forward to industry
+  const handleForwardToIndustry = (appId) => {
+    if (!onUpdateApplicationStatus) return;
+    const res = onUpdateApplicationStatus(
+      appId,
+      APPLICATION_STATUS.FORWARDED_TO_INDUSTRY,
+      ACTOR_ROLES.INSTITUTION,
+      "Endorsed by Institution TPO. Academic standing and skill passport verified.",
+      {
+        authorName: "Institution Placement Cell",
+        category: "Institutional Endorsement",
+        message: "Student verified with good academic standing and high competency passport credentials. Recommended for recruitment consideration.",
+        visibility: "STUDENT_VISIBLE"
+      }
+    );
+
+    if (res?.success) {
+      setEndorsementMessage("Application successfully endorsed & forwarded to industry hiring partner!");
+      setTimeout(() => setEndorsementMessage(""), 3500);
+      if (selectedStudentApp && selectedStudentApp.id === appId) {
+        setSelectedStudentApp(res.application);
+      }
+    }
+  };
+
   return (
-    <div className="space-y-6 max-w-5xl mx-auto pb-8">
+    <div className="space-y-6 max-w-6xl mx-auto pb-8">
+      {/* Endorsement Message Banner */}
+      {endorsementMessage && (
+        <div className="p-3 bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-300 dark:border-emerald-800 rounded-xl text-emerald-800 dark:text-emerald-200 text-xs font-bold flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+            <span>{endorsementMessage}</span>
+          </div>
+          <button onClick={() => setEndorsementMessage("")} className="text-emerald-700 hover:text-emerald-900 text-xs font-semibold">
+            Dismiss
+          </button>
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-              Institution Intelligence & Analytics
-            </h2>
+            <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+              Institution Intelligence & Placement Portal
+            </h1>
             <span className="px-2.5 py-0.5 bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 text-xs font-bold rounded-full border border-blue-200 dark:border-blue-900/50">
               ABC Institute of Technology
             </span>
           </div>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-            Overall student competency progression, curriculum alignment, and placement readiness.
+            Institutional competency monitoring, NIRF placement tracking, and student application endorsement queue.
           </p>
         </div>
 
-        <button
-          onClick={() => onNavigate("student_dashboard")}
-          className="px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-xl text-xs font-bold transition self-start sm:self-auto cursor-pointer"
-        >
-          ← Return to Student Portal
-        </button>
+        <div className="flex items-center gap-2 self-start sm:self-auto">
+          <button
+            onClick={() => onNavigate("student_dashboard")}
+            className="px-3.5 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-xl text-xs font-bold transition cursor-pointer"
+          >
+            ← Student Portal
+          </button>
+          <button
+            onClick={() => onNavigate("industry_dashboard")}
+            className="px-3.5 py-2 bg-purple-50 dark:bg-purple-950/40 hover:bg-purple-100 text-purple-800 dark:text-purple-200 border border-purple-200 dark:border-purple-800/60 rounded-xl text-xs font-bold transition cursor-pointer"
+          >
+            Industry Portal →
+          </button>
+        </div>
       </div>
 
-      {/* Internal Navigation Tabs (Phase 2 Requirement) */}
+      {/* Internal Navigation Tabs */}
       <div className="bg-white dark:bg-[#111827] rounded-2xl p-2 border border-slate-200/80 dark:border-slate-800 shadow-xs flex items-center gap-1.5 overflow-x-auto scrollbar-none text-xs font-bold">
         <button
           onClick={() => setCurrentTab("overview")}
-          className={`px-4 py-2 rounded-xl transition cursor-pointer ${
+          className={`px-4 py-2 rounded-xl transition cursor-pointer flex items-center gap-1.5 ${
             currentTab === "overview"
               ? "bg-[#1E60D5] text-white shadow-xs"
               : "text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
           }`}
         >
-          Institutional Overview
+          <BarChart3 className="w-3.5 h-3.5" />
+          <span>Institutional Overview</span>
+        </button>
+        <button
+          onClick={() => setCurrentTab("endorsements")}
+          className={`px-4 py-2 rounded-xl transition cursor-pointer flex items-center gap-1.5 ${
+            currentTab === "endorsements"
+              ? "bg-[#1E60D5] text-white shadow-xs"
+              : "text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
+          }`}
+        >
+          <ShieldCheck className="w-3.5 h-3.5" />
+          <span>Student Endorsement Queue ({institutionApplications.length})</span>
         </button>
         <button
           onClick={() => setCurrentTab("skill_demand")}
@@ -214,7 +375,90 @@ export default function InstitutionAnalytics({ onNavigate, activeSection = "inst
         </div>
       )}
 
-      {/* TAB 2: SKILL DEMAND TRENDS */}
+      {/* TAB 2: STUDENT ENDORSEMENT & VERIFICATION QUEUE */}
+      {currentTab === "endorsements" && (
+        <div className="space-y-4">
+          <div className="bg-white dark:bg-[#111827] rounded-2xl p-6 border border-slate-200/80 dark:border-slate-800 shadow-xs">
+            <div className="pb-3 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <h3 className="text-base font-bold text-slate-900 dark:text-white">
+                  Student Institutional Endorsement Queue
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                  Review student applications, verify academic standing, and endorse/forward directly to partner recruiters.
+                </p>
+              </div>
+              <span className="text-xs font-bold text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/40 px-3 py-1 rounded-xl border border-blue-200 dark:border-blue-800 self-start sm:self-auto">
+                {institutionApplications.length} Total Student Submissions
+              </span>
+            </div>
+
+            <div className="divide-y divide-slate-100 dark:divide-slate-800 mt-4">
+              {institutionApplications.length === 0 ? (
+                <div className="py-12 text-center text-slate-500 dark:text-slate-400">
+                  <AlertCircle className="w-8 h-8 mx-auto mb-2 text-slate-400" />
+                  <p className="font-bold text-sm text-slate-700 dark:text-slate-300">No student applications in endorsement queue</p>
+                  <p className="text-xs text-slate-400 mt-1">When students submit applications, they will appear here for institutional verification and endorsement.</p>
+                </div>
+              ) : (
+                institutionApplications.map((app) => {
+                  const statusMeta = STATUS_UI_META[app.status] || STATUS_UI_META[APPLICATION_STATUS.APPLIED];
+                  const canForward = canTransition(app, ACTOR_ROLES.INSTITUTION, APPLICATION_STATUS.FORWARDED_TO_INDUSTRY);
+
+                  return (
+                    <div key={app.id} className="py-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                      <div className="flex items-start gap-3">
+                        <div className="w-10 h-10 rounded-full bg-blue-600 text-white font-bold text-sm flex items-center justify-center shrink-0">
+                          {(app.studentName || "S").charAt(0)}
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <h4 className="text-xs font-bold text-slate-900 dark:text-white">{app.studentName}</h4>
+                            <span className="text-[11px] text-slate-400">• {app.degree || "B.Tech"}</span>
+                            <span className="px-2 py-0.2 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 text-[10px] font-bold rounded border border-emerald-200">
+                              {app.matchScore || 85}% Skill Match
+                            </span>
+                          </div>
+                          <p className="text-xs text-slate-600 dark:text-slate-300 mt-0.5">
+                            Target: <strong>{app.position}</strong> at <strong>{app.company}</strong>
+                          </p>
+                          <div className="flex items-center gap-3 text-[11px] text-slate-400 mt-1">
+                            <span>Applied: {app.appliedDate}</span>
+                            <span>•</span>
+                            <span>Passport ID: {app.passportCredentialId || "CRED-SB-2026-VERIFIED"}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-3 self-end md:self-auto">
+                        <span className={`px-2.5 py-1 text-xs font-bold rounded-lg border ${statusMeta.badgeBg}`}>
+                          {app.status}
+                        </span>
+
+                        {canForward ? (
+                          <button
+                            onClick={() => handleForwardToIndustry(app.id)}
+                            className="px-4 py-2 bg-[#1E60D5] hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-xs transition cursor-pointer flex items-center gap-1.5"
+                          >
+                            <Send className="w-3.5 h-3.5" />
+                            <span>Endorse & Forward to {app.company}</span>
+                          </button>
+                        ) : (
+                          <span className="text-[11px] text-slate-400 font-semibold italic">
+                            {app.status === APPLICATION_STATUS.FORWARDED_TO_INDUSTRY ? "Endorsed to Employer ✓" : "In Recruiter Pipeline"}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* TAB 3: SKILL DEMAND TRENDS */}
       {currentTab === "skill_demand" && (
         <div className="bg-white dark:bg-[#111827] rounded-2xl p-6 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-4">
           <div className="pb-3 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
@@ -248,7 +492,7 @@ export default function InstitutionAnalytics({ onNavigate, activeSection = "inst
         </div>
       )}
 
-      {/* TAB 3: CURRICULUM GAP ANALYSIS */}
+      {/* TAB 4: CURRICULUM GAP ANALYSIS */}
       {currentTab === "curriculum_gap" && (
         <div className="bg-white dark:bg-[#111827] rounded-2xl p-6 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-4">
           <div className="pb-3 border-b border-slate-100 dark:border-slate-800">
@@ -278,7 +522,7 @@ export default function InstitutionAnalytics({ onNavigate, activeSection = "inst
         </div>
       )}
 
-      {/* TAB 4: PLACEMENTS & INTERNSHIPS */}
+      {/* TAB 5: PLACEMENTS & INTERNSHIPS */}
       {currentTab === "placements" && (
         <div className="bg-white dark:bg-[#111827] rounded-2xl p-6 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-4">
           <div className="pb-3 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
@@ -287,7 +531,7 @@ export default function InstitutionAnalytics({ onNavigate, activeSection = "inst
               <p className="text-xs text-slate-500 dark:text-slate-400">Aggregated verified statistics for NIRF & NBA accreditation</p>
             </div>
             <span className="text-xs font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-1 rounded-lg border border-emerald-200 dark:border-emerald-800">
-              85% Overall Institution Placement Rate
+              {overallPlacementRate}% Overall Institution Placement Rate
             </span>
           </div>
 

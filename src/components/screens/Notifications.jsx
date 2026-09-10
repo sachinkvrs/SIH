@@ -19,6 +19,7 @@ import {
 
 export default function Notifications({
   onNavigate,
+  onNavigateToEntity,
   notifications = [],
   onMarkAllAsRead,
   onMarkAsRead
@@ -198,8 +199,12 @@ export default function Notifications({
                 <div className={`w-9 h-9 rounded-xl ${selectedNotification.iconBg} flex items-center justify-center text-xs font-bold`}>
                   {selectedNotification.category === "Applications" ? (
                     <FolderKanban className="w-4 h-4" />
-                  ) : (
+                  ) : selectedNotification.category === "Internships" ? (
                     <Briefcase className="w-4 h-4" />
+                  ) : selectedNotification.category === "Skills" ? (
+                    <TrendingUp className="w-4 h-4" />
+                  ) : (
+                    <BookOpen className="w-4 h-4" />
                   )}
                 </div>
                 <div>
@@ -233,8 +238,11 @@ export default function Notifications({
               <button
                 onClick={() => {
                   const target = selectedNotification.targetScreen;
+                  const entityId = selectedNotification.targetEntityId;
                   setSelectedNotification(null);
-                  if (onNavigate && target) {
+                  if (entityId && onNavigateToEntity && target) {
+                    onNavigateToEntity(target, entityId);
+                  } else if (onNavigate && target) {
                     onNavigate(target);
                   }
                 }}

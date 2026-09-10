@@ -2,47 +2,118 @@
 // Model D: Learning Recommendation & Dynamic Course Resource Service
 // Integrates synthetic ML dataset: learning_resources.csv & learning_interactions.csv
 
-import { ML_LEARNING_RESOURCES, DEFAULT_STUDENT_INTERACTIONS } from "../data/mlDataset/learningResourcesData";
+import { ML_LEARNING_RESOURCES, DEFAULT_STUDENT_INTERACTIONS } from "../data/mlDataset/learningResourcesData.js";
 
 const STORAGE_KEY_INTERACTIONS = "skillbridge_learning_interactions";
 
 /**
- * Skill keywords mapping for Roadmap Module IDs
+ * Dynamically build skill-to-module mapping from all roles.
+ * Falls back to Data Analyst mapping for generic content.
  */
 export const MODULE_SKILL_MAP = {
-  "sql-fundamentals": ["SQL", "Relational Databases", "Data Filtering"],
-  "advanced-sql": ["SQL", "Window Functions", "CTEs", "Query Optimization"],
-  "power-bi": ["Power BI", "Data Visualization", "Excel", "DAX"],
-  "data-analytics-project": ["Python", "Pandas", "NumPy", "Statistics", "Data Visualization", "SQL"],
-  "industry-assessment": ["Problem Solving", "Communication", "SQL", "Python", "Statistics", "Project Management"],
-  "internship-ready": ["Communication", "Problem Solving", "Project Management"]
+  // Data Analyst / CS/IT
+  "sql-fundamentals": ["SQL", "Relational Databases", "Data Filtering", "Database"],
+  "advanced-sql": ["SQL", "Window Functions", "CTEs", "Query Optimization", "Advanced SQL"],
+  "power-bi": ["Power BI", "Data Visualization", "Excel", "DAX", "Business Intelligence", "Tableau"],
+  "data-analytics-project": ["Python", "Pandas", "NumPy", "Statistics", "Data Visualization", "EDA"],
+  "industry-assessment": ["Problem Solving", "Communication", "Statistics", "Project Management"],
+  "internship-ready": ["Communication", "Problem Solving", "Project Management", "Teamwork"],
+  // ECE / Embedded
+  "embedded-c": ["Embedded C", "C Programming", "Microcontrollers", "Firmware"],
+  "microcontrollers": ["Microcontrollers", "Arduino", "STM32", "AVR", "PIC", "Embedded Systems"],
+  "rtos": ["RTOS", "FreeRTOS", "Real-Time Systems", "Embedded Linux"],
+  "iot-protocols": ["IoT", "MQTT", "BLE", "Wi-Fi", "Zigbee", "IoT Protocols"],
+  "pcb-design": ["PCB Design", "KiCad", "Altium", "Circuit Design", "Schematic"],
+  // EEE / Power
+  "circuit-analysis": ["Circuit Analysis", "Electrical Fundamentals", "Ohm's Law", "KVL", "KCL"],
+  "power-electronics": ["Power Electronics", "SMPS", "Inverters", "Converters", "MOSFETs"],
+  "electrical-machines": ["Electrical Machines", "Motors", "Generators", "Transformers"],
+  "matlab-simulink": ["MATLAB", "Simulink", "MathWorks", "Control Systems"],
+  "load-flow": ["Load Flow", "Power Systems", "Grid Analysis", "ETAP"],
+  // Mechanical
+  "cad-design": ["AutoCAD", "SolidWorks", "CATIA", "CAD", "3D Modeling"],
+  "fea-cfd": ["FEA", "CFD", "ANSYS", "Structural Analysis", "Fluid Dynamics"],
+  "manufacturing": ["Manufacturing", "CNC", "CAM", "GD&T", "Production"],
+  // Civil
+  "structural-analysis": ["Structural Analysis", "STAAD Pro", "ETABS", "RCC Design"],
+  "bim": ["BIM", "Revit", "Autodesk", "Building Information Modeling"],
+  "autocad-civil": ["AutoCAD", "Civil Engineering", "Engineering Drawing"],
+  // Management / Commerce
+  "financial-modeling": ["Financial Modeling", "DCF", "Valuation", "Excel", "Finance"],
+  "business-analytics": ["Business Analytics", "Data Analysis", "Excel", "Power BI", "Business Intelligence"],
+  "requirements-engineering": ["Requirements Engineering", "BPMN", "Use Cases", "Stakeholder Analysis"],
 };
 
 /**
- * Reverse mapping from a skill to its primary roadmap step ID
+ * Reverse mapping from a skill to its primary roadmap step ID across domains
  */
 export const SKILL_TO_MODULE_MAP = {
+  // SQL/Data
   "SQL": "advanced-sql",
   "Relational Databases": "sql-fundamentals",
   "Power BI": "power-bi",
   "Data Visualization": "power-bi",
+  "Tableau": "power-bi",
   "Excel": "power-bi",
   "Python": "data-analytics-project",
   "Pandas": "data-analytics-project",
   "NumPy": "data-analytics-project",
   "Statistics": "data-analytics-project",
   "Machine Learning": "data-analytics-project",
-  "Git": "data-analytics-project",
   "Problem Solving": "industry-assessment",
   "Communication": "industry-assessment",
   "Project Management": "industry-assessment",
-  "JavaScript": "advanced-sql",
-  "React": "advanced-sql",
-  "Node.js": "advanced-sql",
+  // ECE
+  "Embedded C": "embedded-c",
+  "C Programming": "embedded-c",
+  "Microcontrollers": "microcontrollers",
+  "Arduino": "microcontrollers",
+  "STM32": "microcontrollers",
+  "RTOS": "rtos",
+  "FreeRTOS": "rtos",
+  "IoT": "iot-protocols",
+  "PCB Design": "pcb-design",
+  "KiCad": "pcb-design",
+  // EEE
+  "Circuit Analysis": "circuit-analysis",
+  "Power Electronics": "power-electronics",
+  "Electrical Machines": "electrical-machines",
+  "MATLAB": "matlab-simulink",
+  "Simulink": "matlab-simulink",
+  "Power Systems": "load-flow",
+  "Load Flow": "load-flow",
+  // Mechanical
+  "AutoCAD": "cad-design",
+  "SolidWorks": "cad-design",
+  "CATIA": "cad-design",
+  "FEA": "fea-cfd",
+  "ANSYS": "fea-cfd",
+  "CFD": "fea-cfd",
+  "Manufacturing": "manufacturing",
+  "CNC": "manufacturing",
+  // Civil
+  "Structural Analysis": "structural-analysis",
+  "STAAD Pro": "structural-analysis",
+  "ETABS": "structural-analysis",
+  "BIM": "bim",
+  "Revit": "bim",
+  // Management/Commerce
+  "Financial Modeling": "financial-modeling",
+  "DCF": "financial-modeling",
+  "Business Analytics": "business-analytics",
+  "Requirements Engineering": "requirements-engineering",
+  "BPMN": "requirements-engineering",
+  // Software / Cloud
   "Docker": "data-analytics-project",
-  "Cybersecurity": "industry-assessment",
+  "Kubernetes": "data-analytics-project",
+  "Git": "data-analytics-project",
   "Linux": "data-analytics-project",
-  "Cloud": "data-analytics-project"
+  "Cloud": "data-analytics-project",
+  "AWS": "data-analytics-project",
+  "JavaScript": "data-analytics-project",
+  "React": "data-analytics-project",
+  "Node.js": "data-analytics-project",
+  "Cybersecurity": "industry-assessment"
 };
 
 /**
@@ -149,16 +220,15 @@ export function getModelDRecommendations({
       gapMap[name.toLowerCase()] = {
         priority: g.priority || "MEDIUM",
         gap: g.gap || 15,
-        targetModuleId: g.roadmapStepId ? (g.roadmapStepId === "step-adv-sql" ? "advanced-sql" : g.roadmapStepId === "step-pbi" ? "power-bi" : "advanced-sql") : SKILL_TO_MODULE_MAP[name] || "advanced-sql"
+        targetModuleId: g.roadmapStepId ? (SKILL_TO_MODULE_MAP[name] || g.roadmapStepId.replace(/^step-/, "")) : (SKILL_TO_MODULE_MAP[name] || "industry-assessment")
       };
     });
   }
 
-  // Default fallback gaps if empty
+  // Default fallback gaps if empty — use generic learning rather than Data Analyst SQL defaults
   if (Object.keys(gapMap).length === 0) {
-    gapMap["sql"] = { priority: "HIGH", gap: 15, targetModuleId: "advanced-sql" };
-    gapMap["power bi"] = { priority: "HIGH", gap: 30, targetModuleId: "power-bi" };
-    gapMap["python"] = { priority: "MEDIUM", gap: 10, targetModuleId: "data-analytics-project" };
+    gapMap["communication"] = { priority: "MEDIUM", gap: 15, targetModuleId: "industry-assessment" };
+    gapMap["problem solving"] = { priority: "MEDIUM", gap: 10, targetModuleId: "industry-assessment" };
   }
 
   const scored = ML_LEARNING_RESOURCES.map((res) => {
@@ -203,7 +273,7 @@ export function getModelDRecommendations({
     totalScore = Math.min(99, Math.max(65, totalScore));
 
     // Determine target roadmap module
-    const targetModuleId = matchingGap?.targetModuleId || SKILL_TO_MODULE_MAP[res.skill] || "advanced-sql";
+    const targetModuleId = matchingGap?.targetModuleId || SKILL_TO_MODULE_MAP[res.skill] || "industry-assessment";
 
     // Generate Explainable AI rationale
     let rationale = "";

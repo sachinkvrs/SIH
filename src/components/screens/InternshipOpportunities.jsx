@@ -24,8 +24,14 @@ import {
   Upload,
   Award,
   ChevronRight,
-  Check
+  Check,
+  Target,
+  ChevronDown,
+  FileText,
+  Trash2,
+  Paperclip
 } from "lucide-react";
+import { getRoleData } from "../../data/roleCompetencies";
 
 export default function InternshipOpportunities({
   onNavigate,
@@ -39,7 +45,8 @@ export default function InternshipOpportunities({
     course: "B.Tech CSE"
   },
   appliedApplications = [],
-  onApplyOpportunity
+  onApplyOpportunity,
+  onOpenRoleSelector
 }) {
   const [selectedTab, setSelectedTab] = useState("All");
   const [remoteOnly, setRemoteOnly] = useState(false);
@@ -54,13 +61,28 @@ export default function InternshipOpportunities({
   const [applicantEmail, setApplicantEmail] = useState(profileData?.email || "sachin.cs@example.edu.in");
   const [applicantPhone, setApplicantPhone] = useState(profileData?.phone || "+91 98765 43210");
   const [resumeType, setResumeType] = useState("passport"); // "passport" | "upload"
-  const [portfolioLink, setPortfolioLink] = useState("https://github.com/sachin-portfolio");
-  const [coverNote, setCoverNote] = useState("Passionate about leveraging verified SQL & analytics skills to drive business intelligence.");
+  const [portfolioLink, setPortfolioLink] = useState(
+    profileData?.portfolio || profileData?.github || "https://github.com/sachin-dev"
+  );
+  const [uploadedResume, setUploadedResume] = useState({
+    name: `${(profileData?.fullName || "Sachin").replace(/\s+/g, "_")}_Resume.pdf`,
+    size: "245 KB",
+    type: "application/pdf",
+    uploadedAt: "Today"
+  });
+  const [uploadError, setUploadError] = useState(null);
+  const [activeReviewSection, setActiveReviewSection] = useState("sec-profile");
+  const [coverNote, setCoverNote] = useState(
+    `Passionate about leveraging verified competencies and practical project milestones in ${careerGoal} to contribute from day one.`
+  );
   const [attachPassport, setAttachPassport] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submittedAppDetails, setSubmittedAppDetails] = useState(null);
 
-  const rawOpportunities = careerData?.opportunities || [];
+  const activeRoleData = getRoleData(careerGoal);
+  const rawOpportunities = (careerData?.opportunities && careerData.opportunities.length > 0)
+    ? careerData.opportunities
+    : (activeRoleData.opportunities || []);
 
   // Categorized opportunities ensuring All 4 Types are represented (Phase 13)
   const defaultOpportunities = [
@@ -209,6 +231,40 @@ export default function InternshipOpportunities({
     setApplyModalOpp(opp);
     setApplyStep(1);
     setSubmittedAppDetails(null);
+    setApplicantName(profileData?.fullName || "Sachin");
+    setApplicantEmail(profileData?.email || "sachin.cs@example.edu.in");
+    setApplicantPhone(profileData?.phone || "+91 98765 43210");
+    setPortfolioLink(profileData?.portfolio || profileData?.github || "https://github.com/sachin-dev");
+    setCoverNote(
+      `Passionate about leveraging verified competencies and practical project milestones in ${careerGoal} to contribute from day one.`
+    );
+    setAttachPassport(true);
+    setUploadError(null);
+    setActiveReviewSection("sec-profile");
+  };
+
+  // Handle custom file upload
+  const handleFileUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 10 * 1024 * 1024) {
+      setUploadError("File size exceeds 10MB limit. Please upload a smaller PDF or Word document.");
+      return;
+    }
+
+    setUploadError(null);
+    const sizeInKB = Math.round(file.size / 1024);
+    const sizeStr = sizeInKB > 1024 ? `${(sizeInKB / 1024).toFixed(1)} MB` : `${sizeInKB} KB`;
+
+    setUploadedResume({
+      name: file.name,
+      size: sizeStr,
+      type: file.type || "application/pdf",
+      uploadedAt: "Just now",
+      fileObject: file
+    });
+    setResumeType("upload");
   };
 
   // Submit Final Application
@@ -216,8 +272,23 @@ export default function InternshipOpportunities({
     setIsSubmitting(true);
     setTimeout(() => {
       setIsSubmitting(false);
+
+      const submissionPayload = {
+        applicantName,
+        applicantEmail,
+        applicantPhone,
+        resumeType,
+        uploadedResume: resumeType === "upload" ? uploadedResume : null,
+        portfolioLink,
+        coverNote,
+        attachPassport
+      };
+
       const appRecord = {
         id: `app-${Date.now()}`,
+        studentName: applicantName,
+        studentEmail: applicantEmail,
+        studentPhone: applicantPhone,
         company: applyModalOpp.company,
         position: applyModalOpp.role,
         role: applyModalOpp.role,
@@ -225,12 +296,27 @@ export default function InternshipOpportunities({
         status: "Applied",
         statusColor: "bg-blue-50 text-blue-700 border-blue-200",
         match: `${applyModalOpp.matchPercentage}%`,
+        matchScore: applyModalOpp.matchPercentage,
         location: applyModalOpp.location,
         salary: applyModalOpp.stipend,
         type: applyModalOpp.duration || "Internship",
         source: applyModalOpp.source || "SkillBridge Verified",
+        resumeType,
+        submittedResumeUrl:
+          resumeType === "upload" && uploadedResume?.name
+            ? uploadedResume.name
+            : "https://skillbridge.edu/passports/CRED-SB-2026-9482.pdf",
+        portfolioLink,
+        coverNote,
+        passportCredentialId: attachPassport ? "CRED-SB-2026-88492-V" : null,
         timeline: [
-          { status: "Applied", date: "Today", note: "Application submitted with verified Skill Passport credential." },
+          {
+            status: "Applied",
+            date: "Today",
+            note: `Application submitted with ${
+              attachPassport ? "verified Skill Passport credential" : "custom uploaded resume"
+            }.`
+          },
           { status: "Under Review", date: "Pending", note: "Awaiting recruiter portfolio screening." }
         ]
       };
@@ -240,7 +326,7 @@ export default function InternshipOpportunities({
       setApplyStep(5); // Success step
 
       if (onApplyOpportunity) {
-        onApplyOpportunity(appRecord);
+        onApplyOpportunity(applyModalOpp, submissionPayload);
       }
     }, 600);
   };
@@ -273,13 +359,24 @@ export default function InternshipOpportunities({
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
               Opportunities & Internship Intelligence
             </h1>
             <span className="px-2.5 py-0.5 bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 text-xs font-bold rounded-full border border-blue-200 dark:border-blue-800">
               Role: {careerGoal}
             </span>
+            {onOpenRoleSelector && (
+              <button
+                onClick={onOpenRoleSelector}
+                className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold rounded-lg border border-slate-200 dark:border-slate-700 transition cursor-pointer"
+                title="Switch Target Career Role"
+              >
+                <Target className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                <span>Switch Role</span>
+                <ChevronDown className="w-3 h-3 text-slate-400" />
+              </button>
+            )}
           </div>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
             Separated, explainable hiring opportunities matched against your verified SkillBridge competency graph.
@@ -639,14 +736,14 @@ export default function InternshipOpportunities({
           }}
         >
           <div
-            className="bg-white dark:bg-[#111827] rounded-2xl max-w-xl w-full p-6 space-y-5 border border-slate-200 dark:border-slate-800 shadow-2xl relative overflow-y-auto max-h-[90vh]"
+            className="bg-white dark:bg-[#111827] rounded-2xl max-w-3xl w-full p-6 space-y-5 border border-slate-200 dark:border-slate-800 shadow-2xl relative overflow-y-auto max-h-[90vh]"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
             <div className="flex items-start justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
               <div>
                 <span className="text-[10px] font-bold px-2 py-0.5 bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-300 rounded-full uppercase tracking-wider">
-                  Official Application Portal
+                  Official Application Workspace
                 </span>
                 <h3 className="text-base font-black text-slate-900 dark:text-white mt-1">
                   Apply for {applyModalOpp.role}
@@ -661,13 +758,13 @@ export default function InternshipOpportunities({
               </button>
             </div>
 
-            {/* 5-Step Progress Indicator (Level 3 Workflow Navigation) */}
+            {/* 4-Step Progress Indicator (Level 3 Workflow Navigation) */}
             {applyStep < 5 && (
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between text-[11px] font-bold text-slate-600 dark:text-slate-400">
                   <span className={applyStep >= 1 ? "text-blue-600 dark:text-blue-400" : "text-slate-400 dark:text-slate-500"}>1. Profile</span>
                   <span>›</span>
-                  <span className={applyStep >= 2 ? "text-blue-600 dark:text-blue-400" : "text-slate-400 dark:text-slate-500"}>2. Resume</span>
+                  <span className={applyStep >= 2 ? "text-blue-600 dark:text-blue-400" : "text-slate-400 dark:text-slate-500"}>2. Resume & Portfolio</span>
                   <span>›</span>
                   <span className={applyStep >= 3 ? "text-blue-600 dark:text-blue-400" : "text-slate-400 dark:text-slate-500"}>3. Skills</span>
                   <span>›</span>
@@ -750,64 +847,210 @@ export default function InternshipOpportunities({
               </div>
             )}
 
-            {/* STEP 2: Resume & Portfolio */}
+            {/* STEP 2: Resume & Portfolio (Two-Panel Workspace) */}
             {applyStep === 2 && (
               <div className="space-y-4 text-xs">
-                <div className="space-y-2">
-                  <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300">Resume Submission Method</label>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div
-                      onClick={() => setResumeType("passport")}
-                      className={`p-3 rounded-xl border cursor-pointer transition ${
-                        resumeType === "passport"
-                          ? "border-blue-600 dark:border-blue-500 bg-blue-50/50 dark:bg-blue-950/30 ring-1 ring-blue-600 dark:ring-blue-500"
-                          : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/60 hover:border-slate-300 dark:hover:border-slate-600"
-                      }`}
-                    >
-                      <span className="font-bold text-slate-900 dark:text-white block">Verified Skill Passport</span>
-                      <span className="text-[10.5px] text-slate-500 dark:text-slate-400">Auto-generates verified portfolio PDF</span>
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+                  {/* Left Column: Resume & Portfolio Submissions */}
+                  <div className="lg:col-span-7 space-y-4">
+                    <div className="space-y-2">
+                      <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300">
+                        Resume Submission Method
+                      </label>
+                      <div className="grid grid-cols-2 gap-2.5">
+                        <div
+                          onClick={() => setResumeType("passport")}
+                          className={`p-3 rounded-xl border cursor-pointer transition ${
+                            resumeType === "passport"
+                              ? "border-blue-600 dark:border-blue-500 bg-blue-50/50 dark:bg-blue-950/30 ring-1 ring-blue-600 dark:ring-blue-500"
+                              : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/60 hover:border-slate-300 dark:hover:border-slate-600"
+                          }`}
+                        >
+                          <span className="font-bold text-slate-900 dark:text-white block flex items-center gap-1">
+                            <ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
+                            <span>Verified Passport</span>
+                          </span>
+                          <span className="text-[10px] text-slate-500 dark:text-slate-400 block mt-0.5">
+                            Auto-generates authenticated credential PDF
+                          </span>
+                        </div>
+
+                        <div
+                          onClick={() => setResumeType("upload")}
+                          className={`p-3 rounded-xl border cursor-pointer transition ${
+                            resumeType === "upload"
+                              ? "border-blue-600 dark:border-blue-500 bg-blue-50/50 dark:bg-blue-950/30 ring-1 ring-blue-600 dark:ring-blue-500"
+                              : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/60 hover:border-slate-300 dark:hover:border-slate-600"
+                          }`}
+                        >
+                          <span className="font-bold text-slate-900 dark:text-white block flex items-center gap-1">
+                            <Upload className="w-3.5 h-3.5 text-blue-600" />
+                            <span>Custom Upload</span>
+                          </span>
+                          <span className="text-[10px] text-slate-500 dark:text-slate-400 block mt-0.5">
+                            Upload PDF or DOCX from device
+                          </span>
+                        </div>
+                      </div>
                     </div>
 
-                    <div
-                      onClick={() => setResumeType("upload")}
-                      className={`p-3 rounded-xl border cursor-pointer transition ${
-                        resumeType === "upload"
-                          ? "border-blue-600 dark:border-blue-500 bg-blue-50/50 dark:bg-blue-950/30 ring-1 ring-blue-600 dark:ring-blue-500"
-                          : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/60 hover:border-slate-300 dark:hover:border-slate-600"
-                      }`}
-                    >
-                      <span className="font-bold text-slate-900 dark:text-white block">Custom Resume Upload</span>
-                      <span className="text-[10.5px] text-slate-500 dark:text-slate-400">Upload PDF / DOCX from device</span>
+                    {/* Custom File Upload Area */}
+                    {resumeType === "upload" && (
+                      <div className="space-y-2 animate-in fade-in duration-200">
+                        <input
+                          type="file"
+                          id="resume-file-input"
+                          accept=".pdf,.doc,.docx"
+                          onChange={handleFileUpload}
+                          className="hidden"
+                        />
+                        {uploadedResume?.name ? (
+                          <div className="p-3.5 rounded-xl border border-emerald-200 dark:border-emerald-800/80 bg-emerald-50/40 dark:bg-emerald-950/20 flex items-center justify-between gap-3">
+                            <div className="flex items-center gap-2.5 min-w-0">
+                              <div className="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 flex items-center justify-center shrink-0">
+                                <FileText className="w-4 h-4" />
+                              </div>
+                              <div className="min-w-0">
+                                <p className="font-bold text-slate-900 dark:text-white truncate text-xs">
+                                  {uploadedResume.name}
+                                </p>
+                                <p className="text-[10px] text-slate-500 dark:text-slate-400">
+                                  {uploadedResume.size} • Uploaded {uploadedResume.uploadedAt}
+                                </p>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2 shrink-0">
+                              <label
+                                htmlFor="resume-file-input"
+                                className="px-2.5 py-1 text-[11px] font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition cursor-pointer"
+                              >
+                                Replace
+                              </label>
+                            </div>
+                          </div>
+                        ) : (
+                          <label
+                            htmlFor="resume-file-input"
+                            className="block p-5 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl text-center space-y-1 bg-slate-50/50 dark:bg-slate-800/40 hover:bg-slate-100/50 dark:hover:bg-slate-800/60 cursor-pointer transition"
+                          >
+                            <Upload className="w-6 h-6 text-blue-500 mx-auto" />
+                            <span className="font-semibold text-slate-700 dark:text-slate-300 block text-xs">
+                              Click to select file or drag & drop
+                            </span>
+                            <span className="text-[10.5px] text-slate-400 block">
+                              PDF, DOC, DOCX up to 10MB
+                            </span>
+                          </label>
+                        )}
+                        {uploadError && (
+                          <p className="text-[11px] text-rose-600 dark:text-rose-400 flex items-center gap-1 font-semibold">
+                            <AlertCircle className="w-3.5 h-3.5" />
+                            <span>{uploadError}</span>
+                          </p>
+                        )}
+                      </div>
+                    )}
+
+                    {/* GitHub / Portfolio Link */}
+                    <div>
+                      <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
+                        GitHub / Live Project Portfolio
+                      </label>
+                      <input
+                        type="url"
+                        placeholder="https://github.com/username/project"
+                        value={portfolioLink}
+                        onChange={(e) => setPortfolioLink(e.target.value)}
+                        className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-1 focus:ring-blue-500 font-medium text-slate-800 dark:text-white text-xs"
+                      />
+                      <span className="text-[10px] text-slate-400 block mt-0.5">
+                        Recruiters review live code repositories and deployment links.
+                      </span>
+                    </div>
+
+                    {/* Candidate Cover Note */}
+                    <div>
+                      <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
+                        Candidate Note to Recruiter (Optional)
+                      </label>
+                      <textarea
+                        rows={2}
+                        value={coverNote}
+                        onChange={(e) => setCoverNote(e.target.value)}
+                        className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-1 focus:ring-blue-500 text-slate-800 dark:text-white text-xs"
+                      />
                     </div>
                   </div>
-                </div>
 
-                {resumeType === "upload" && (
-                  <div className="p-4 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl text-center space-y-1 bg-slate-50/50 dark:bg-slate-800/40">
-                    <Upload className="w-6 h-6 text-slate-400 dark:text-slate-500 mx-auto" />
-                    <span className="font-semibold text-slate-700 dark:text-slate-300 block">Sachin_Resume_DataAnalyst.pdf (245 KB)</span>
-                    <span className="text-[10.5px] text-emerald-600 dark:text-emerald-400 font-bold">✓ Uploaded and parsed</span>
+                  {/* Right Column: Selected Opportunity Context & Resume Alignment */}
+                  <div className="lg:col-span-5 bg-slate-50 dark:bg-slate-800/40 rounded-xl p-4 border border-slate-200/80 dark:border-slate-700/80 space-y-3.5 flex flex-col justify-between">
+                    <div className="space-y-3">
+                      <div className="flex items-start justify-between gap-2">
+                        <div>
+                          <span className="text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider block">
+                            Target Opening
+                          </span>
+                          <h4 className="font-bold text-slate-900 dark:text-white text-xs leading-snug">
+                            {applyModalOpp.role}
+                          </h4>
+                          <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                            {applyModalOpp.company} • {applyModalOpp.location}
+                          </p>
+                        </div>
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 shrink-0">
+                          {applyModalOpp.matchPercentage}% Match
+                        </span>
+                      </div>
+
+                      {/* Matching Skills */}
+                      <div className="space-y-1">
+                        <span className="text-[10.5px] font-bold text-slate-700 dark:text-slate-300 block">
+                          Verified Matching Competencies:
+                        </span>
+                        <div className="flex flex-wrap gap-1">
+                          {applyModalOpp.matchingSkills?.slice(0, 4).map((m, idx) => (
+                            <span
+                              key={idx}
+                              className="px-2 py-0.5 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 rounded-md border border-emerald-200 dark:border-emerald-800 font-bold text-[10px]"
+                            >
+                              ✓ {m.skill}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Missing / High-Impact Skills */}
+                      {applyModalOpp.missingSkills && applyModalOpp.missingSkills.length > 0 && (
+                        <div className="space-y-1">
+                          <span className="text-[10.5px] font-bold text-amber-700 dark:text-amber-400 block">
+                            Priority Skills for this Role:
+                          </span>
+                          <div className="flex flex-wrap gap-1">
+                            {applyModalOpp.missingSkills.map((gap, idx) => (
+                              <span
+                                key={idx}
+                                className="px-2 py-0.5 bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 rounded-md border border-amber-200 dark:border-amber-800 font-semibold text-[10px]"
+                              >
+                                ⚡ {gap.skill} ({gap.impact || "+5% match"})
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Tailoring Tip */}
+                      <div className="p-2.5 bg-blue-50/70 dark:bg-blue-950/30 rounded-lg border border-blue-200/70 dark:border-blue-800/50 space-y-1">
+                        <span className="text-[10.5px] font-bold text-blue-900 dark:text-blue-300 flex items-center gap-1">
+                          <Sparkles className="w-3 h-3 text-blue-600" />
+                          <span>Contextual Tailoring Guidance:</span>
+                        </span>
+                        <p className="text-[10.5px] text-blue-800 dark:text-blue-300 leading-relaxed">
+                          Partner recruiters at {applyModalOpp.company} emphasize demonstrated project experience with{" "}
+                          <strong>{applyModalOpp.tags?.[0] || "core competencies"}</strong>. Submitting with your verified Digital Skill Passport guarantees priority queue screening.
+                        </p>
+                      </div>
+                    </div>
                   </div>
-                )}
-
-                <div>
-                  <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">GitHub / Live Project Portfolio</label>
-                  <input
-                    type="url"
-                    value={portfolioLink}
-                    onChange={(e) => setPortfolioLink(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-1 focus:ring-blue-500 font-medium text-slate-800 dark:text-white"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">Short Candidate Note (Optional)</label>
-                  <textarea
-                    rows={2}
-                    value={coverNote}
-                    onChange={(e) => setCoverNote(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-1 focus:ring-blue-500 text-slate-800 dark:text-white text-xs"
-                  />
                 </div>
 
                 <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
@@ -819,9 +1062,14 @@ export default function InternshipOpportunities({
                   </button>
                   <button
                     onClick={() => setApplyStep(3)}
-                    className="px-5 py-2 bg-[#1E60D5] hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition flex items-center gap-1.5 cursor-pointer"
+                    disabled={resumeType === "upload" && !uploadedResume?.name}
+                    className={`px-5 py-2 text-white text-xs font-bold rounded-xl transition flex items-center gap-1.5 cursor-pointer ${
+                      resumeType === "upload" && !uploadedResume?.name
+                        ? "bg-slate-400 cursor-not-allowed"
+                        : "bg-[#1E60D5] hover:bg-blue-700"
+                    }`}
                   >
-                    <span>Next: Verified Credentials</span>
+                    <span>Next: Verified Skills</span>
                     <ArrowRight className="w-3.5 h-3.5" />
                   </button>
                 </div>
@@ -841,7 +1089,7 @@ export default function InternshipOpportunities({
                   </div>
                 </div>
 
-                <label className="flex items-center gap-2 p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700 cursor-pointer">
+                <label className="flex items-center gap-2.5 p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700 cursor-pointer hover:border-blue-400 transition">
                   <input
                     type="checkbox"
                     checked={attachPassport}
@@ -849,19 +1097,67 @@ export default function InternshipOpportunities({
                     className="w-4 h-4 text-blue-600 rounded"
                   />
                   <div>
-                    <span className="font-bold text-slate-900 dark:text-white block">Attach SkillBridge Passport (ID: SB-2026-88492-V)</span>
-                    <span className="text-[10.5px] text-slate-500 dark:text-slate-400">Includes 12 verified skill badges, assessment scores, and project repo links</span>
+                    <span className="font-bold text-slate-900 dark:text-white block">
+                      Attach SkillBridge Digital Passport (ID: SB-2026-88492-V)
+                    </span>
+                    <span className="text-[10.5px] text-slate-500 dark:text-slate-400">
+                      Includes verified assessment scores, milestone achievements, and proctored credentials.
+                    </span>
                   </div>
                 </label>
 
-                <div className="space-y-1.5">
-                  <span className="font-bold text-slate-700 dark:text-slate-300 block">Matching Competencies Being Shared:</span>
-                  <div className="flex flex-wrap gap-1.5">
-                    {applyModalOpp.matchingSkills?.map((m, idx) => (
-                      <span key={idx} className="px-2.5 py-1 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 rounded-lg border border-emerald-200 dark:border-emerald-800 font-bold text-[11px]">
-                        ✓ {m.skill} ({m.studentScore}%)
-                      </span>
-                    ))}
+                {/* Side-by-side Skills Comparison */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
+                  {/* Matched Skills Card */}
+                  <div className="p-3 bg-emerald-50/50 dark:bg-emerald-950/20 rounded-xl border border-emerald-200 dark:border-emerald-900 space-y-2">
+                    <span className="font-bold text-emerald-800 dark:text-emerald-300 block text-[11px] flex items-center gap-1.5">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                      <span>Matching Competencies ({applyModalOpp.matchingSkills?.length || 0})</span>
+                    </span>
+                    <div className="space-y-1.5">
+                      {applyModalOpp.matchingSkills?.map((m, idx) => (
+                        <div
+                          key={idx}
+                          className="flex items-center justify-between p-1.5 bg-white dark:bg-slate-800/80 rounded-lg border border-emerald-100 dark:border-emerald-800/60 text-[11px]"
+                        >
+                          <span className="font-semibold text-slate-800 dark:text-slate-200">
+                            {m.skill}
+                          </span>
+                          <span className="px-2 py-0.5 bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 rounded font-bold text-[10px]">
+                            {m.studentScore}% (Required: {m.requiredScore}%)
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Missing Skills Card */}
+                  <div className="p-3 bg-amber-50/50 dark:bg-amber-950/20 rounded-xl border border-amber-200 dark:border-amber-900 space-y-2">
+                    <span className="font-bold text-amber-800 dark:text-amber-300 block text-[11px] flex items-center gap-1.5">
+                      <Sparkles className="w-3.5 h-3.5 text-amber-600" />
+                      <span>Target Skill Growth Opportunities</span>
+                    </span>
+                    {applyModalOpp.missingSkills && applyModalOpp.missingSkills.length > 0 ? (
+                      <div className="space-y-1.5">
+                        {applyModalOpp.missingSkills.map((gap, idx) => (
+                          <div
+                            key={idx}
+                            className="flex items-center justify-between p-1.5 bg-white dark:bg-slate-800/80 rounded-lg border border-amber-100 dark:border-amber-800/60 text-[11px]"
+                          >
+                            <span className="font-semibold text-slate-800 dark:text-slate-200">
+                              {gap.skill}
+                            </span>
+                            <span className="px-2 py-0.5 bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 rounded font-bold text-[10px]">
+                              {gap.impact || "+5% affinity"}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 italic">
+                        All required skill benchmarks for this opportunity are fully satisfied!
+                      </p>
+                    )}
                   </div>
                 </div>
 
@@ -883,34 +1179,157 @@ export default function InternshipOpportunities({
               </div>
             )}
 
-            {/* STEP 4: Review Application */}
+            {/* STEP 4: Review Application (Interactive Gmail / Inbox Inspired) */}
             {applyStep === 4 && (
               <div className="space-y-4 text-xs">
-                <div className="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700 space-y-2.5">
-                  <div className="flex justify-between pb-2 border-b border-slate-200/80 dark:border-slate-700/80">
-                    <span className="text-slate-500 dark:text-slate-400">Candidate:</span>
-                    <span className="font-bold text-slate-900 dark:text-white">{applicantName} ({applicantEmail})</span>
+                {/* Gmail-style clickable inbox rows index */}
+                <div className="bg-slate-50/70 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden divide-y divide-slate-200 dark:divide-slate-700">
+                  <div
+                    onClick={() => {
+                      setActiveReviewSection("sec-profile");
+                      document.getElementById("sec-profile")?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+                    }}
+                    className="p-2.5 flex items-center justify-between hover:bg-blue-50/40 dark:hover:bg-slate-700/40 cursor-pointer transition"
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-slate-800 dark:text-slate-200 w-28">Profile:</span>
+                      <span className="text-slate-600 dark:text-slate-400 truncate">{applicantName} • {applicantEmail}</span>
+                    </div>
+                    <span className="text-[10px] text-blue-600 dark:text-blue-400 font-semibold">View / Focus</span>
                   </div>
-                  <div className="flex justify-between pb-2 border-b border-slate-200/80 dark:border-slate-700/80">
-                    <span className="text-slate-500 dark:text-slate-400">Applying For:</span>
-                    <span className="font-bold text-slate-900 dark:text-white">{applyModalOpp.role} at {applyModalOpp.company}</span>
+
+                  <div
+                    onClick={() => {
+                      setActiveReviewSection("sec-resume");
+                      document.getElementById("sec-resume")?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+                    }}
+                    className="p-2.5 flex items-center justify-between hover:bg-blue-50/40 dark:hover:bg-slate-700/40 cursor-pointer transition"
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-slate-800 dark:text-slate-200 w-28">Resume & Link:</span>
+                      <span className="text-slate-600 dark:text-slate-400 truncate">
+                        {resumeType === "passport" ? "Verified Skill Passport PDF" : uploadedResume.name}
+                      </span>
+                    </div>
+                    <span className="text-[10px] text-blue-600 dark:text-blue-400 font-semibold">View / Focus</span>
                   </div>
-                  <div className="flex justify-between pb-2 border-b border-slate-200/80 dark:border-slate-700/80">
-                    <span className="text-slate-500 dark:text-slate-400">Match Affinity:</span>
-                    <span className="font-black text-emerald-600 dark:text-emerald-400">{applyModalOpp.matchPercentage}% Verified Match</span>
+
+                  <div
+                    onClick={() => {
+                      setActiveReviewSection("sec-opp");
+                      document.getElementById("sec-opp")?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+                    }}
+                    className="p-2.5 flex items-center justify-between hover:bg-blue-50/40 dark:hover:bg-slate-700/40 cursor-pointer transition"
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-slate-800 dark:text-slate-200 w-28">Opportunity:</span>
+                      <span className="text-slate-600 dark:text-slate-400 truncate">
+                        {applyModalOpp.role} at {applyModalOpp.company} ({applyModalOpp.stipend})
+                      </span>
+                    </div>
+                    <span className="text-[10px] text-blue-600 dark:text-blue-400 font-semibold">View / Focus</span>
                   </div>
-                  <div className="flex justify-between pb-2 border-b border-slate-200/80 dark:border-slate-700/80">
-                    <span className="text-slate-500 dark:text-slate-400">Credential Shared:</span>
-                    <span className="font-bold text-purple-700 dark:text-purple-300">Digital Skill Passport (Verified)</span>
+
+                  <div
+                    onClick={() => {
+                      setActiveReviewSection("sec-skills");
+                      document.getElementById("sec-skills")?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+                    }}
+                    className="p-2.5 flex items-center justify-between hover:bg-blue-50/40 dark:hover:bg-slate-700/40 cursor-pointer transition"
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-slate-800 dark:text-slate-200 w-28">Skills Affinity:</span>
+                      <span className="text-emerald-600 dark:text-emerald-400 font-bold truncate">
+                        {applyModalOpp.matchPercentage}% Verified Match
+                      </span>
+                    </div>
+                    <span className="text-[10px] text-blue-600 dark:text-blue-400 font-semibold">View / Focus</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-500 dark:text-slate-400">Portfolio:</span>
-                    <span className="font-mono text-blue-600 dark:text-blue-400 truncate max-w-[200px]">{portfolioLink}</span>
+                </div>
+
+                {/* Review Detail Cards with Smooth Scroll Target & Active Glow */}
+                <div className="space-y-3 max-h-[220px] overflow-y-auto pr-1">
+                  {/* Card 1: Profile */}
+                  <div
+                    id="sec-profile"
+                    className={`p-3.5 rounded-xl border transition-all duration-300 space-y-1.5 ${
+                      activeReviewSection === "sec-profile"
+                        ? "ring-2 ring-blue-500 bg-blue-50/30 dark:bg-blue-950/30 border-blue-400"
+                        : "border-slate-200 dark:border-slate-700 bg-white dark:bg-[#111827]"
+                    }`}
+                  >
+                    <span className="text-[10.5px] font-bold text-slate-400 uppercase tracking-wider block">Candidate Profile</span>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500 dark:text-slate-400">Legal Name:</span>
+                      <span className="font-bold text-slate-900 dark:text-white">{applicantName}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500 dark:text-slate-400">Email & Phone:</span>
+                      <span className="font-medium text-slate-700 dark:text-slate-300">{applicantEmail} • {applicantPhone}</span>
+                    </div>
+                  </div>
+
+                  {/* Card 2: Resume & Portfolio */}
+                  <div
+                    id="sec-resume"
+                    className={`p-3.5 rounded-xl border transition-all duration-300 space-y-1.5 ${
+                      activeReviewSection === "sec-resume"
+                        ? "ring-2 ring-blue-500 bg-blue-50/30 dark:bg-blue-950/30 border-blue-400"
+                        : "border-slate-200 dark:border-slate-700 bg-white dark:bg-[#111827]"
+                    }`}
+                  >
+                    <span className="text-[10.5px] font-bold text-slate-400 uppercase tracking-wider block">Resume & Portfolio Credentials</span>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500 dark:text-slate-400">Submitted Document:</span>
+                      <span className="font-bold text-purple-700 dark:text-purple-300">
+                        {resumeType === "passport" ? "SkillBridge Verified Passport (PDF)" : uploadedResume.name}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500 dark:text-slate-400">Portfolio Repo:</span>
+                      <span className="font-mono text-blue-600 dark:text-blue-400 truncate max-w-[240px]">{portfolioLink}</span>
+                    </div>
+                  </div>
+
+                  {/* Card 3: Opportunity */}
+                  <div
+                    id="sec-opp"
+                    className={`p-3.5 rounded-xl border transition-all duration-300 space-y-1.5 ${
+                      activeReviewSection === "sec-opp"
+                        ? "ring-2 ring-blue-500 bg-blue-50/30 dark:bg-blue-950/30 border-blue-400"
+                        : "border-slate-200 dark:border-slate-700 bg-white dark:bg-[#111827]"
+                    }`}
+                  >
+                    <span className="text-[10.5px] font-bold text-slate-400 uppercase tracking-wider block">Target Position</span>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500 dark:text-slate-400">Role & Employer:</span>
+                      <span className="font-bold text-slate-900 dark:text-white">{applyModalOpp.role} at {applyModalOpp.company}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500 dark:text-slate-400">Compensation:</span>
+                      <span className="font-medium text-slate-700 dark:text-slate-300">{applyModalOpp.stipend} ({applyModalOpp.duration || "Internship"})</span>
+                    </div>
+                  </div>
+
+                  {/* Card 4: Skills Affinity */}
+                  <div
+                    id="sec-skills"
+                    className={`p-3.5 rounded-xl border transition-all duration-300 space-y-1.5 ${
+                      activeReviewSection === "sec-skills"
+                        ? "ring-2 ring-blue-500 bg-blue-50/30 dark:bg-blue-950/30 border-blue-400"
+                        : "border-slate-200 dark:border-slate-700 bg-white dark:bg-[#111827]"
+                    }`}
+                  >
+                    <span className="text-[10.5px] font-bold text-slate-400 uppercase tracking-wider block">Skill Alignment</span>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500 dark:text-slate-400">Match Affinity:</span>
+                      <span className="font-black text-emerald-600 dark:text-emerald-400">{applyModalOpp.matchPercentage}% Verified Match</span>
+                    </div>
                   </div>
                 </div>
 
                 <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
-                  By clicking submit, your application is logged directly into the SkillBridge candidate matching system for {applyModalOpp.company}.
+                  By clicking submit, your application is logged directly into the unified candidate matching system for {applyModalOpp.company} and synced with your Institution placement cell.
                 </p>
 
                 <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
@@ -926,7 +1345,7 @@ export default function InternshipOpportunities({
                     className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-xs transition flex items-center gap-2 cursor-pointer min-h-[42px]"
                   >
                     {isSubmitting ? (
-                      <span>Submitting...</span>
+                      <span>Submitting to ATS Pipeline...</span>
                     ) : (
                       <>
                         <CheckCircle2 className="w-4 h-4" />

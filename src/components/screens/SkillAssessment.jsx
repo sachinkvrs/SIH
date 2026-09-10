@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   ArrowLeft,
   ArrowRight,
@@ -12,251 +12,61 @@ import {
   RotateCcw,
   Check,
   ChevronRight,
+  ChevronDown,
   ShieldCheck,
   Zap,
-  FileText
+  FileText,
+  Target
 } from "lucide-react";
+import { getRoleData } from "../../data/roleCompetencies";
 
 export default function SkillAssessment({
   onNavigate,
   careerGoal = "Data Analyst",
   careerData,
   onRecordActivity,
-  onNotify
+  onNotify,
+  onOpenRoleSelector
 }) {
   // Assessment workflow stages: "instructions" | "quiz" | "review" | "results"
   const [stage, setStage] = useState("instructions");
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState({});
   const [submittedAt, setSubmittedAt] = useState(null);
+  const [finalScoreResult, setFinalScoreResult] = useState(null);
+  const [credentialHash, setCredentialHash] = useState(null);
 
-  // 15 Comprehensive Assessment Questions (Tailored for Data Analyst / AI competencies)
-  const questions = [
-    {
-      id: 1,
-      category: "SQL Fundamentals",
-      difficulty: "Beginner",
-      question: "Which SQL clause is used to filter group summary results after an aggregation function has been applied?",
-      description: "Select the correct ANSI-standard SQL keyword for conditional aggregation.",
-      options: [
-        { value: "WHERE", label: "WHERE — Filters individual rows prior to grouping" },
-        { value: "HAVING", label: "HAVING — Filters aggregated row groups created by GROUP BY" },
-        { value: "ORDER BY", label: "ORDER BY — Sorts output in ascending or descending sequence" },
-        { value: "GROUP FILTER", label: "GROUP FILTER — Non-standard proprietary keyword" }
-      ],
-      correct: "HAVING"
-    },
-    {
-      id: 2,
-      category: "SQL Joins",
-      difficulty: "Intermediate",
-      question: "What will a FULL OUTER JOIN return when executed between two tables?",
-      description: "Identify how non-matching foreign and primary key records are evaluated.",
-      options: [
-        { value: "A", label: "Only matching rows present in both the left and right tables" },
-        { value: "B", label: "All rows from the left table, with nulls for non-matching right table columns" },
-        { value: "C", label: "All rows from both tables, filling with NULL where join conditions do not match" },
-        { value: "D", label: "A Cartesian product of all rows regardless of join predicates" }
-      ],
-      correct: "C"
-    },
-    {
-      id: 3,
-      category: "Advanced SQL",
-      difficulty: "Intermediate",
-      question: "How do Common Table Expressions (CTEs) defined using the WITH clause improve complex querying?",
-      description: "Evaluate readability, recursiveness, and temporary table optimization.",
-      options: [
-        { value: "A", label: "They physically index the underlying disk storage permanently" },
-        { value: "B", label: "They provide modular, readable named subquery blocks that can be referenced or recursive" },
-        { value: "C", label: "They automatically disable ACID compliance for faster throughput" },
-        { value: "D", label: "They convert relational tables directly into unstructured JSON files" }
-      ],
-      correct: "B"
-    },
-    {
-      id: 4,
-      category: "Advanced SQL",
-      difficulty: "Advanced",
-      question: "Which Window Function assigns rank without gaps when two rows have identical tie values?",
-      description: "Distinguish between RANK(), DENSE_RANK(), and ROW_NUMBER().",
-      options: [
-        { value: "A", label: "ROW_NUMBER() — Guarantees unique sequential integers regardless of ties" },
-        { value: "B", label: "RANK() — Leaves gaps in ranking sequence after ties (e.g., 1, 2, 2, 4)" },
-        { value: "C", label: "DENSE_RANK() — Assigns consecutive ranks without skipped numbers (e.g., 1, 2, 2, 3)" },
-        { value: "D", label: "NTILE() — Divides rows into specified buckets" }
-      ],
-      correct: "C"
-    },
-    {
-      id: 5,
-      category: "Python Data Manipulation",
-      difficulty: "Beginner",
-      question: "In Pandas, what is the primary difference between df.loc[] and df.iloc[]?",
-      description: "Analyze indexer syntax for series and dataframe slicing.",
-      options: [
-        { value: "A", label: "df.loc is label-based selection, whereas df.iloc is integer position-based" },
-        { value: "B", label: "df.loc only works on columns, while df.iloc only works on rows" },
-        { value: "C", label: "df.iloc requires SQL syntax, while df.loc uses standard Python" },
-        { value: "D", label: "There is no difference; they are interchangeable aliases" }
-      ],
-      correct: "A"
-    },
-    {
-      id: 6,
-      category: "Python Data Manipulation",
-      difficulty: "Intermediate",
-      question: "Which Pandas method is best suited to pivot wide categorical columns into long tidy key-value format?",
-      description: "Selecting transformation routines for normalized data pipelines.",
-      options: [
-        { value: "A", label: "pd.concat() with axis=1" },
-        { value: "B", label: "pd.melt() — Unpivots DataFrame from wide to long format" },
-        { value: "C", label: "df.to_records()" },
-        { value: "D", label: "df.fillna() with method='ffill'" }
-      ],
-      correct: "B"
-    },
-    {
-      id: 7,
-      category: "Business Intelligence (Power BI)",
-      difficulty: "Intermediate",
-      question: "In Power BI DAX, what is the fundamental purpose of the CALCULATE() function?",
-      description: "Understanding filter context modification in tabular analytical models.",
-      options: [
-        { value: "A", label: "It merely sums numerical columns similar to basic arithmetic" },
-        { value: "B", label: "It evaluates an expression under modified, newly injected filter contexts" },
-        { value: "C", label: "It imports external CSV files into Power Query" },
-        { value: "D", label: "It renders bar charts directly inside canvas visuals" }
-      ],
-      correct: "B"
-    },
-    {
-      id: 8,
-      category: "Business Intelligence (Power BI)",
-      difficulty: "Intermediate",
-      question: "What distinguishes Star Schema from Snowflake Schema in analytical data warehouse modeling?",
-      description: "Evaluating dimension normalization and query join performance.",
-      options: [
-        { value: "A", label: "Star Schema denormalizes dimensions into single tables; Snowflake normalizes dimensions" },
-        { value: "B", label: "Star Schema does not support numerical measure calculations" },
-        { value: "C", label: "Snowflake Schema eliminates fact tables completely" },
-        { value: "D", label: "Star Schema is strictly reserved for NoSQL graph databases" }
-      ],
-      correct: "A"
-    },
-    {
-      id: 9,
-      category: "Statistics & EDA",
-      difficulty: "Intermediate",
-      question: "When analyzing right-skewed salary data with severe high-end outliers, which central metric is most resilient?",
-      description: "Evaluating central tendency sensitivity to extreme distributions.",
-      options: [
-        { value: "A", label: "Arithmetic Mean — Pulled strongly toward high outliers" },
-        { value: "B", label: "Median (50th Percentile) — Non-parametric and robust against outliers" },
-        { value: "C", label: "Range — Maximally affected by extreme ends" },
-        { value: "D", label: "Standard Deviation — Amplified quadratically by outliers" }
-      ],
-      correct: "B"
-    },
-    {
-      id: 10,
-      category: "Statistics & EDA",
-      difficulty: "Intermediate",
-      question: "What statistical pitfall does Simpson's Paradox describe in aggregated datasets?",
-      description: "Understanding confounding variables across demographic cohorts.",
-      options: [
-        { value: "A", label: "Correlation coefficient exceeding +1.0 in normalized models" },
-        { value: "B", label: "A trend appearing in subgroups disappears or reverses when groups are combined" },
-        { value: "C", label: "Machine learning models overfitting training sets prematurely" },
-        { value: "D", label: "Null hypotheses rejected when p-value is greater than 0.05" }
-      ],
-      correct: "B"
-    },
-    {
-      id: 11,
-      category: "Data Modeling & Architecture",
-      difficulty: "Advanced",
-      question: "In dimensional modeling, what is a Slowly Changing Dimension Type 2 (SCD Type 2)?",
-      description: "Preserving historical record tracking in analytical data marts.",
-      options: [
-        { value: "A", label: "Overwrites previous attributes directly with no audit history retained" },
-        { value: "B", label: "Creates a new row with start/end effective dates and an active current flag" },
-        { value: "C", label: "Deletes obsolete records permanently upon receiving update signals" },
-        { value: "D", label: "Appends new columns dynamically for each historical modification" }
-      ],
-      correct: "B"
-    },
-    {
-      id: 12,
-      category: "Data Cleaning & Quality",
-      difficulty: "Intermediate",
-      question: "Which technique is most appropriate to detect multidimensional anomalies in continuous sensor telemetry?",
-      description: "Identifying statistical and algorithmic outlier mitigation techniques.",
-      options: [
-        { value: "A", label: "Z-score univariate clipping on one single feature" },
-        { value: "B", label: "Isolation Forest or Mahalanobis distance accounting for covariance" },
-        { value: "C", label: "Replacing all values above zero with missing NaN tokens" },
-        { value: "D", label: "One-hot encoding all continuous floats" }
-      ],
-      correct: "B"
-    },
-    {
-      id: 13,
-      category: "Data Storytelling & Reporting",
-      difficulty: "Beginner",
-      question: "Which chart type is best suited to display cumulative contributions of positive and negative cash flows?",
-      description: "Choosing appropriate executive-level financial and metric visual charts.",
-      options: [
-        { value: "A", label: "Pie Chart with 20 categorical slices" },
-        { value: "B", label: "Waterfall Chart illustrating incremental positive and negative transitions" },
-        { value: "C", label: "Radar Chart with overlapping polylines" },
-        { value: "D", label: "3D Concentric Donut Visual" }
-      ],
-      correct: "B"
-    },
-    {
-      id: 14,
-      category: "Metrics & Business KPIs",
-      difficulty: "Intermediate",
-      question: "How is Customer Churn Rate calculated over a defined monthly billing cycle?",
-      description: "Evaluating SaaS cohort retention metrics.",
-      options: [
-        { value: "A", label: "(Lost Customers during Period) / (Total Customers at Start of Period) × 100%" },
-        { value: "B", label: "(New Customers Acquired) / (Total Operational Expenses) × 100%" },
-        { value: "C", label: "(Average Revenue Per User) × (Customer Lifetime in Months)" },
-        { value: "D", label: "(Total Website Pageviews) / (Unique Conversions) × 100%" }
-      ],
-      correct: "A"
-    },
-    {
-      id: 15,
-      category: "Applied Capstone Scenario",
-      difficulty: "Advanced",
-      question: "An executive reports that dashboard metrics are 24 hours stale. Where in the data pipeline should you investigate first?",
-      description: "Root cause diagnosis across ingestion, ETL scheduling, and visual cache.",
-      options: [
-        { value: "A", label: "Immediately delete all production database backup snapshots" },
-        { value: "B", label: "Check automated pipeline orchestration logs (Airflow/dbt/Data Factory) for failed batch jobs" },
-        { value: "C", label: "Rewrite all frontend CSS styling templates" },
-        { value: "D", label: "Instruct users to clear their personal browser cookies" }
-      ],
-      correct: "B"
+  // Dynamically load active role data and tailored 15 diagnostic questions
+  const activeRoleData = getRoleData(careerGoal);
+  const questions = activeRoleData.assessmentQuestions || [];
+
+  // Reset quiz state if role changes while on instructions
+  useEffect(() => {
+    if (stage === "instructions") {
+      setAnswers({});
+      setCurrentQuestionIndex(0);
     }
-  ];
+  }, [careerGoal, stage]);
 
   const totalQuestions = questions.length;
-  const currentQ = questions[currentQuestionIndex];
+  const currentQ = questions[currentQuestionIndex] || questions[0];
   const answeredCount = Object.keys(answers).length;
   const progressPercent = Math.round((answeredCount / totalQuestions) * 100);
 
   const handleSelectOption = (val) => {
+    if (!currentQ) return;
     setAnswers((prev) => ({
       ...prev,
       [currentQ.id]: val
     }));
   };
 
+  const isCurrentAnswered = currentQ && answers[currentQ.id] !== undefined && answers[currentQ.id] !== null;
+
   const handleNext = () => {
+    // Strict validation: cannot advance without selecting an answer
+    if (!isCurrentAnswered) return;
+
     if (currentQuestionIndex < totalQuestions - 1) {
       setCurrentQuestionIndex((prev) => prev + 1);
     } else {
@@ -271,6 +81,9 @@ export default function SkillAssessment({
   };
 
   const handleSubmitAssessment = () => {
+    const unAnsweredCount = totalQuestions - answeredCount;
+    if (unAnsweredCount > 0) return; // Strict validation: blocked if incomplete
+
     // Calculate final score
     let correctCount = 0;
     questions.forEach((q) => {
@@ -280,6 +93,8 @@ export default function SkillAssessment({
     });
 
     const finalScore = Math.round((correctCount / totalQuestions) * 100);
+    setFinalScoreResult(finalScore);
+    setCredentialHash(`SB-${careerGoal.replace(/\s+/g, "").toUpperCase().slice(0, 4)}-${Math.floor(100000 + Math.random() * 900000)}`);
     setSubmittedAt(new Date().toLocaleDateString());
     setStage("results");
 
@@ -291,7 +106,10 @@ export default function SkillAssessment({
         time: "Just now",
         desc: `Scored ${finalScore}% across 15 technical evaluation questions. Results updated in your Skill Gap profile.`,
         meta: `Score: ${finalScore}%`,
-        metaColor: finalScore >= 75 ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-blue-50 text-blue-700 border-blue-200"
+        metaColor:
+          finalScore >= 75
+            ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+            : "bg-blue-50 text-blue-700 border-blue-200"
       });
     }
 
@@ -308,6 +126,9 @@ export default function SkillAssessment({
 
   // 1. INSTRUCTIONS SCREEN
   if (stage === "instructions") {
+    // Extract unique categories tested for this role
+    const categoriesList = Array.from(new Set(questions.map((q) => q.category))).slice(0, 5);
+
     return (
       <div className="max-w-4xl mx-auto space-y-6 pb-8">
         {/* Breadcrumb Hierarchy */}
@@ -327,19 +148,36 @@ export default function SkillAssessment({
         <div className="bg-white dark:bg-[#111827] rounded-2xl p-6 sm:p-8 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-100 dark:border-slate-800">
             <div>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <span className="px-2.5 py-0.5 bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 text-xs font-bold rounded-full border border-blue-200 dark:border-blue-800">
                   Target: {careerGoal}
                 </span>
+
+                {/* Target Role Selector Button */}
+                {onOpenRoleSelector && (
+                  <button
+                    onClick={onOpenRoleSelector}
+                    className="flex items-center gap-1.5 px-3 py-1 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold rounded-lg border border-slate-200 dark:border-slate-700 transition cursor-pointer"
+                    title="Change active target role benchmark"
+                  >
+                    <Target className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                    <span>Change Target Role</span>
+                    <ChevronDown className="w-3 h-3 text-slate-400" />
+                  </button>
+                )}
+
                 <span className="text-xs text-slate-400">• Standardized Technical Benchmark</span>
               </div>
               <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight mt-1.5">
-                Competency Assessment & Verification
+                {careerGoal} Competency Benchmark
               </h1>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                Discipline: <strong className="text-slate-700 dark:text-slate-300">{activeRoleData.domainName}</strong> • Category: {activeRoleData.category}
+              </p>
             </div>
-            <div className="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800 px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700">
+            <div className="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800 px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 shrink-0">
               <Clock className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-              <span>15 Questions • ~15–20 Mins</span>
+              <span>15 Questions • ~20 Mins</span>
             </div>
           </div>
 
@@ -352,10 +190,10 @@ export default function SkillAssessment({
               <div className="p-4 rounded-xl bg-blue-50/50 dark:bg-blue-950/30 border border-blue-100 dark:border-blue-900/50 space-y-1">
                 <span className="text-xs font-bold text-blue-900 dark:text-blue-200 flex items-center gap-1.5">
                   <Award className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                  15 Multiple-Choice Questions
+                  15 Technical Questions
                 </span>
-                <p className="text-[11.5px] text-slate-600 dark:text-slate-400">
-                  Covers SQL, Python, Power BI, Statistics, and Data Architecture scenarios.
+                <p className="text-[11.5px] text-slate-600 dark:text-slate-400 leading-normal">
+                  Covers: {categoriesList.join(", ")}.
                 </p>
               </div>
 
@@ -364,8 +202,8 @@ export default function SkillAssessment({
                   <ShieldCheck className="w-4 h-4 text-purple-600 dark:text-purple-400" />
                   Skill Passport Verification
                 </span>
-                <p className="text-[11.5px] text-slate-600 dark:text-slate-400">
-                  Scoring above 75% unlocks verified credential badges for employer portfolios.
+                <p className="text-[11.5px] text-slate-600 dark:text-slate-400 leading-normal">
+                  Scoring above 75% unlocks verified credential badges for employer partner pipelines.
                 </p>
               </div>
 
@@ -374,8 +212,8 @@ export default function SkillAssessment({
                   <Compass className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                   Direct Roadmap Action
                 </span>
-                <p className="text-[11.5px] text-slate-600 dark:text-slate-400">
-                  Identified weaknesses automatically queue matching tutorials and practice projects.
+                <p className="text-[11.5px] text-slate-600 dark:text-slate-400 leading-normal">
+                  Identified weaknesses automatically queue matching industrial experiments and coursework.
                 </p>
               </div>
             </div>
@@ -383,12 +221,13 @@ export default function SkillAssessment({
             <div className="p-4 rounded-xl bg-amber-50/60 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/60 text-xs text-amber-900 dark:text-amber-200 space-y-1">
               <span className="font-bold flex items-center gap-1.5 text-amber-950 dark:text-amber-300">
                 <AlertCircle className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-                Assessment Guidelines:
+                Assessment Instructions & Integrity Rules:
               </span>
-              <ul className="list-disc pl-5 space-y-0.5 text-[11.5px] text-amber-800 dark:text-amber-300/90">
-                <li>You can navigate back and forth freely between questions without losing answers.</li>
-                <li>You can review and modify your answers before final submission.</li>
-                <li>Submitting will take you directly to your personalized <strong>Skill Gap Analysis</strong>.</li>
+              <ul className="list-disc pl-5 space-y-1 text-[11.5px] text-amber-800 dark:text-amber-300/90">
+                <li>Every question is mandatory and marked with a red asterisk (<span className="text-rose-600 font-bold">*</span>).</li>
+                <li><strong>The Next button is disabled</strong> until an answer choice is selected for the active question.</li>
+                <li>You can navigate back with the <strong>Previous</strong> button at any time without losing already answered selections.</li>
+                <li>Final submission is strictly blocked in the Review stage until all 15 questions are answered.</li>
               </ul>
             </div>
           </div>
@@ -405,7 +244,7 @@ export default function SkillAssessment({
               onClick={() => setStage("quiz")}
               className="w-full sm:w-auto px-6 py-2.5 bg-[#1E60D5] hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition flex items-center justify-center gap-2 cursor-pointer"
             >
-              <span>Begin Assessment</span>
+              <span>Begin {careerGoal} Assessment</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>
@@ -449,10 +288,15 @@ export default function SkillAssessment({
           </button>
         </div>
 
-        {/* Question Navigator Strip (Phase 5 Requirement: 1 ✓, 2 ✓, 3 ●, 4 ○ ...) */}
+        {/* Question Navigator Strip (1 ✓, 2 ✓, 3 ●, 4 ○ ...) */}
         <div className="bg-white dark:bg-[#111827] rounded-2xl p-4 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-3">
           <div className="flex items-center justify-between text-xs">
-            <span className="font-bold text-slate-700 dark:text-slate-300">Question Navigator:</span>
+            <div className="flex items-center gap-2">
+              <span className="font-bold text-slate-700 dark:text-slate-300">Question Navigator:</span>
+              <span className="text-xs px-2 py-0.5 rounded bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 font-bold">
+                {careerGoal}
+              </span>
+            </div>
             <span className="text-slate-500 dark:text-slate-400 font-semibold">
               {answeredCount} of {totalQuestions} Answered ({progressPercent}%)
             </span>
@@ -461,14 +305,16 @@ export default function SkillAssessment({
           {/* 15 Question Navigator Grid */}
           <div className="grid grid-cols-5 sm:grid-cols-15 gap-1.5">
             {questions.map((q, idx) => {
-              const isAnswered = answers[q.id] !== undefined;
+              const isAnswered = answers[q.id] !== undefined && answers[q.id] !== null;
               const isCurrent = idx === currentQuestionIndex;
 
-              let btnClass = "border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 bg-white dark:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-600";
+              let btnClass =
+                "border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 bg-white dark:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-600";
               if (isCurrent) {
                 btnClass = "border-blue-600 bg-blue-600 text-white font-bold shadow-xs ring-2 ring-blue-400/30";
               } else if (isAnswered) {
-                btnClass = "border-emerald-300 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 font-bold";
+                btnClass =
+                  "border-emerald-300 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 font-bold";
               }
 
               return (
@@ -476,7 +322,7 @@ export default function SkillAssessment({
                   key={q.id}
                   onClick={() => setCurrentQuestionIndex(idx)}
                   className={`h-9 rounded-xl border text-xs flex items-center justify-center transition cursor-pointer ${btnClass}`}
-                  title={`Question ${idx + 1}: ${q.category} ${isAnswered ? "(Answered)" : "(Pending)"}`}
+                  title={`Question ${idx + 1}: ${q.category} ${isAnswered ? "(Answered: " + answers[q.id] + ")" : "(Pending)"}`}
                 >
                   {isAnswered && !isCurrent ? (
                     <span className="text-[11px]">✓ {idx + 1}</span>
@@ -516,10 +362,10 @@ export default function SkillAssessment({
             </span>
           </div>
 
-          {/* Question Title & Scenario */}
+          {/* Question Title & Scenario with Required Asterisk */}
           <div>
             <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white leading-snug">
-              {currentQ.question}
+              {currentQ.question} <span className="text-rose-500 font-bold ml-0.5" title="Required response">*</span>
             </h2>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
               {currentQ.description}
@@ -552,7 +398,9 @@ export default function SkillAssessment({
                     </div>
                     <span
                       className={`text-xs sm:text-sm font-medium leading-relaxed ${
-                        isSelected ? "text-blue-950 dark:text-blue-200 font-bold" : "text-slate-700 dark:text-slate-200"
+                        isSelected
+                          ? "text-blue-950 dark:text-blue-200 font-bold"
+                          : "text-slate-700 dark:text-slate-200"
                       }`}
                     >
                       {opt.label}
@@ -567,7 +415,15 @@ export default function SkillAssessment({
             })}
           </div>
 
-          {/* Workflow Level 3 Navigation Bar (Phase 5 Requirement: Back disabled on Q1, Next becomes Review on Q15) */}
+          {/* Helper hint when unanswered */}
+          {!isCurrentAnswered && (
+            <p className="text-[11px] text-amber-600 dark:text-amber-400 flex items-center gap-1 font-medium">
+              <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+              <span>Please select an option to enable Next.</span>
+            </p>
+          )}
+
+          {/* Workflow Level 3 Navigation Bar (Strict Validation Bug Fix: Next disabled until answered) */}
           <div className="flex items-center justify-between pt-6 border-t border-slate-100 dark:border-slate-800 gap-3">
             <button
               onClick={handlePrevious}
@@ -592,7 +448,13 @@ export default function SkillAssessment({
 
               <button
                 onClick={handleNext}
-                className="flex items-center gap-2 px-6 py-2.5 bg-[#1E60D5] hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-xs transition cursor-pointer min-h-[42px]"
+                disabled={!isCurrentAnswered}
+                className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-xs font-bold shadow-xs transition min-h-[42px] ${
+                  isCurrentAnswered
+                    ? "bg-[#1E60D5] hover:bg-blue-700 text-white cursor-pointer"
+                    : "bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-600 cursor-not-allowed border border-slate-300 dark:border-slate-700"
+                }`}
+                title={!isCurrentAnswered ? "Select an answer to proceed" : ""}
               >
                 <span>
                   {currentQuestionIndex === totalQuestions - 1 ? "Review Answers →" : "Next"}
@@ -608,7 +470,7 @@ export default function SkillAssessment({
     );
   }
 
-  // 3. REVIEW ANSWERS STAGE (Phase 5 Requirement)
+  // 3. REVIEW ANSWERS STAGE (Submit blocked if any unanswered)
   if (stage === "review") {
     const unAnsweredCount = totalQuestions - answeredCount;
 
@@ -635,11 +497,13 @@ export default function SkillAssessment({
         <div className="bg-white dark:bg-[#111827] rounded-2xl p-6 sm:p-8 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100 dark:border-slate-800">
             <div>
-              <h2 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight">
-                Review Your Assessment Responses
-              </h2>
+              <div className="flex items-center gap-2">
+                <h2 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight">
+                  Review Your Responses: {careerGoal}
+                </h2>
+              </div>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                Check your answers before final submission. You can click any question to review or edit.
+                Check your answers before final submission. All 15 questions must be answered.
               </p>
             </div>
 
@@ -655,11 +519,21 @@ export default function SkillAssessment({
             </div>
           </div>
 
+          {/* Warning Banner if Unanswered */}
+          {unAnsweredCount > 0 && (
+            <div className="p-4 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 text-rose-800 dark:text-rose-300 text-xs font-semibold flex items-center gap-2.5">
+              <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+              <span>
+                Submission is locked. You have {unAnsweredCount} unanswered question{unAnsweredCount > 1 ? "s" : ""}. Please answer all required questions before final submission. Click on any unanswered question below to jump directly to it.
+              </span>
+            </div>
+          )}
+
           {/* Review Question Cards List */}
           <div className="space-y-3">
             {questions.map((q, idx) => {
               const selectedVal = answers[q.id];
-              const isAnswered = selectedVal !== undefined;
+              const isAnswered = selectedVal !== undefined && selectedVal !== null;
 
               return (
                 <div
@@ -668,25 +542,31 @@ export default function SkillAssessment({
                     setCurrentQuestionIndex(idx);
                     setStage("quiz");
                   }}
-                  className="p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-700 hover:border-blue-300 dark:hover:border-blue-500 hover:bg-slate-50/50 dark:hover:bg-slate-800/60 transition cursor-pointer flex items-center justify-between gap-3"
+                  className={`p-3.5 rounded-xl border transition cursor-pointer flex items-center justify-between gap-3 ${
+                    isAnswered
+                      ? "border-slate-200/80 dark:border-slate-700 hover:border-blue-300 dark:hover:border-blue-500 bg-slate-50/30 dark:bg-slate-800/40"
+                      : "border-rose-300 dark:border-rose-900/60 bg-rose-50/40 dark:bg-rose-950/20 hover:border-rose-400"
+                  }`}
                 >
                   <div className="flex items-start gap-3">
                     <span
                       className={`w-6 h-6 rounded-lg text-xs font-bold flex items-center justify-center shrink-0 ${
                         isAnswered
                           ? "bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300"
-                          : "bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400"
+                          : "bg-rose-100 dark:bg-rose-900/60 text-rose-700 dark:text-rose-300 font-black"
                       }`}
                     >
                       {idx + 1}
                     </span>
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400">{q.category}</span>
+                        <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400">
+                          {q.category}
+                        </span>
                         <span className="text-[10px] text-slate-400 dark:text-slate-500">• {q.difficulty}</span>
                       </div>
                       <h4 className="text-xs font-bold text-slate-900 dark:text-white mt-0.5 line-clamp-1">
-                        {q.question}
+                        {q.question} <span className="text-rose-500 font-bold">*</span>
                       </h4>
                     </div>
                   </div>
@@ -694,15 +574,15 @@ export default function SkillAssessment({
                   <div className="shrink-0 flex items-center gap-2 text-xs">
                     {isAnswered ? (
                       <span className="px-2.5 py-0.5 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 font-bold rounded-md border border-emerald-200 dark:border-emerald-800 text-[11px]">
-                        Option {selectedVal}
+                        Choice: {selectedVal}
                       </span>
                     ) : (
-                      <span className="px-2.5 py-0.5 bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 font-bold rounded-md border border-rose-200 dark:border-rose-800 text-[11px]">
+                      <span className="px-2.5 py-0.5 bg-rose-100 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 font-bold rounded-md border border-rose-200 dark:border-rose-800 text-[11px]">
                         Not Answered
                       </span>
                     )}
                     <span className="text-blue-600 dark:text-blue-400 font-semibold text-xs hover:underline">
-                      Edit →
+                      {isAnswered ? "Edit →" : "Answer Now →"}
                     </span>
                   </div>
                 </div>
@@ -722,10 +602,20 @@ export default function SkillAssessment({
 
             <button
               onClick={handleSubmitAssessment}
-              className="w-full sm:w-auto px-7 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-xs transition flex items-center justify-center gap-2 cursor-pointer min-h-[42px]"
+              disabled={unAnsweredCount > 0}
+              className={`w-full sm:w-auto px-7 py-2.5 rounded-xl text-xs font-bold shadow-xs transition flex items-center justify-center gap-2 min-h-[42px] ${
+                unAnsweredCount === 0
+                  ? "bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer"
+                  : "bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-600 cursor-not-allowed border border-slate-300 dark:border-slate-700"
+              }`}
+              title={unAnsweredCount > 0 ? "Complete all questions before submitting" : ""}
             >
               <CheckCircle2 className="w-4 h-4" />
-              <span>Submit Assessment →</span>
+              <span>
+                {unAnsweredCount === 0
+                  ? "Submit Assessment & Verify Passport →"
+                  : `Submit Disabled (${unAnsweredCount} Incomplete)`}
+              </span>
             </button>
           </div>
         </div>
@@ -739,15 +629,34 @@ export default function SkillAssessment({
     questions.forEach((q) => {
       if (answers[q.id] === q.correct) correctCount += 1;
     });
-    const finalScore = Math.round((correctCount / totalQuestions) * 100);
+    const finalScore = finalScoreResult !== null ? finalScoreResult : Math.round((correctCount / totalQuestions) * 100);
 
-    const categoryBreakdown = [
-      { name: "SQL & Advanced Queries", score: 85, status: "Strong", color: "bg-emerald-500" },
-      { name: "Python Data Wrangling", score: 80, status: "Good", color: "bg-blue-600" },
-      { name: "Power BI & Data Modeling", score: 55, status: "Needs Improvement", color: "bg-rose-500" },
-      { name: "Statistics & Exploratory Analysis", score: 75, status: "Competent", color: "bg-indigo-600" },
-      { name: "Business Architecture & KPIs", score: 70, status: "Competent", color: "bg-amber-500" }
-    ];
+    // Compute dynamic category scores based on active questions
+    const categoriesMap = {};
+    questions.forEach((q) => {
+      if (!categoriesMap[q.category]) {
+        categoriesMap[q.category] = { total: 0, correct: 0 };
+      }
+      categoriesMap[q.category].total += 1;
+      if (answers[q.id] === q.correct) {
+        categoriesMap[q.category].correct += 1;
+      }
+    });
+
+    const categoryBreakdown = Object.keys(categoriesMap).map((catName) => {
+      const { total, correct } = categoriesMap[catName];
+      const catScore = Math.round((correct / total) * 100);
+      let status = "Competent";
+      let color = "bg-blue-600";
+      if (catScore >= 80) {
+        status = "Strong";
+        color = "bg-emerald-500";
+      } else if (catScore < 60) {
+        status = "Needs Improvement";
+        color = "bg-rose-500";
+      }
+      return { name: catName, score: catScore, status, color };
+    });
 
     return (
       <div className="max-w-4xl mx-auto space-y-6 pb-8">
@@ -774,7 +683,7 @@ export default function SkillAssessment({
               Assessment Completed!
             </h1>
             <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
-              Your competency evaluation for <strong>{careerGoal}</strong> has been recorded and verified on your Digital Skill Passport.
+              Your competency evaluation for <strong>{careerGoal}</strong> ({activeRoleData.domainName}) has been recorded and calibrated against verified employer benchmarks.
             </p>
           </div>
 
@@ -787,7 +696,7 @@ export default function SkillAssessment({
               <div className="flex items-baseline gap-3 justify-center sm:justify-start">
                 <span className="text-4xl sm:text-5xl font-black text-white">{finalScore}%</span>
                 <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">
-                  {finalScore >= 75 ? "Proficient" : "Foundational"}
+                  {finalScore >= 75 ? "Industry Ready" : "Foundational"}
                 </span>
               </div>
               <p className="text-xs text-slate-300">
@@ -796,12 +705,12 @@ export default function SkillAssessment({
             </div>
 
             <div className="shrink-0 text-center sm:text-right space-y-2">
-              <span className="text-[11px] text-slate-300 block">Credential Identifier:</span>
+              <span className="text-[11px] text-slate-300 block">Credential Hash:</span>
               <span className="text-xs font-mono font-bold bg-white/10 px-3 py-1.5 rounded-lg border border-white/20 block">
-                SB-ASSESS-2026-8821
+                {credentialHash || `SB-${careerGoal.replace(/\s+/g, "").toUpperCase().slice(0, 4)}-884920`}
               </span>
               <span className="text-[10.5px] text-emerald-400 block font-semibold">
-                ✓ Recorded in Activity Timeline
+                ✓ Synced to Digital Skill Passport
               </span>
             </div>
           </div>
@@ -813,7 +722,10 @@ export default function SkillAssessment({
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
               {categoryBreakdown.map((cat, idx) => (
-                <div key={idx} className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200/80 dark:border-slate-700 space-y-2">
+                <div
+                  key={idx}
+                  className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200/80 dark:border-slate-700 space-y-2"
+                >
                   <div className="flex items-center justify-between text-xs">
                     <span className="font-bold text-slate-800 dark:text-slate-200">{cat.name}</span>
                     <span className="font-black text-slate-900 dark:text-white">{cat.score}%</span>
@@ -822,7 +734,9 @@ export default function SkillAssessment({
                     <div className={`${cat.color} h-full rounded-full`} style={{ width: `${cat.score}%` }} />
                   </div>
                   <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
-                    <span>Status: <strong className="text-slate-700 dark:text-slate-300">{cat.status}</strong></span>
+                    <span>
+                      Status: <strong className="text-slate-700 dark:text-slate-300">{cat.status}</strong>
+                    </span>
                     {cat.score < 70 && (
                       <span className="text-rose-600 dark:text-rose-400 font-bold">Action Recommended</span>
                     )}
@@ -832,7 +746,7 @@ export default function SkillAssessment({
             </div>
           </div>
 
-          {/* Call to Action: Logical Transition to Skill Gap Analysis (Phase 5 Requirement) */}
+          {/* Call to Action: Logical Transition to Skill Gap Analysis */}
           <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3">
             <button
               onClick={() => onNavigate("student_dashboard")}
@@ -843,13 +757,12 @@ export default function SkillAssessment({
 
             <div className="flex items-center gap-2 w-full sm:w-auto">
               <button
-                onClick={() => onNavigate("skill_passport")}
+                onClick={() => onNavigate("roadmap")}
                 className="w-full sm:w-auto px-4 py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-bold rounded-xl transition cursor-pointer"
               >
-                View Skill Passport
+                Go to Roadmap
               </button>
 
-              {/* Logical Next Step: View Skill Gap Analysis */}
               <button
                 onClick={() => onNavigate("skill_gap")}
                 className="w-full sm:w-auto px-6 py-2.5 bg-[#1E60D5] hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition flex items-center justify-center gap-2 cursor-pointer min-h-[42px]"

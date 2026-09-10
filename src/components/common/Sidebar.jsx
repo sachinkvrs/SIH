@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import BrandLogo from "./BrandLogo";
 import {
+  Home,
+  MessageSquare,
   LayoutDashboard,
   FileText,
   Zap,
@@ -29,6 +31,7 @@ export default function Sidebar({
   onNavigate,
   portalType = "student",
   unreadCount = 4,
+  unreadCommCount = 0,
   profileData = {
     fullName: "Sachin",
     email: "sachin.cs@example.edu.in",
@@ -43,23 +46,24 @@ export default function Sidebar({
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const profileDropdownRef = useRef(null);
 
-  // Student Navigation: EXACT 10 items from reference image
+  // Student Navigation: Clean, recognized icon language with Home and Communications
   const studentNavItems = [
-    { id: "student_dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { id: "student_dashboard", label: "Dashboard", icon: Home },
     { id: "skill_assessment", label: "Skill Assessment", icon: FileText },
     { id: "my_skills", label: "My Skills", icon: Zap },
     { id: "skill_gap", label: "Skill Gap Analysis", icon: BarChart3 },
     { id: "roadmap", label: "Career Roadmap", icon: Compass },
     { id: "opportunities", label: "Opportunities", icon: Briefcase },
     { id: "applications", label: "Applications", icon: FolderKanban },
+    { id: "communications", label: "Communications", icon: MessageSquare, badge: unreadCommCount > 0 ? unreadCommCount : null },
     { id: "skill_passport", label: "Skill Passport", icon: Award },
     { id: "notifications", label: "Notifications", icon: Bell, badge: unreadCount > 0 ? unreadCount : null },
     { id: "settings", label: "Settings", icon: SettingsIcon },
   ];
 
-  // Industry Navigation: Comprehensive recruiter & employer workflow
+  // Industry Navigation: Comprehensive recruiter & employer workflow (using Home icon for Overview)
   const industryNavItems = [
-    { id: "industry_dashboard", label: "Overview", icon: LayoutDashboard },
+    { id: "industry_dashboard", label: "Overview", icon: Home },
     { id: "post_jobs", label: "Post Jobs & Roles", icon: Briefcase },
     { id: "candidate_matching", label: "Candidate AI Match", icon: Users },
     { id: "feedback", label: "Recruiter Feedback", icon: FileText },
@@ -273,6 +277,30 @@ export default function Sidebar({
                 <Shield className="w-3.5 h-3.5 text-slate-400" />
                 <span>Security</span>
               </button>
+
+              {/* Portal Switchers */}
+              <div className="pt-1.5 mt-1 border-t border-slate-100 dark:border-slate-800">
+                <button
+                  onClick={() => {
+                    setProfileDropdownOpen(false);
+                    onNavigate("industry_dashboard");
+                  }}
+                  className="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-purple-700 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-950/40 text-[11px] font-bold text-left cursor-pointer transition"
+                >
+                  <Briefcase className="w-3.5 h-3.5" />
+                  <span>Switch to Industry Portal</span>
+                </button>
+                <button
+                  onClick={() => {
+                    setProfileDropdownOpen(false);
+                    onNavigate("institution_analytics");
+                  }}
+                  className="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-amber-700 dark:text-amber-300 hover:bg-amber-50 dark:hover:bg-amber-950/40 text-[11px] font-bold text-left cursor-pointer transition"
+                >
+                  <BarChart3 className="w-3.5 h-3.5" />
+                  <span>Switch to Institution Portal</span>
+                </button>
+              </div>
             </div>
 
             {/* Logout */}

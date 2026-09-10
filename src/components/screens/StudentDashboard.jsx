@@ -25,19 +25,24 @@ import {
 } from "lucide-react";
 import { CAREER_GOALS } from "../../data/careerIntelligence";
 import { ROADMAP_MODULES } from "../../data/roadmapData";
+import { getRoleData } from "../../data/roleCompetencies";
+import { getRoadmapOverallProgress, MODULE_STATUS } from "../../services/canonicalLearningService";
 import { getModelDRecommendations } from "../../services/learningRecommendationService";
 
 export default function StudentDashboard({
   onNavigate,
   careerGoal = "Data Analyst",
   onChangeCareerGoal,
+  onOpenRoleSelector,
   careerData,
   profileData,
   userRoadmap = [],
   completedModuleIds = {},
+  canonicalLearningProgress = {},
   onOpenResource,
   recentActivities = [],
-  onApplyOpportunity
+  onApplyOpportunity,
+  applicationsList = []
 }) {
   const [goalModalOpen, setGoalModalOpen] = useState(false);
   const [readinessModalOpen, setReadinessModalOpen] = useState(false);
@@ -46,15 +51,39 @@ export default function StudentDashboard({
   const studentName = profileData?.fullName || "Sachin";
   const readiness = careerData?.readinessScore || 82;
 
-  // Derive dynamic active milestone from independent roadmap modules
-  const learningCourses = ROADMAP_MODULES.filter((m) => m.id !== "internship-ready");
-  const completedCoursesCount = learningCourses.filter((m) => completedModuleIds[m.id]).length;
+  // Derive dynamic active milestone and mathematical progress from active role roadmap
+  const activeRoleData = getRoleData(careerGoal);
+  const activeRoleRoadmap = (activeRoleData?.roadmap && activeRoleData.roadmap.length > 0)
+    ? activeRoleData.roadmap
+    : ROADMAP_MODULES;
+
+  const learningCourses = activeRoleRoadmap.filter((m) => m.id !== "internship-ready");
+  
+  const { overallProgress, completedCount } = getRoadmapOverallProgress(
+    activeRoleRoadmap,
+    canonicalLearningProgress
+  );
+  const completedCoursesCount = completedCount;
+  const roadmapProgressPct = overallProgress;
+
   const activeMilestone =
-    learningCourses.find((m) => !completedModuleIds[m.id]) ||
-    ROADMAP_MODULES[ROADMAP_MODULES.length - 1];
-  const activeMilestoneIndex = ROADMAP_MODULES.findIndex((m) => m.id === activeMilestone.id);
-  const nextMilestone = ROADMAP_MODULES[activeMilestoneIndex + 1];
-  const roadmapProgressPct = Math.round((completedCoursesCount / learningCourses.length) * 100);
+    learningCourses.find((m) => {
+      const prog = canonicalLearningProgress[m.id];
+      return !completedModuleIds[m.id] && (!prog || prog.status !== MODULE_STATUS.COMPLETED);
+    }) ||
+    activeRoleRoadmap[activeRoleRoadmap.length - 1];
+
+  const activeMilestoneIndex = Math.max(0, activeRoleRoadmap.findIndex((m) => m.id === activeMilestone?.id));
+  const nextMilestone = activeRoleRoadmap[activeMilestoneIndex + 1];
+
+  const isOppApplied = (opp) => {
+    return (
+      !!appliedJobs[opp.id] ||
+      applicationsList.some(
+        (a) => a.company === opp.company && (a.position === opp.role || a.role === opp.role)
+      )
+    );
+  };
 
   const handleApply = (opp) => {
     setAppliedJobs((prev) => ({ ...prev, [opp.id]: true }));
@@ -75,7 +104,7 @@ export default function StudentDashboard({
     },
     {
       title: "Skills Verified",
-      value: "12",
+      value: `${(careerData?.skillGaps?.filter((g) => g.gap === 0).length || 0) + (completedModuleIds ? Object.keys(completedModuleIds).length * 2 : 0) + 4}`,
       subtitle: "Verified on Passport",
       subColor: "text-purple-600 font-semibold",
       icon: Award,
@@ -92,13 +121,16 @@ export default function StudentDashboard({
       onClick: () => onNavigate("skill_gap")
     },
     {
-      title: "Matching Internships",
-      value: `${careerData?.opportunities?.length || 3}`,
-      subtitle: "High affinity roles",
-      subColor: "text-blue-600 font-semibold",
+      title: "Applications Active",
+      value: `${applicationsList.length}`,
+      subtitle:
+        applicationsList.length > 0
+          ? `${applicationsList.filter((a) => a.status === "Selected" || a.status === "Shortlisted" || a.status === "Interview").length} in advanced review`
+          : "0 submitted",
+      subColor: applicationsList.length > 0 ? "text-blue-600 font-semibold" : "text-slate-400 font-semibold",
       icon: Briefcase,
       iconBg: "bg-blue-50 text-blue-600 border border-blue-100",
-      onClick: () => onNavigate("opportunities")
+      onClick: () => onNavigate("applications")
     },
   ];
 
@@ -298,7 +330,13 @@ export default function StudentDashboard({
 
             <div className="relative z-10 shrink-0">
               <button
-                onClick={() => setGoalModalOpen(true)}
+                onClick={() => {
+                  if (onOpenRoleSelector) {
+                    onOpenRoleSelector();
+                  } else {
+                    setGoalModalOpen(true);
+                  }
+                }}
                 className="px-4 py-2 bg-white hover:bg-slate-100 text-slate-900 text-xs font-bold rounded-xl shadow-xs transition flex items-center gap-1.5 cursor-pointer"
               >
                 <span>Change Career Goal</span>
@@ -473,14 +511,15 @@ export default function StudentDashboard({
                     </div>
 
                     <button
-                      onClick={() => handleApply(opp)}
-                      className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition cursor-pointer min-h-[34px] ${
-                        appliedJobs[opp.id]
-                          ? "bg-emerald-600 text-white"
-                          : "bg-[#1E60D5] hover:bg-blue-700 text-white"
+                      onClick={() => !isOppApplied(opp) && handleApply(opp)}
+                      disabled={isOppApplied(opp)}
+                      className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition min-h-[34px] ${
+                        isOppApplied(opp)
+                          ? "bg-emerald-600 text-white cursor-default opacity-90"
+                          : "bg-[#1E60D5] hover:bg-blue-700 text-white cursor-pointer"
                       }`}
                     >
-                      {appliedJobs[opp.id] ? "Applied ✓" : "Quick Apply"}
+                      {isOppApplied(opp) ? "Applied ✓" : "Quick Apply"}
                     </button>
                   </div>
                 </div>
@@ -560,7 +599,7 @@ export default function StudentDashboard({
                     <ArrowRight className="w-3.5 h-3.5" />
                   </button>
                   <span className="text-[10.5px] text-slate-400 dark:text-slate-500">
-                    Milestone {activeMilestoneIndex + 1} of {ROADMAP_MODULES.length}
+                    Milestone {activeMilestoneIndex + 1} of {activeRoleRoadmap.length}
                   </span>
                 </div>
               </div>
@@ -575,6 +614,67 @@ export default function StudentDashboard({
           </div>
         </div>
       </div>
+
+      {/* HANDS-ON INDUSTRIAL EXPERIMENTS & REAL-WORLD LAB PROJECTS */}
+      {careerData?.handsOnExperiments && careerData.handsOnExperiments.length > 0 && (
+        <div className="bg-white dark:bg-[#111827] rounded-2xl p-5 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-100 dark:border-slate-800">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/60 px-2 py-0.5 rounded-full border border-blue-200 dark:border-blue-900">
+                  Industrial Relevance
+                </span>
+                <span className="text-xs text-slate-400 font-medium">Domain: {careerData.domain?.toUpperCase() || "ENGINEERING"}</span>
+              </div>
+              <h3 className="text-sm font-bold text-slate-900 dark:text-white mt-1">
+                Hands-On Industrial Experiments for {careerGoal}
+              </h3>
+            </div>
+            <button
+              onClick={() => onNavigate("skill_gap")}
+              className="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 cursor-pointer self-start sm:self-auto"
+            >
+              <span>View Full Lab Specs</span>
+              <ChevronRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+            {careerData.handsOnExperiments.slice(0, 2).map((exp) => (
+              <div
+                key={exp.id}
+                className="p-4 bg-slate-50/70 dark:bg-slate-800/60 rounded-xl border border-slate-200/70 dark:border-slate-700/60 space-y-2.5 flex flex-col justify-between"
+              >
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-slate-900 dark:text-white">{exp.title}</span>
+                    <span className="text-[10px] font-semibold px-2 py-0.5 bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 rounded border border-amber-200 dark:border-amber-800">
+                      {exp.difficulty} • {exp.duration}
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+                    {exp.description}
+                  </p>
+                  <div className="p-2.5 bg-blue-50/60 dark:bg-blue-950/40 rounded-lg border border-blue-100 dark:border-blue-900/40 text-[11px] text-blue-900 dark:text-blue-200">
+                    <span className="font-bold block text-blue-950 dark:text-blue-300 mb-0.5">🏭 Where is this used in industry?</span>
+                    {exp.industryUse || exp.industryContext || "Used across industry production pipelines and technical architectures."}
+                  </div>
+                </div>
+                <div className="pt-2 flex items-center justify-between border-t border-slate-200/60 dark:border-slate-700/60">
+                  <span className="text-[10.5px] text-slate-400">Tools: {Array.isArray(exp.tools) ? exp.tools.join(", ") : (typeof exp.tools === "string" ? exp.tools : "Standard Tooling")}</span>
+                  <button
+                    onClick={() => onNavigate("roadmap")}
+                    className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:text-blue-700 flex items-center gap-1 cursor-pointer"
+                  >
+                    <span>Build Project</span>
+                    <ArrowRight className="w-3 h-3" />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* 8. RECENT ACTIVITY & 9. RECOMMENDATIONS */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
