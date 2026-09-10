@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   ArrowLeft,
   ArrowRight,
@@ -8,9 +8,18 @@ import {
   Clock,
   Award,
   Zap,
-  Check
+  Check,
+  Sparkles,
+  Star,
+  PlayCircle,
+  FileText,
+  FolderKanban,
+  HelpCircle,
+  X,
+  Filter
 } from "lucide-react";
 import { ROADMAP_MODULES } from "../../data/roadmapData";
+import { getResourcesForModule, recordResourceInteraction } from "../../services/learningRecommendationService";
 
 export default function LearningResource({
   moduleId = "advanced-sql",
@@ -22,12 +31,21 @@ export default function LearningResource({
 }) {
   const [completedItems, setCompletedItems] = useState({});
   const [successToast, setSuccessToast] = useState(false);
+  const [resourceFilter, setResourceFilter] = useState("all"); // 'all' | 'curated' | 'model_d'
+  const [simulatedResourceModal, setSimulatedResourceModal] = useState(null);
 
   // Find module data or fallback to Advanced SQL
   const moduleData =
     ROADMAP_MODULES.find((m) => m.id === moduleId) ||
     ROADMAP_MODULES.find((m) => m.id === "advanced-sql") ||
     ROADMAP_MODULES[1];
+
+  // Model D dynamic dataset resources for this module
+  const [datasetResources, setDatasetResources] = useState(() => getResourcesForModule(moduleData.id));
+
+  useEffect(() => {
+    setDatasetResources(getResourcesForModule(moduleData.id));
+  }, [moduleData.id]);
 
   const currentIdx = ROADMAP_MODULES.findIndex((m) => m.id === moduleData.id);
   const prevModule = currentIdx > 0 ? ROADMAP_MODULES[currentIdx - 1] : null;
@@ -46,6 +64,28 @@ export default function LearningResource({
         metaColor: "bg-blue-100 text-blue-800 border-blue-200"
       });
     }
+  };
+
+  const handleUpdateDatasetProgress = (resourceId, progressVal) => {
+    recordResourceInteraction(resourceId, progressVal);
+    setDatasetResources(getResourcesForModule(moduleData.id));
+    if (onRecordActivity) {
+      onRecordActivity({
+        id: `act-${Date.now()}`,
+        type: "Learning",
+        title: `Updated progress (${Math.round(progressVal * 100)}%) on dataset resource #${resourceId}`,
+        time: "Just now",
+        dateGroup: "Today",
+        desc: `Logged interactive study milestone for Model D resource.`,
+        meta: progressVal >= 1.0 ? "Completed ✓" : "In Progress ●",
+        metaColor: progressVal >= 1.0 ? "bg-emerald-100 text-emerald-800 border-emerald-200" : "bg-blue-100 text-blue-800 border-blue-200"
+      });
+    }
+  };
+
+  const handleUpdateDatasetRating = (resourceId, ratingVal) => {
+    recordResourceInteraction(resourceId, undefined, ratingVal);
+    setDatasetResources(getResourcesForModule(moduleData.id));
   };
 
   const handleToggleItem = (itemId) => {
@@ -251,7 +291,171 @@ export default function LearningResource({
         </div>
       </div>
 
+      {/* Model D: Synthetic ML Dataset Integration Toolbar & Recommendations */}
+      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 rounded-2xl p-5 border border-blue-200 dark:border-blue-900/50 shadow-xs space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+              <Sparkles className="w-4 h-4" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="text-sm font-extrabold text-slate-900 dark:text-white">
+                  Model D: Content-Based Learning Recommendations
+                </h3>
+                <span className="px-2 py-0.5 bg-blue-100 dark:bg-blue-900/60 text-blue-800 dark:text-blue-200 text-[10px] font-bold rounded-full border border-blue-300 dark:border-blue-700">
+                  ML Dataset Active
+                </span>
+              </div>
+              <p className="text-xs text-slate-600 dark:text-slate-300 mt-0.5">
+                {datasetResources.totalCount} synthetic resources mapped from <code className="text-blue-700 dark:text-blue-300 font-mono">learning_resources.csv</code> &amp; <code className="text-blue-700 dark:text-blue-300 font-mono">learning_interactions.csv</code> for {moduleData.title}.
+              </p>
+            </div>
+          </div>
+
+          {/* Filter Pills */}
+          <div className="flex items-center gap-1.5 bg-white dark:bg-slate-800 p-1 rounded-xl border border-slate-200 dark:border-slate-700 self-start sm:self-auto text-xs font-semibold">
+            <button
+              onClick={() => setResourceFilter("all")}
+              className={`px-3 py-1 rounded-lg transition cursor-pointer ${
+                resourceFilter === "all"
+                  ? "bg-blue-600 text-white shadow-2xs font-bold"
+                  : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white"
+              }`}
+            >
+              All ({totalSubItems + datasetResources.totalCount})
+            </button>
+            <button
+              onClick={() => setResourceFilter("curated")}
+              className={`px-3 py-1 rounded-lg transition cursor-pointer ${
+                resourceFilter === "curated"
+                  ? "bg-blue-600 text-white shadow-2xs font-bold"
+                  : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white"
+              }`}
+            >
+              Curated ({totalSubItems})
+            </button>
+            <button
+              onClick={() => setResourceFilter("model_d")}
+              className={`px-3 py-1 rounded-lg transition cursor-pointer flex items-center gap-1 ${
+                resourceFilter === "model_d"
+                  ? "bg-blue-600 text-white shadow-2xs font-bold"
+                  : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white"
+              }`}
+            >
+              <Sparkles className="w-3 h-3" />
+              <span>Model D ({datasetResources.totalCount})</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Model D Resource Cards Grid */}
+        {(resourceFilter === "all" || resourceFilter === "model_d") && datasetResources.all.length > 0 && (
+          <div className="space-y-3 pt-1">
+            <div className="flex items-center justify-between text-xs font-bold text-slate-700 dark:text-slate-300">
+              <span>Dynamically Recommended by Model D for {moduleData.skills?.join(", ")}</span>
+              <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
+                Ranked by Gap Priority + Peer Rating
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {datasetResources.all.map((res) => {
+                const progressPct = Math.round((res.userProgress || 0) * 100);
+                const isResDone = (res.userProgress || 0) >= 1.0;
+
+                return (
+                  <div
+                    key={res.id}
+                    className="p-4 bg-white dark:bg-[#111827] rounded-xl border border-slate-200/80 dark:border-slate-800 hover:border-blue-300 dark:hover:border-blue-600 shadow-2xs transition flex flex-col justify-between space-y-3"
+                  >
+                    <div>
+                      <div className="flex items-center justify-between gap-2 mb-2">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                            res.type === "COURSE"
+                              ? "bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800"
+                              : res.type === "PROJECT"
+                              ? "bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800"
+                              : res.type === "QUIZ"
+                              ? "bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800"
+                              : res.type === "VIDEO"
+                              ? "bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800"
+                              : "bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800"
+                          }`}>
+                            {res.type}
+                          </span>
+                          <span className="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-[10px] font-bold rounded">
+                            {res.skill}
+                          </span>
+                          <span className="text-[10px] font-semibold text-slate-400">
+                            • {res.difficulty}
+                          </span>
+                        </div>
+
+                        <div className="flex items-center gap-1 text-[11px] font-bold text-amber-500">
+                          <Star className="w-3.5 h-3.5 fill-amber-400" />
+                          <span>{res.rating}</span>
+                          <span className="text-[10px] text-slate-400 font-normal">({res.learnersCount})</span>
+                        </div>
+                      </div>
+
+                      <h4 className="text-xs font-bold text-slate-900 dark:text-white leading-snug">
+                        {res.title}
+                      </h4>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
+                        Est. {res.durationHours} hours • {res.completionRate}% peer completion rate
+                      </p>
+                    </div>
+
+                    {/* Progress Control */}
+                    <div className="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-2">
+                      <div className="flex items-center justify-between text-[10.5px]">
+                        <span className="text-slate-500 dark:text-slate-400 font-medium">Your Progress:</span>
+                        <span className={`font-bold ${isResDone ? "text-emerald-600 dark:text-emerald-400" : "text-blue-600 dark:text-blue-400"}`}>
+                          {progressPct}% {isResDone ? "✓ Completed" : ""}
+                        </span>
+                      </div>
+
+                      {/* Interactive Progress Stepper */}
+                      <div className="flex items-center gap-1">
+                        {[0, 0.25, 0.5, 0.75, 1.0].map((stepVal) => (
+                          <button
+                            key={stepVal}
+                            onClick={() => handleUpdateDatasetProgress(res.id, stepVal)}
+                            className={`flex-1 py-1 rounded text-[10px] font-bold transition cursor-pointer ${
+                              res.userProgress >= stepVal
+                                ? "bg-blue-600 text-white"
+                                : "bg-slate-100 dark:bg-slate-800 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700"
+                            }`}
+                            title={`Set progress to ${Math.round(stepVal * 100)}%`}
+                          >
+                            {Math.round(stepVal * 100)}%
+                          </button>
+                        ))}
+                      </div>
+
+                      <div className="flex items-center justify-between pt-1">
+                        <button
+                          onClick={() => setSimulatedResourceModal(res)}
+                          className="text-[11px] font-bold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 cursor-pointer"
+                        >
+                          <PlayCircle className="w-3.5 h-3.5" />
+                          <span>Simulate / Open Module</span>
+                        </button>
+                        <span className="text-[10px] text-slate-400 font-mono">Dataset #{res.id}</span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+      </div>
+
       {/* 4 STRUCTURED RESOURCE PILLARS */}
+      {(resourceFilter === "all" || resourceFilter === "curated") && (
       <div className="space-y-6">
         {/* PILLAR 1: LEARN */}
         <div className="bg-white dark:bg-[#111827] rounded-2xl p-6 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-4">
@@ -521,6 +725,7 @@ export default function LearningResource({
           </div>
         </div>
       </div>
+      )}
 
       {/* Bottom Completion Actions */}
       <div className="bg-white dark:bg-[#111827] rounded-2xl p-5 border border-slate-200/80 dark:border-slate-800 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -597,6 +802,125 @@ export default function LearningResource({
           <div className="hidden sm:block" />
         )}
       </div>
+
+      {/* SIMULATED RESOURCE MODAL (Model D Interactive Console) */}
+      {simulatedResourceModal && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-[#111827] rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 max-w-xl w-full p-6 space-y-5 animate-in zoom-in-95 duration-150">
+            <div className="flex items-start justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className="px-2 py-0.5 bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 text-[10.5px] font-bold rounded border border-blue-200 dark:border-blue-800">
+                    Model D • {simulatedResourceModal.type}
+                  </span>
+                  <span className="text-xs text-slate-400 font-mono">Dataset #{simulatedResourceModal.id}</span>
+                </div>
+                <h3 className="text-base font-extrabold text-slate-900 dark:text-white">
+                  {simulatedResourceModal.title}
+                </h3>
+              </div>
+              <button
+                onClick={() => setSimulatedResourceModal(null)}
+                className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Simulated Workspace Information */}
+            <div className="space-y-4 text-xs">
+              <div className="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-200/80 dark:border-slate-700 space-y-2">
+                <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 font-medium">
+                  <span>Skill Competency:</span>
+                  <strong className="text-slate-900 dark:text-white">{simulatedResourceModal.skill}</strong>
+                </div>
+                <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 font-medium">
+                  <span>Difficulty Tier:</span>
+                  <strong className="text-slate-900 dark:text-white">{simulatedResourceModal.difficulty}</strong>
+                </div>
+                <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 font-medium">
+                  <span>Duration:</span>
+                  <strong className="text-slate-900 dark:text-white">{simulatedResourceModal.durationHours} Hours</strong>
+                </div>
+                <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 font-medium">
+                  <span>Peer Community Rating:</span>
+                  <span className="text-amber-500 font-bold flex items-center gap-1">
+                    ★ {simulatedResourceModal.rating} ({simulatedResourceModal.learnersCount} learners)
+                  </span>
+                </div>
+              </div>
+
+              {/* Interactive Study Controls */}
+              <div className="space-y-2">
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
+                  Update Your Learning Progress:
+                </label>
+                <div className="grid grid-cols-5 gap-1.5">
+                  {[0, 0.25, 0.5, 0.75, 1.0].map((stepVal) => (
+                    <button
+                      key={stepVal}
+                      onClick={() => {
+                        handleUpdateDatasetProgress(simulatedResourceModal.id, stepVal);
+                        setSimulatedResourceModal((prev) => prev ? { ...prev, userProgress: stepVal } : null);
+                      }}
+                      className={`py-2 rounded-xl text-xs font-bold transition cursor-pointer ${
+                        (simulatedResourceModal.userProgress || 0) >= stepVal
+                          ? "bg-blue-600 text-white shadow-xs"
+                          : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700"
+                      }`}
+                    >
+                      {Math.round(stepVal * 100)}%
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Rating Feedback */}
+              <div className="space-y-2 pt-1">
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
+                  Rate this Resource:
+                </label>
+                <div className="flex items-center gap-2">
+                  {[1, 2, 3, 4, 5].map((starVal) => (
+                    <button
+                      key={starVal}
+                      onClick={() => {
+                        handleUpdateDatasetRating(simulatedResourceModal.id, starVal);
+                        setSimulatedResourceModal((prev) => prev ? { ...prev, userRating: starVal } : null);
+                      }}
+                      className="p-2 hover:bg-amber-50 dark:hover:bg-amber-950/40 rounded-xl transition cursor-pointer"
+                    >
+                      <Star
+                        className={`w-5 h-5 ${
+                          (simulatedResourceModal.userRating || 0) >= starVal
+                            ? "text-amber-400 fill-amber-400"
+                            : "text-slate-300 dark:text-slate-600"
+                        }`}
+                      />
+                    </button>
+                  ))}
+                  <span className="text-xs font-bold text-slate-500 ml-2">
+                    {simulatedResourceModal.userRating ? `${simulatedResourceModal.userRating} / 5 Stars` : "Not rated yet"}
+                  </span>
+                </div>
+              </div>
+
+              <div className="p-3 bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-900 rounded-xl text-[11px] text-blue-800 dark:text-blue-300">
+                💡 <strong>Model D Interaction:</strong> Updates are saved to your local interaction profile and feed into the readiness and recommendations engine.
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+              <button
+                onClick={() => setSimulatedResourceModal(null)}
+                className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-xs transition cursor-pointer"
+              >
+                Close &amp; Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

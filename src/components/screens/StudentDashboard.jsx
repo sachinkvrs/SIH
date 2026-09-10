@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 import { CAREER_GOALS } from "../../data/careerIntelligence";
 import { ROADMAP_MODULES } from "../../data/roadmapData";
+import { getModelDRecommendations } from "../../services/learningRecommendationService";
 
 export default function StudentDashboard({
   onNavigate,
@@ -101,35 +102,31 @@ export default function StudentDashboard({
     },
   ];
 
-  const recommendations = [
-    {
-      title: "Advanced SQL Queries & Window Functions",
-      type: "Course • High Priority Gap",
-      rating: "4.8",
-      duration: "2 weeks",
-      btnText: "Start Learning",
-      action: () => (onOpenResource ? onOpenResource("advanced-sql") : onNavigate("roadmap")),
-      iconBg: "bg-blue-600 text-white",
-    },
-    {
-      title: "End-to-End Analytics Capstone",
-      type: "Guided Project",
-      rating: "4.9",
-      duration: "4 weeks",
-      btnText: "View Project",
-      action: () => (onOpenResource ? onOpenResource("data-analytics-project") : onNavigate("roadmap")),
-      iconBg: "bg-amber-500 text-white",
-    },
-    {
-      title: "Power BI Desktop & DAX Modeling",
-      type: "Interactive Workshop",
-      rating: "4.7",
-      duration: "3 weeks",
-      btnText: "Start Learning",
-      action: () => (onOpenResource ? onOpenResource("power-bi") : onNavigate("roadmap")),
-      iconBg: "bg-orange-500 text-white",
-    },
-  ];
+  const modelDRecs = getModelDRecommendations({
+    careerGoal,
+    skillGaps: careerData?.skillGaps || [],
+    limit: 3
+  });
+
+  const recommendations = modelDRecs.map((rec) => ({
+    id: rec.id,
+    title: rec.title,
+    type: `${rec.type} • ${rec.skill}`,
+    rating: String(rec.rating),
+    duration: `${rec.durationHours} hrs`,
+    badgeText: rec.badgeText,
+    matchScore: rec.matchScore,
+    btnText: "Start Learning",
+    action: () => (onOpenResource ? onOpenResource(rec.targetModuleId) : onNavigate("roadmap")),
+    iconBg:
+      rec.type === "COURSE"
+        ? "bg-blue-600 text-white"
+        : rec.type === "PROJECT"
+        ? "bg-amber-500 text-white"
+        : rec.type === "QUIZ"
+        ? "bg-purple-600 text-white"
+        : "bg-emerald-600 text-white"
+  }));
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-8">
@@ -637,7 +634,9 @@ export default function StudentDashboard({
                 <Sparkles className="w-4 h-4 text-amber-500" />
                 <h3 className="text-sm font-bold text-slate-900 dark:text-white">Curated Learning Recommendations</h3>
               </div>
-              <span className="text-[11px] text-slate-400 font-medium">Industry Partner Verified</span>
+              <span className="text-[10px] text-blue-700 dark:text-blue-300 font-bold bg-blue-50 dark:bg-blue-950/60 px-2 py-0.5 rounded-full border border-blue-200 dark:border-blue-900">
+                Model D Active
+              </span>
             </div>
 
             <div className="space-y-2.5">
@@ -651,7 +650,14 @@ export default function StudentDashboard({
                       {idx === 0 ? <BookOpen className="w-4 h-4" /> : idx === 1 ? <FolderKanban className="w-4 h-4" /> : <Award className="w-4 h-4" />}
                     </div>
                     <div>
-                      <h4 className="text-xs font-bold text-slate-900 dark:text-white leading-snug">{rec.title}</h4>
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <h4 className="text-xs font-bold text-slate-900 dark:text-white leading-snug">{rec.title}</h4>
+                        {rec.badgeText && (
+                          <span className="px-1.5 py-0.2 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 text-[9.5px] font-extrabold rounded border border-emerald-200 dark:border-emerald-800">
+                            {rec.badgeText} ({rec.matchScore}% Match)
+                          </span>
+                        )}
+                      </div>
                       <div className="flex items-center gap-2 mt-0.5 text-[10.5px] text-slate-400 font-medium">
                         <span>{rec.type}</span>
                         <span>•</span>

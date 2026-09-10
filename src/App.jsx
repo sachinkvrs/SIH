@@ -26,6 +26,7 @@ import IndustryCollaboration from "./components/screens/IndustryCollaboration";
 // Career Intelligence & Roadmap Central Data
 import { CAREER_INTELLIGENCE_DATA } from "./data/careerIntelligence";
 import { ROADMAP_MODULES } from "./data/roadmapData";
+import { studentApi } from "./api/client";
 
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState("landing");
@@ -112,7 +113,7 @@ export default function App() {
     };
   });
 
-  // Central profile update handler with persistence
+  // Central profile update handler with persistence and backend sync
   const handleUpdateProfile = (newProfile) => {
     setProfileData(newProfile);
     try {
@@ -120,7 +121,46 @@ export default function App() {
     } catch (e) {
       console.error("Failed to persist profile to localStorage", e);
     }
+    // Asynchronously synchronize with backend API if online
+    studentApi.updateProfile({
+      name: newProfile.fullName,
+      phone: newProfile.phone,
+      institution: newProfile.college,
+      department: newProfile.course,
+      graduationYear: parseInt(newProfile.gradYear, 10) || undefined,
+      targetCareer: newProfile.targetRole,
+      avatar: newProfile.avatar
+    }).catch(() => {
+      // Graceful offline fallback
+    });
   };
+
+  // Synchronize profile from backend on initial mount if authenticated
+  useEffect(() => {
+    async function fetchLiveProfile() {
+      try {
+        const res = await studentApi.getProfile();
+        if (res && res.success && res.data) {
+          const s = res.data;
+          setProfileData((prev) => ({
+            ...prev,
+            fullName: s.user?.name || prev.fullName,
+            email: s.user?.email || prev.email,
+            phone: s.phone || prev.phone,
+            college: s.institution || prev.college,
+            course: s.department || prev.course,
+            gradYear: s.graduationYear ? String(s.graduationYear) : prev.gradYear,
+            targetRole: s.targetCareer || prev.targetRole,
+            avatar: s.user?.avatar || prev.avatar,
+            readinessScore: s.readinessScore || prev.readinessScore
+          }));
+        }
+      } catch (err) {
+        // Backend offline or unauthenticated, graceful fallback to localStorage
+      }
+    }
+    fetchLiveProfile();
+  }, []);
 
   // Keep Profile Target Role and Readiness in sync with active Career Goal
   useEffect(() => {

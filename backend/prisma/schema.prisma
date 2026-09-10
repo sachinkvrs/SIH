@@ -1,0 +1,385 @@
+// backend/prisma/schema.prisma
+// SkillBridge Database Schema for PostgreSQL & Prisma ORM
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  STUDENT
+  RECRUITER
+  INSTITUTION
+  ADMIN
+}
+
+enum VerificationStatus {
+  UNVERIFIED
+  PENDING
+  VERIFIED
+}
+
+enum SkillSource {
+  SELF
+  ASSESSMENT
+  PROJECT
+  CERTIFICATE
+  GITHUB
+  INSTITUTION
+}
+
+enum ResourceType {
+  COURSE
+  VIDEO
+  ARTICLE
+  PROJECT
+  QUIZ
+}
+
+enum RoadmapStatus {
+  LOCKED
+  UPCOMING
+  IN_PROGRESS
+  COMPLETED
+}
+
+enum ApplicationStatus {
+  APPLIED
+  REVIEWING
+  SHORTLISTED
+  INTERVIEW
+  SELECTED
+  REJECTED
+}
+
+// 1. User Model
+model User {
+  id           String          @id @default(uuid())
+  name         String
+  email        String          @unique
+  passwordHash String
+  role         Role            @default(STUDENT)
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  studentProfile StudentProfile?
+  notifications  Notification[]
+
+  @@map("users")
+}
+
+// 2. StudentProfile Model
+model StudentProfile {
+  id             String          @id @default(uuid())
+  userId         String          @unique
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  college        String?
+  degree         String?
+  branch         String?
+  graduationYear String?
+  careerGoal     String?         @default("Data Analyst")
+  bio            String?
+  location       String?
+  avatarUrl      String?
+  readinessScore Int             @default(82)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  skills         StudentSkill[]
+  assessmentResults AssessmentResult[]
+  learningProgress  LearningProgress[]
+  roadmaps       Roadmap[]
+  jobMatches     JobMatch[]
+  applications   Application[]
+  passports      SkillPassport[]
+
+  @@map("student_profiles")
+}
+
+// 3. Skill Catalogue
+model Skill {
+  id          String         @id @default(uuid())
+  name        String         @unique
+  category    String
+  description String?
+  createdAt   DateTime       @default(now())
+
+  studentSkills    StudentSkill[]
+  careerSkills     CareerSkill[]
+  jobSkills        JobSkill[]
+  assessments      Assessment[]
+  learningResources LearningResource[]
+  roadmapItems     RoadmapItem[]
+
+  @@map("skills")
+}
+
+// 4. StudentSkill (Pivot)
+model StudentSkill {
+  id                 String             @id @default(uuid())
+  studentId          String
+  student            StudentProfile     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  skillId            String
+  skill              Skill              @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  currentLevel       Int                @default(50) // 0-100
+  verifiedLevel      Int                @default(0)  // 0-100
+  verificationStatus VerificationStatus @default(UNVERIFIED)
+  source             SkillSource        @default(SELF)
+  updatedAt          DateTime           @updatedAt
+
+  @@unique([studentId, skillId])
+  @@map("student_skills")
+}
+
+// 5. Career Model
+model Career {
+  id            String         @id @default(uuid())
+  title         String         @unique
+  description   String?
+  category      String?
+  averageSalary String?
+  demandLevel   String?        @default("High") // High, Very High, Moderate
+
+  careerSkills  CareerSkill[]
+  roadmaps      Roadmap[]
+
+  @@map("careers")
+}
+
+// 6. CareerSkill (Pivot)
+model CareerSkill {
+  id            String   @id @default(uuid())
+  careerId      String
+  career        Career   @relation(fields: [careerId], references: [id], onDelete: Cascade)
+  skillId       String
+  skill         Skill    @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  requiredLevel Int      @default(75) // 0-100
+  importance    Int      @default(3)  // 1-5
+
+  @@unique([careerId, skillId])
+  @@map("career_skills")
+}
+
+// 7. Assessment Model
+model Assessment {
+  id             String               @id @default(uuid())
+  title          String
+  description    String?
+  skillId        String
+  skill          Skill                @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  duration       Int                  @default(20) // in minutes
+  totalQuestions Int                  @default(10)
+  createdAt      DateTime             @default(now())
+
+  questions      AssessmentQuestion[]
+  results        AssessmentResult[]
+
+  @@map("assessments")
+}
+
+// 8. AssessmentQuestion Model
+model AssessmentQuestion {
+  id            String     @id @default(uuid())
+  assessmentId  String
+  assessment    Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  question      String
+  options       String[]   // String array of multiple choice options
+  correctAnswer Int        // 0-indexed index of correct option
+  difficulty    String     @default("Intermediate") // Beginner, Intermediate, Advanced
+
+  @@map("assessment_questions")
+}
+
+// 9. AssessmentResult Model
+model AssessmentResult {
+  id           String         @id @default(uuid())
+  studentId    String
+  student      StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  assessmentId String
+  assessment   Assessment     @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  score        Int
+  percentage   Float
+  completedAt  DateTime       @default(now())
+
+  @@map("assessment_results")
+}
+
+// 10. LearningResource Model
+model LearningResource {
+  id          String             @id @default(uuid())
+  title       String
+  description String?
+  skillId     String
+  skill       Skill              @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  type        ResourceType       @default(COURSE)
+  difficulty  String             @default("Intermediate")
+  duration    String             @default("3 hours")
+  url         String?
+
+  progress    LearningProgress[]
+  roadmapItems RoadmapItem[]
+
+  @@map("learning_resources")
+}
+
+// 11. LearningProgress Model
+model LearningProgress {
+  id          String           @id @default(uuid())
+  studentId   String
+  student     StudentProfile   @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  resourceId  String
+  resource    LearningResource @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+  progress    Float            @default(0.0) // 0.0 to 1.0
+  completed   Boolean          @default(false)
+  completedAt DateTime?
+  updatedAt   DateTime         @updatedAt
+
+  @@unique([studentId, resourceId])
+  @@map("learning_progress")
+}
+
+// 12. Roadmap Model
+model Roadmap {
+  id         String         @id @default(uuid())
+  studentId  String
+  student    StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  careerId   String
+  career     Career         @relation(fields: [careerId], references: [id], onDelete: Cascade)
+  title      String
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+
+  items      RoadmapItem[]
+
+  @@map("roadmaps")
+}
+
+// 13. RoadmapItem Model
+model RoadmapItem {
+  id         String            @id @default(uuid())
+  roadmapId  String
+  roadmap    Roadmap           @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
+  skillId    String
+  skill      Skill             @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  resourceId String?
+  resource   LearningResource? @relation(fields: [resourceId], references: [id], onDelete: SetNull)
+  order      Int               @default(1)
+  status     RoadmapStatus     @default(UPCOMING)
+  priority   String            @default("HIGH") // HIGH, MEDIUM, LOW
+
+  @@map("roadmap_items")
+}
+
+// 14. Company Model
+model Company {
+  id          String           @id @default(uuid())
+  name        String           @unique
+  description String?
+  website     String?
+  location    String?
+  industry    String?
+
+  jobs        JobOpportunity[]
+
+  @@map("companies")
+}
+
+// 15. JobOpportunity Model
+model JobOpportunity {
+  id          String        @id @default(uuid())
+  companyId   String
+  company     Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  title       String
+  description String?
+  location    String        @default("Hybrid")
+  jobType     String        @default("Internship") // Internship, Full-time, Startup, Government
+  experience  String        @default("0-1 Years")
+  salary      String?       @default("₹25,000 - ₹35,000 / month")
+  deadline    DateTime?
+  createdAt   DateTime      @default(now())
+
+  jobSkills   JobSkill[]
+  matches     JobMatch[]
+  applications Application[]
+
+  @@map("job_opportunities")
+}
+
+// 16. JobSkill (Pivot)
+model JobSkill {
+  id            String         @id @default(uuid())
+  jobId         String
+  job           JobOpportunity @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  skillId       String
+  skill         Skill          @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  requiredLevel Int            @default(75) // 0-100
+  importance    Int            @default(3)  // 1-5
+
+  @@unique([jobId, skillId])
+  @@map("job_skills")
+}
+
+// 17. JobMatch Model
+model JobMatch {
+  id              String         @id @default(uuid())
+  studentId       String
+  student         StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  jobId           String
+  job             JobOpportunity @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  matchPercentage Int            @default(80)
+  skillMatch      Int            @default(80)
+  educationMatch  Int            @default(90)
+  experienceMatch Int            @default(70)
+  interestMatch   Int            @default(85)
+  explanation     String[]       // Array of human-readable matching bullet points
+  createdAt       DateTime       @default(now())
+
+  @@unique([studentId, jobId])
+  @@map("job_matches")
+}
+
+// 18. Application Model
+model Application {
+  id        String            @id @default(uuid())
+  studentId String
+  student   StudentProfile    @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  jobId     String
+  job       JobOpportunity    @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  status    ApplicationStatus @default(APPLIED)
+  appliedAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+
+  @@unique([studentId, jobId])
+  @@map("applications")
+}
+
+// 19. Notification Model
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  message   String
+  type      String   @default("SYSTEM") // SYSTEM, ASSESSMENT, LEARNING, JOB, PASSPORT, APPLICATION
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@map("notifications")
+}
+
+// 20. SkillPassport Model
+model SkillPassport {
+  id                 String             @id @default(uuid())
+  studentId          String
+  student            StudentProfile     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  credentialId       String             @unique // e.g. CRED-SB-2026-XXXX
+  verificationStatus VerificationStatus @default(VERIFIED)
+  issuedAt           DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  @@map("skill_passports")
+}

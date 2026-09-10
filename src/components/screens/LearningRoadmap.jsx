@@ -23,6 +23,7 @@ import {
   FileCheck2
 } from "lucide-react";
 import { ROADMAP_MODULES, ACADEMIC_DOMAINS_DATA } from "../../data/roadmapData";
+import { getResourcesForModule } from "../../services/learningRecommendationService";
 
 export default function LearningRoadmap({
   onNavigate,
@@ -396,6 +397,18 @@ export default function LearningRoadmap({
                             {isCompleted ? 100 : isCurrent ? 50 : 0}%
                           </strong>
                         </span>
+                        {(() => {
+                          const resCount = getResourcesForModule(step.id)?.totalCount || 0;
+                          return resCount > 0 ? (
+                            <>
+                              <span>•</span>
+                              <span className="inline-flex items-center gap-1 text-blue-600 dark:text-blue-400 font-bold bg-blue-50 dark:bg-blue-950/60 px-2 py-0.5 rounded-md border border-blue-200 dark:border-blue-900">
+                                <Sparkles className="w-3 h-3 text-amber-500" />
+                                <span>{resCount} ML Resources</span>
+                              </span>
+                            </>
+                          ) : null;
+                        })()}
                       </>
                     )}
                   </div>

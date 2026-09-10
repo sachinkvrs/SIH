@@ -1,11 +1,14 @@
 import React, { useState } from "react";
 import BrandLogo from "../common/BrandLogo";
-import { User, Building2, BookOpen, School, ArrowRight } from "lucide-react";
+import { User, Building2, BookOpen, School, ArrowRight, Loader2 } from "lucide-react";
+import { authApi } from "../../api/client";
 
 export default function LoginPage({ onNavigate }) {
   const [selectedRole, setSelectedRole] = useState("student");
-  const [email, setEmail] = useState("rahul.sharma@example.com");
-  const [password, setPassword] = useState("••••••••");
+  const [email, setEmail] = useState("alex.chen@skillbridge.edu");
+  const [password, setPassword] = useState("Password123!");
+  const [isLoading, setIsLoading] = useState(false);
+  const [authError, setAuthError] = useState("");
 
   const roles = [
     { id: "student", label: "Student", icon: User, color: "bg-blue-600 text-white ring-blue-600" },
@@ -14,8 +17,36 @@ export default function LoginPage({ onNavigate }) {
     { id: "institution", label: "Institution", icon: School, color: "bg-amber-600 text-white ring-amber-600" },
   ];
 
-  const handleLogin = (e) => {
+  const handleRoleSelect = (roleId) => {
+    setSelectedRole(roleId);
+    setAuthError("");
+    if (roleId === "student") setEmail("alex.chen@skillbridge.edu");
+    else if (roleId === "industry") setEmail("recruiter@techcorp.com");
+    else if (roleId === "institution") setEmail("dean@university.edu");
+    else if (roleId === "academician") setEmail("alex.chen@skillbridge.edu");
+  };
+
+  const handleLogin = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
+    setAuthError("");
+
+    try {
+      const res = await authApi.login(email, password);
+      if (res && res.success && res.data?.user) {
+        const role = res.data.user.role;
+        if (role === "RECRUITER") onNavigate("industry_dashboard");
+        else if (role === "INSTITUTION") onNavigate("institution_analytics");
+        else onNavigate("student_dashboard");
+        return;
+      }
+    } catch (err) {
+      console.warn("Backend login network fallback:", err);
+    } finally {
+      setIsLoading(false);
+    }
+
+    // Seamless offline demo fallback
     if (selectedRole === "industry") {
       onNavigate("industry_dashboard");
     } else if (selectedRole === "institution") {
@@ -28,7 +59,7 @@ export default function LoginPage({ onNavigate }) {
   };
 
   const handleQuickLogin = (role) => {
-    setSelectedRole(role);
+    handleRoleSelect(role);
     if (role === "industry") {
       onNavigate("industry_dashboard");
     } else if (role === "institution") {
@@ -94,7 +125,7 @@ export default function LoginPage({ onNavigate }) {
                       <button
                         type="button"
                         key={r.id}
-                        onClick={() => setSelectedRole(r.id)}
+                        onClick={() => handleRoleSelect(r.id)}
                         className={`flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-xs font-semibold transition border cursor-pointer ${
                           isSelected
                             ? `${r.color} shadow-sm border-transparent`
@@ -109,11 +140,19 @@ export default function LoginPage({ onNavigate }) {
                 </div>
               </div>
 
+              {authError && (
+                <div className="p-2 text-xs text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-900/30 rounded-lg border border-rose-200 dark:border-rose-800">
+                  {authError}
+                </div>
+              )}
+
               <button
                 type="submit"
-                className="w-full py-2.5 mt-2 bg-[#1E60D5] hover:bg-blue-700 text-white font-semibold text-xs rounded-lg shadow-sm transition cursor-pointer"
+                disabled={isLoading}
+                className="w-full py-2.5 mt-2 bg-[#1E60D5] hover:bg-blue-700 disabled:opacity-60 text-white font-semibold text-xs rounded-lg shadow-sm transition cursor-pointer flex items-center justify-center gap-2"
               >
-                Login
+                {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
+                <span>{isLoading ? "Signing in..." : "Login"}</span>
               </button>
             </form>
 
