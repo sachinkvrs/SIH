@@ -23,8 +23,7 @@ import {
 
 import { CAREER_GOALS } from "../../data/careerIntelligence";
 
-const DEFAULT_AVATAR =
-  "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80";
+const DEFAULT_AVATAR = "/avatar-sachin.png";
 
 export default function Settings({
   onNavigate,
@@ -42,16 +41,18 @@ export default function Settings({
 
   // 1. PROFILE
   const [profile, setProfile] = useState({
-    fullName: profileData.fullName || "Sachin",
-    email: profileData.email || "sachin.cs@example.edu.in",
+    fullName: profileData.fullName || "Sachin_kvrs",
+    email: profileData.email || "sachin.it@example.edu.in",
     phone: profileData.phone || "+91 98765 43210",
-    college: profileData.college || "ABC Institute of Technology",
-    course: profileData.course || "Computer Science & Engineering",
-    gradYear: profileData.gradYear || "2027",
+    college: profileData.college || "sri sairam instute of techhnology",
+    course: profileData.course || "Information Technology",
+    gradYear: profileData.gradYear || "2028",
   });
 
   const [draftAvatar, setDraftAvatar] = useState(
-    profileData.avatar || DEFAULT_AVATAR
+    (profileData.avatar && !profileData.avatar.includes("photo-1534528741775"))
+      ? profileData.avatar
+      : DEFAULT_AVATAR
   );
 
   // Sync draft avatar and profile when profileData prop updates
@@ -66,7 +67,11 @@ export default function Settings({
         course: profileData.course || prev.course,
         gradYear: profileData.gradYear || prev.gradYear,
       }));
-      setDraftAvatar(profileData.avatar || DEFAULT_AVATAR);
+      setDraftAvatar(
+        (profileData.avatar && !profileData.avatar.includes("photo-1534528741775"))
+          ? profileData.avatar
+          : DEFAULT_AVATAR
+      );
     }
   }, [profileData]);
 

@@ -125,8 +125,8 @@ export default function App() {
     };
   }, [careerGoal]);
 
-  // Default Avatar Reference
-  const DEFAULT_AVATAR = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80";
+  // Default Avatar Reference (Using user-specified sunset sports car profile photo)
+  const DEFAULT_AVATAR = "/avatar-sachin.png";
 
   // Central Theme State ("light" | "dark" | "system") with localStorage persistence
   const [theme, setTheme] = useState(() => {
@@ -176,23 +176,44 @@ export default function App() {
     }
   }, [theme]);
 
-  // Shared Profile State with localStorage persistence
+  // Shared Profile State with localStorage persistence (Defaulted to user-specified Profile Information)
   const [profileData, setProfileData] = useState(() => {
     try {
       const saved = localStorage.getItem("skillbridge_student_profile");
       if (saved) {
-        return JSON.parse(saved);
+        const parsed = JSON.parse(saved);
+        // Automatically upgrade previous hardcoded demo avatar or old name/course to new default
+        if (
+          parsed.fullName === "Sachin" ||
+          !parsed.fullName ||
+          parsed.email === "sachin.cs@example.edu.in" ||
+          parsed.avatar?.includes("unsplash.com/photo-1534528741775")
+        ) {
+          const upgraded = {
+            ...parsed,
+            fullName: "Sachin_kvrs",
+            email: "sachin.it@example.edu.in",
+            phone: "+91 98765 43210",
+            college: "sri sairam instute of techhnology",
+            course: "Information Technology",
+            gradYear: "2028",
+            avatar: DEFAULT_AVATAR
+          };
+          localStorage.setItem("skillbridge_student_profile", JSON.stringify(upgraded));
+          return upgraded;
+        }
+        return parsed;
       }
     } catch (e) {
       console.error("Failed to load profile from localStorage", e);
     }
     return {
-      fullName: "Sachin",
-      email: "sachin.cs@example.edu.in",
+      fullName: "Sachin_kvrs",
+      email: "sachin.it@example.edu.in",
       phone: "+91 98765 43210",
-      college: "ABC Institute of Technology",
-      course: "Computer Science & Engineering",
-      gradYear: "2027",
+      college: "sri sairam instute of techhnology",
+      course: "Information Technology",
+      gradYear: "2028",
       targetRole: "Data Analyst",
       preferredIndustry: "Artificial Intelligence & Enterprise SaaS",
       preferredLocation: "Bangalore, Remote",
@@ -915,11 +936,11 @@ export default function App() {
     const newApplication = {
       id: appId,
       studentId: "std-101",
-      studentName: customSubmission?.applicantName || profileData?.fullName || "Sachin",
-      studentEmail: customSubmission?.applicantEmail || profileData?.email || "sachin.cs@example.edu.in",
+      studentName: customSubmission?.applicantName || profileData?.fullName || "Sachin_kvrs",
+      studentEmail: customSubmission?.applicantEmail || profileData?.email || "sachin.it@example.edu.in",
       studentPhone: customSubmission?.applicantPhone || profileData?.phone || "+91 98765 43210",
-      college: profileData?.college || "ABC Institute of Technology",
-      degree: profileData?.degree || "B.Tech Computer Science & Engineering",
+      college: profileData?.college || "sri sairam instute of techhnology",
+      degree: profileData?.degree || profileData?.course || "Information Technology",
       company: opp.company,
       position: roleTitle,
       role: roleTitle,

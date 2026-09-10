@@ -38,11 +38,11 @@ export default function InternshipOpportunities({
   careerGoal = "Data Analyst",
   careerData,
   profileData = {
-    fullName: "Sachin",
-    email: "sachin.cs@example.edu.in",
+    fullName: "Sachin_kvrs",
+    email: "sachin.it@example.edu.in",
     phone: "+91 98765 43210",
-    college: "Indian Institute of Technology / Apex Engineering University",
-    course: "B.Tech CSE"
+    college: "sri sairam instute of techhnology",
+    course: "Information Technology"
   },
   appliedApplications = [],
   onApplyOpportunity,
@@ -57,8 +57,8 @@ export default function InternshipOpportunities({
   const [localApplied, setLocalApplied] = useState({});
 
   // Application Modal Form State
-  const [applicantName, setApplicantName] = useState(profileData?.fullName || "Sachin");
-  const [applicantEmail, setApplicantEmail] = useState(profileData?.email || "sachin.cs@example.edu.in");
+  const [applicantName, setApplicantName] = useState(profileData?.fullName || "Sachin_kvrs");
+  const [applicantEmail, setApplicantEmail] = useState(profileData?.email || "sachin.it@example.edu.in");
   const [applicantPhone, setApplicantPhone] = useState(profileData?.phone || "+91 98765 43210");
   const [resumeType, setResumeType] = useState("passport"); // "passport" | "upload"
   const [portfolioLink, setPortfolioLink] = useState(

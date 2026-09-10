@@ -33,12 +33,12 @@ export default function Sidebar({
   unreadCount = 4,
   unreadCommCount = 0,
   profileData = {
-    fullName: "Sachin",
-    email: "sachin.cs@example.edu.in",
-    course: "B.Tech CSE",
+    fullName: "Sachin_kvrs",
+    email: "sachin.it@example.edu.in",
+    course: "Information Technology",
     targetRole: "Data Analyst",
     readinessScore: 82,
-    avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80"
+    avatar: "/avatar-sachin.png"
   },
   mobileOpen = false,
   onCloseMobile
@@ -83,10 +83,10 @@ export default function Sidebar({
 
   let navItems = studentNavItems;
   let userDetails = {
-    name: profileData.fullName || "Sachin",
-    role: `Student • ${profileData.course || "B.Tech CSE"}`,
-    email: profileData.email || "sachin.cs@example.edu.in",
-    avatar: profileData.avatar
+    name: profileData.fullName || "Sachin_kvrs",
+    role: `Student • ${profileData.course || "Information Technology"}`,
+    email: profileData.email || "sachin.it@example.edu.in",
+    avatar: profileData.avatar || "/avatar-sachin.png"
   };
 
   if (portalType === "industry") {

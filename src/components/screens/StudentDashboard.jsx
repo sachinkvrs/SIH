@@ -48,7 +48,7 @@ export default function StudentDashboard({
   const [readinessModalOpen, setReadinessModalOpen] = useState(false);
   const [appliedJobs, setAppliedJobs] = useState({});
 
-  const studentName = profileData?.fullName || "Sachin";
+  const studentName = profileData?.fullName || "Sachin_kvrs";
   const readiness = careerData?.readinessScore || 82;
 
   // Derive dynamic active milestone and mathematical progress from active role roadmap

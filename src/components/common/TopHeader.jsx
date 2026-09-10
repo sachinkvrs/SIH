@@ -34,11 +34,11 @@ export default function TopHeader({
   onOpenRoleSelector,
   onOpenResource,
   profileData = {
-    fullName: "Sachin",
-    email: "sachin.cs@example.edu.in",
+    fullName: "Sachin_kvrs",
+    email: "sachin.it@example.edu.in",
     targetRole: "Data Analyst",
     readinessScore: 82,
-    avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80"
+    avatar: "/avatar-sachin.png"
   },
   onToggleMobileMenu
 }) {

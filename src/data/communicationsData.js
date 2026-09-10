@@ -122,12 +122,12 @@ Director of University Relations • Wipro`,
       name: "Accenture Talent Portal",
       role: "Automated Evaluation Engine",
       company: "Accenture",
-      avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80",
+      avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=120&auto=format&fit=crop&q=80",
       email: "evaluations@accenture.com"
     },
     subject: "Assessment Invitation: Software Developer Coding & SQL Benchmark",
     preview: "You have been invited to complete the Accenture Technical Assessment for Software Developer Intern...",
-    body: `Dear Sachin,
+    body: `Dear Sachin_kvrs,
 
 Thank you for your application to Accenture for the Software Developer Intern role.
 
