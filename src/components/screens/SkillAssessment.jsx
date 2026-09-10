@@ -311,81 +311,81 @@ export default function SkillAssessment({
     return (
       <div className="max-w-4xl mx-auto space-y-6 pb-8">
         {/* Breadcrumb Hierarchy */}
-        <div className="flex items-center gap-2 text-xs text-slate-500 font-medium">
+        <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 font-medium">
           <button
             onClick={() => onNavigate("student_dashboard")}
-            className="hover:text-blue-600 cursor-pointer"
+            className="hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer"
           >
             Dashboard
           </button>
           <span>›</span>
-          <span className="text-slate-900 font-bold">Skill Assessment</span>
+          <span className="text-slate-900 dark:text-white font-bold">Skill Assessment</span>
           <span>›</span>
-          <span className="text-blue-600 font-bold">Instructions</span>
+          <span className="text-blue-600 dark:text-blue-400 font-bold">Instructions</span>
         </div>
 
-        <div className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200/80 shadow-xs space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-100">
+        <div className="bg-white dark:bg-[#111827] rounded-2xl p-6 sm:p-8 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-100 dark:border-slate-800">
             <div>
               <div className="flex items-center gap-2">
-                <span className="px-2.5 py-0.5 bg-blue-50 text-blue-700 text-xs font-bold rounded-full border border-blue-200">
+                <span className="px-2.5 py-0.5 bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 text-xs font-bold rounded-full border border-blue-200 dark:border-blue-800">
                   Target: {careerGoal}
                 </span>
                 <span className="text-xs text-slate-400">• Standardized Technical Benchmark</span>
               </div>
-              <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight mt-1.5">
+              <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight mt-1.5">
                 Competency Assessment & Verification
               </h1>
             </div>
-            <div className="flex items-center gap-2 text-xs font-bold text-slate-600 bg-slate-50 px-3 py-2 rounded-xl border border-slate-200">
-              <Clock className="w-4 h-4 text-blue-600" />
+            <div className="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800 px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700">
+              <Clock className="w-4 h-4 text-blue-600 dark:text-blue-400" />
               <span>15 Questions • ~15–20 Mins</span>
             </div>
           </div>
 
-          <div className="space-y-4 text-xs sm:text-sm text-slate-600 leading-relaxed">
+          <div className="space-y-4 text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
             <p>
               This adaptive diagnostic tests hands-on proficiency across key industry requirements for <strong>{careerGoal}</strong>. Results will calibrate your <strong>Industry Readiness Score</strong>, detect exact <strong>Skill Gaps</strong>, and tailor your personalized <strong>Learning Roadmap</strong>.
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
-              <div className="p-4 rounded-xl bg-blue-50/50 border border-blue-100 space-y-1">
-                <span className="text-xs font-bold text-blue-900 flex items-center gap-1.5">
-                  <Award className="w-4 h-4 text-blue-600" />
+              <div className="p-4 rounded-xl bg-blue-50/50 dark:bg-blue-950/30 border border-blue-100 dark:border-blue-900/50 space-y-1">
+                <span className="text-xs font-bold text-blue-900 dark:text-blue-200 flex items-center gap-1.5">
+                  <Award className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                   15 Multiple-Choice Questions
                 </span>
-                <p className="text-[11.5px] text-slate-600">
+                <p className="text-[11.5px] text-slate-600 dark:text-slate-400">
                   Covers SQL, Python, Power BI, Statistics, and Data Architecture scenarios.
                 </p>
               </div>
 
-              <div className="p-4 rounded-xl bg-purple-50/50 border border-purple-100 space-y-1">
-                <span className="text-xs font-bold text-purple-900 flex items-center gap-1.5">
-                  <ShieldCheck className="w-4 h-4 text-purple-600" />
+              <div className="p-4 rounded-xl bg-purple-50/50 dark:bg-purple-950/30 border border-purple-100 dark:border-purple-900/50 space-y-1">
+                <span className="text-xs font-bold text-purple-900 dark:text-purple-200 flex items-center gap-1.5">
+                  <ShieldCheck className="w-4 h-4 text-purple-600 dark:text-purple-400" />
                   Skill Passport Verification
                 </span>
-                <p className="text-[11.5px] text-slate-600">
+                <p className="text-[11.5px] text-slate-600 dark:text-slate-400">
                   Scoring above 75% unlocks verified credential badges for employer portfolios.
                 </p>
               </div>
 
-              <div className="p-4 rounded-xl bg-emerald-50/50 border border-emerald-100 space-y-1">
-                <span className="text-xs font-bold text-emerald-900 flex items-center gap-1.5">
-                  <Compass className="w-4 h-4 text-emerald-600" />
+              <div className="p-4 rounded-xl bg-emerald-50/50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/50 space-y-1">
+                <span className="text-xs font-bold text-emerald-900 dark:text-emerald-200 flex items-center gap-1.5">
+                  <Compass className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                   Direct Roadmap Action
                 </span>
-                <p className="text-[11.5px] text-slate-600">
+                <p className="text-[11.5px] text-slate-600 dark:text-slate-400">
                   Identified weaknesses automatically queue matching tutorials and practice projects.
                 </p>
               </div>
             </div>
 
-            <div className="p-4 rounded-xl bg-amber-50/60 border border-amber-200 text-xs text-amber-900 space-y-1">
-              <span className="font-bold flex items-center gap-1.5 text-amber-950">
-                <AlertCircle className="w-4 h-4 text-amber-600" />
+            <div className="p-4 rounded-xl bg-amber-50/60 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/60 text-xs text-amber-900 dark:text-amber-200 space-y-1">
+              <span className="font-bold flex items-center gap-1.5 text-amber-950 dark:text-amber-300">
+                <AlertCircle className="w-4 h-4 text-amber-600 dark:text-amber-400" />
                 Assessment Guidelines:
               </span>
-              <ul className="list-disc pl-5 space-y-0.5 text-[11.5px] text-amber-800">
+              <ul className="list-disc pl-5 space-y-0.5 text-[11.5px] text-amber-800 dark:text-amber-300/90">
                 <li>You can navigate back and forth freely between questions without losing answers.</li>
                 <li>You can review and modify your answers before final submission.</li>
                 <li>Submitting will take you directly to your personalized <strong>Skill Gap Analysis</strong>.</li>
@@ -393,10 +393,10 @@ export default function SkillAssessment({
             </div>
           </div>
 
-          <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3">
             <button
               onClick={() => onNavigate("student_dashboard")}
-              className="w-full sm:w-auto px-5 py-2.5 border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-bold rounded-xl transition cursor-pointer"
+              className="w-full sm:w-auto px-5 py-2.5 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold rounded-xl transition cursor-pointer"
             >
               ← Back to Dashboard
             </button>
@@ -420,29 +420,29 @@ export default function SkillAssessment({
       <div className="max-w-4xl mx-auto space-y-6 pb-8">
         {/* Level 2 Breadcrumb & Back */}
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2 text-xs text-slate-500 font-medium">
+          <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 font-medium">
             <button
               onClick={() => onNavigate("student_dashboard")}
-              className="hover:text-blue-600 cursor-pointer"
+              className="hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer"
             >
               Dashboard
             </button>
             <span>›</span>
             <button
               onClick={() => setStage("instructions")}
-              className="hover:text-blue-600 cursor-pointer"
+              className="hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer"
             >
               Skill Assessment
             </button>
             <span>›</span>
-            <span className="text-blue-600 font-bold">
+            <span className="text-blue-600 dark:text-blue-400 font-bold">
               Question {currentQuestionIndex + 1} of {totalQuestions}
             </span>
           </div>
 
           <button
             onClick={() => setStage("review")}
-            className="text-xs font-bold text-blue-600 hover:underline flex items-center gap-1 cursor-pointer"
+            className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 cursor-pointer"
           >
             <span>Review All Answers</span>
             <ChevronRight className="w-3.5 h-3.5" />
@@ -450,10 +450,10 @@ export default function SkillAssessment({
         </div>
 
         {/* Question Navigator Strip (Phase 5 Requirement: 1 ✓, 2 ✓, 3 ●, 4 ○ ...) */}
-        <div className="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs space-y-3">
+        <div className="bg-white dark:bg-[#111827] rounded-2xl p-4 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-3">
           <div className="flex items-center justify-between text-xs">
-            <span className="font-bold text-slate-700">Question Navigator:</span>
-            <span className="text-slate-500 font-semibold">
+            <span className="font-bold text-slate-700 dark:text-slate-300">Question Navigator:</span>
+            <span className="text-slate-500 dark:text-slate-400 font-semibold">
               {answeredCount} of {totalQuestions} Answered ({progressPercent}%)
             </span>
           </div>
@@ -464,11 +464,11 @@ export default function SkillAssessment({
               const isAnswered = answers[q.id] !== undefined;
               const isCurrent = idx === currentQuestionIndex;
 
-              let btnClass = "border-slate-200 text-slate-600 bg-white hover:border-slate-300";
+              let btnClass = "border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 bg-white dark:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-600";
               if (isCurrent) {
                 btnClass = "border-blue-600 bg-blue-600 text-white font-bold shadow-xs ring-2 ring-blue-400/30";
               } else if (isAnswered) {
-                btnClass = "border-emerald-300 bg-emerald-50 text-emerald-700 font-bold";
+                btnClass = "border-emerald-300 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 font-bold";
               }
 
               return (
@@ -491,7 +491,7 @@ export default function SkillAssessment({
           </div>
 
           {/* Progress Bar */}
-          <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+          <div className="w-full bg-slate-100 dark:bg-slate-700 h-1.5 rounded-full overflow-hidden">
             <div
               className="bg-blue-600 h-full rounded-full transition-all duration-300"
               style={{ width: `${progressPercent}%` }}
@@ -500,28 +500,28 @@ export default function SkillAssessment({
         </div>
 
         {/* Main Question Card */}
-        <div className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200/80 shadow-xs space-y-6">
+        <div className="bg-white dark:bg-[#111827] rounded-2xl p-6 sm:p-8 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-6">
           {/* Question Metadata */}
-          <div className="flex flex-wrap items-center justify-between gap-2 pb-4 border-b border-slate-100">
+          <div className="flex flex-wrap items-center justify-between gap-2 pb-4 border-b border-slate-100 dark:border-slate-800">
             <div className="flex items-center gap-2">
-              <span className="px-2.5 py-0.5 bg-blue-50 text-blue-700 text-xs font-bold rounded-md border border-blue-200">
+              <span className="px-2.5 py-0.5 bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 text-xs font-bold rounded-md border border-blue-200 dark:border-blue-800">
                 {currentQ.category}
               </span>
-              <span className="px-2.5 py-0.5 bg-slate-100 text-slate-600 text-xs font-semibold rounded-md">
+              <span className="px-2.5 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-semibold rounded-md">
                 {currentQ.difficulty}
               </span>
             </div>
-            <span className="text-xs text-slate-400 font-medium">
+            <span className="text-xs text-slate-400 dark:text-slate-500 font-medium">
               Question {currentQuestionIndex + 1} of {totalQuestions}
             </span>
           </div>
 
           {/* Question Title & Scenario */}
           <div>
-            <h2 className="text-base sm:text-lg font-bold text-slate-900 leading-snug">
+            <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white leading-snug">
               {currentQ.question}
             </h2>
-            <p className="text-xs text-slate-500 mt-1">
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
               {currentQ.description}
             </p>
           </div>
@@ -536,8 +536,8 @@ export default function SkillAssessment({
                   onClick={() => handleSelectOption(opt.value)}
                   className={`flex items-center justify-between p-4 min-h-[56px] rounded-xl border transition-all cursor-pointer ${
                     isSelected
-                      ? "border-blue-600 bg-blue-50/50 shadow-xs ring-1 ring-blue-600/30"
-                      : "border-slate-200 hover:border-slate-300 bg-white"
+                      ? "border-blue-600 dark:border-blue-500 bg-blue-50/50 dark:bg-blue-950/40 shadow-xs ring-1 ring-blue-600/30"
+                      : "border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 bg-white dark:bg-slate-800/70"
                   }`}
                 >
                   <div className="flex items-center gap-3.5">
@@ -545,14 +545,14 @@ export default function SkillAssessment({
                       className={`w-5 h-5 rounded-full border flex items-center justify-center shrink-0 ${
                         isSelected
                           ? "border-blue-600 bg-blue-600 text-white"
-                          : "border-slate-300 bg-white"
+                          : "border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700"
                       }`}
                     >
                       {isSelected && <div className="w-2 h-2 rounded-full bg-white"></div>}
                     </div>
                     <span
                       className={`text-xs sm:text-sm font-medium leading-relaxed ${
-                        isSelected ? "text-blue-950 font-bold" : "text-slate-700"
+                        isSelected ? "text-blue-950 dark:text-blue-200 font-bold" : "text-slate-700 dark:text-slate-200"
                       }`}
                     >
                       {opt.label}
@@ -560,7 +560,7 @@ export default function SkillAssessment({
                   </div>
 
                   {isSelected && (
-                    <Check className="w-4 h-4 text-blue-600 shrink-0 ml-2" />
+                    <Check className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0 ml-2" />
                   )}
                 </div>
               );
@@ -568,14 +568,14 @@ export default function SkillAssessment({
           </div>
 
           {/* Workflow Level 3 Navigation Bar (Phase 5 Requirement: Back disabled on Q1, Next becomes Review on Q15) */}
-          <div className="flex items-center justify-between pt-6 border-t border-slate-100 gap-3">
+          <div className="flex items-center justify-between pt-6 border-t border-slate-100 dark:border-slate-800 gap-3">
             <button
               onClick={handlePrevious}
               disabled={currentQuestionIndex === 0}
               className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold transition cursor-pointer ${
                 currentQuestionIndex === 0
-                  ? "bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-200"
-                  : "bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-xs"
+                  ? "bg-slate-100 dark:bg-slate-800/50 text-slate-400 dark:text-slate-600 cursor-not-allowed border border-slate-200 dark:border-slate-800"
+                  : "bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 shadow-xs"
               }`}
             >
               <ArrowLeft className="w-4 h-4" />
@@ -585,7 +585,7 @@ export default function SkillAssessment({
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setStage("review")}
-                className="hidden sm:inline-block px-4 py-2.5 text-xs font-semibold text-slate-600 hover:text-slate-900 cursor-pointer"
+                className="hidden sm:inline-block px-4 py-2.5 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white cursor-pointer"
               >
                 Review Answers
               </button>
@@ -614,41 +614,41 @@ export default function SkillAssessment({
 
     return (
       <div className="max-w-4xl mx-auto space-y-6 pb-8">
-        <div className="flex items-center gap-2 text-xs text-slate-500 font-medium">
+        <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 font-medium">
           <button
             onClick={() => onNavigate("student_dashboard")}
-            className="hover:text-blue-600 cursor-pointer"
+            className="hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer"
           >
             Dashboard
           </button>
           <span>›</span>
           <button
             onClick={() => setStage("quiz")}
-            className="hover:text-blue-600 cursor-pointer"
+            className="hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer"
           >
             Skill Assessment
           </button>
           <span>›</span>
-          <span className="text-blue-600 font-bold">Review Answers</span>
+          <span className="text-blue-600 dark:text-blue-400 font-bold">Review Answers</span>
         </div>
 
-        <div className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200/80 shadow-xs space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
+        <div className="bg-white dark:bg-[#111827] rounded-2xl p-6 sm:p-8 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100 dark:border-slate-800">
             <div>
-              <h2 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight">
+              <h2 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight">
                 Review Your Assessment Responses
               </h2>
-              <p className="text-xs text-slate-500 mt-0.5">
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                 Check your answers before final submission. You can click any question to review or edit.
               </p>
             </div>
 
             <div className="flex items-center gap-2 text-xs font-bold">
-              <span className="px-3 py-1 bg-emerald-50 text-emerald-700 rounded-lg border border-emerald-200">
+              <span className="px-3 py-1 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 rounded-lg border border-emerald-200 dark:border-emerald-800">
                 {answeredCount} Answered
               </span>
               {unAnsweredCount > 0 && (
-                <span className="px-3 py-1 bg-rose-50 text-rose-700 rounded-lg border border-rose-200">
+                <span className="px-3 py-1 bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 rounded-lg border border-rose-200 dark:border-rose-800">
                   {unAnsweredCount} Unanswered
                 </span>
               )}
@@ -668,24 +668,24 @@ export default function SkillAssessment({
                     setCurrentQuestionIndex(idx);
                     setStage("quiz");
                   }}
-                  className="p-3.5 rounded-xl border border-slate-200/80 hover:border-blue-300 hover:bg-slate-50/50 transition cursor-pointer flex items-center justify-between gap-3"
+                  className="p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-700 hover:border-blue-300 dark:hover:border-blue-500 hover:bg-slate-50/50 dark:hover:bg-slate-800/60 transition cursor-pointer flex items-center justify-between gap-3"
                 >
                   <div className="flex items-start gap-3">
                     <span
                       className={`w-6 h-6 rounded-lg text-xs font-bold flex items-center justify-center shrink-0 ${
                         isAnswered
-                          ? "bg-emerald-100 text-emerald-800"
-                          : "bg-slate-100 text-slate-500"
+                          ? "bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300"
+                          : "bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400"
                       }`}
                     >
                       {idx + 1}
                     </span>
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="text-[11px] font-bold text-slate-500">{q.category}</span>
-                        <span className="text-[10px] text-slate-400">• {q.difficulty}</span>
+                        <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400">{q.category}</span>
+                        <span className="text-[10px] text-slate-400 dark:text-slate-500">• {q.difficulty}</span>
                       </div>
-                      <h4 className="text-xs font-bold text-slate-900 mt-0.5 line-clamp-1">
+                      <h4 className="text-xs font-bold text-slate-900 dark:text-white mt-0.5 line-clamp-1">
                         {q.question}
                       </h4>
                     </div>
@@ -693,15 +693,15 @@ export default function SkillAssessment({
 
                   <div className="shrink-0 flex items-center gap-2 text-xs">
                     {isAnswered ? (
-                      <span className="px-2.5 py-0.5 bg-emerald-50 text-emerald-700 font-bold rounded-md border border-emerald-200 text-[11px]">
+                      <span className="px-2.5 py-0.5 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 font-bold rounded-md border border-emerald-200 dark:border-emerald-800 text-[11px]">
                         Option {selectedVal}
                       </span>
                     ) : (
-                      <span className="px-2.5 py-0.5 bg-rose-50 text-rose-700 font-bold rounded-md border border-rose-200 text-[11px]">
+                      <span className="px-2.5 py-0.5 bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 font-bold rounded-md border border-rose-200 dark:border-rose-800 text-[11px]">
                         Not Answered
                       </span>
                     )}
-                    <span className="text-blue-600 font-semibold text-xs hover:underline">
+                    <span className="text-blue-600 dark:text-blue-400 font-semibold text-xs hover:underline">
                       Edit →
                     </span>
                   </div>
@@ -711,10 +711,10 @@ export default function SkillAssessment({
           </div>
 
           {/* Action Footer */}
-          <div className="pt-6 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="pt-6 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3">
             <button
               onClick={() => setStage("quiz")}
-              className="w-full sm:w-auto px-5 py-2.5 border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-bold rounded-xl transition cursor-pointer flex items-center justify-center gap-2"
+              className="w-full sm:w-auto px-5 py-2.5 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold rounded-xl transition cursor-pointer flex items-center justify-center gap-2"
             >
               <ArrowLeft className="w-4 h-4" />
               <span>← Back to Questions</span>
@@ -751,29 +751,29 @@ export default function SkillAssessment({
 
     return (
       <div className="max-w-4xl mx-auto space-y-6 pb-8">
-        <div className="flex items-center gap-2 text-xs text-slate-500 font-medium">
+        <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 font-medium">
           <button
             onClick={() => onNavigate("student_dashboard")}
-            className="hover:text-blue-600 cursor-pointer"
+            className="hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer"
           >
             Dashboard
           </button>
           <span>›</span>
-          <span className="text-slate-900 font-bold">Skill Assessment</span>
+          <span className="text-slate-900 dark:text-white font-bold">Skill Assessment</span>
           <span>›</span>
-          <span className="text-emerald-600 font-bold">Results</span>
+          <span className="text-emerald-600 dark:text-emerald-400 font-bold">Results</span>
         </div>
 
-        <div className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200/80 shadow-xs space-y-6">
+        <div className="bg-white dark:bg-[#111827] rounded-2xl p-6 sm:p-8 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-6">
           {/* Header Badge */}
           <div className="text-center max-w-lg mx-auto space-y-2">
-            <div className="w-14 h-14 mx-auto rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center justify-center shadow-xs">
+            <div className="w-14 h-14 mx-auto rounded-2xl bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 flex items-center justify-center shadow-xs">
               <Award className="w-8 h-8" />
             </div>
-            <h1 className="text-2xl font-black text-slate-900 tracking-tight">
+            <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
               Assessment Completed!
             </h1>
-            <p className="text-xs sm:text-sm text-slate-500">
+            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
               Your competency evaluation for <strong>{careerGoal}</strong> has been recorded and verified on your Digital Skill Passport.
             </p>
           </div>
@@ -808,23 +808,23 @@ export default function SkillAssessment({
 
           {/* Category Breakdown */}
           <div className="space-y-3">
-            <h3 className="text-sm font-bold text-slate-900">
+            <h3 className="text-sm font-bold text-slate-900 dark:text-white">
               Competency Breakdown & Priority Focus Areas:
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
               {categoryBreakdown.map((cat, idx) => (
-                <div key={idx} className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 space-y-2">
+                <div key={idx} className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200/80 dark:border-slate-700 space-y-2">
                   <div className="flex items-center justify-between text-xs">
-                    <span className="font-bold text-slate-800">{cat.name}</span>
-                    <span className="font-black text-slate-900">{cat.score}%</span>
+                    <span className="font-bold text-slate-800 dark:text-slate-200">{cat.name}</span>
+                    <span className="font-black text-slate-900 dark:text-white">{cat.score}%</span>
                   </div>
-                  <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+                  <div className="w-full bg-slate-200 dark:bg-slate-700 h-2 rounded-full overflow-hidden">
                     <div className={`${cat.color} h-full rounded-full`} style={{ width: `${cat.score}%` }} />
                   </div>
-                  <div className="flex items-center justify-between text-[11px] text-slate-500">
-                    <span>Status: <strong className="text-slate-700">{cat.status}</strong></span>
+                  <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
+                    <span>Status: <strong className="text-slate-700 dark:text-slate-300">{cat.status}</strong></span>
                     {cat.score < 70 && (
-                      <span className="text-rose-600 font-bold">Action Recommended</span>
+                      <span className="text-rose-600 dark:text-rose-400 font-bold">Action Recommended</span>
                     )}
                   </div>
                 </div>
@@ -833,10 +833,10 @@ export default function SkillAssessment({
           </div>
 
           {/* Call to Action: Logical Transition to Skill Gap Analysis (Phase 5 Requirement) */}
-          <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3">
             <button
               onClick={() => onNavigate("student_dashboard")}
-              className="w-full sm:w-auto px-5 py-2.5 border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-bold rounded-xl transition cursor-pointer"
+              className="w-full sm:w-auto px-5 py-2.5 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold rounded-xl transition cursor-pointer"
             >
               Dashboard Overview
             </button>
@@ -844,7 +844,7 @@ export default function SkillAssessment({
             <div className="flex items-center gap-2 w-full sm:w-auto">
               <button
                 onClick={() => onNavigate("skill_passport")}
-                className="w-full sm:w-auto px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold rounded-xl transition cursor-pointer"
+                className="w-full sm:w-auto px-4 py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-bold rounded-xl transition cursor-pointer"
               >
                 View Skill Passport
               </button>

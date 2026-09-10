@@ -24,7 +24,7 @@ import InstitutionAnalytics from "./components/screens/InstitutionAnalytics";
 import IndustryCollaboration from "./components/screens/IndustryCollaboration";
 
 // Career Intelligence & Roadmap Central Data
-import { CAREER_GOALS, CAREER_INTELLIGENCE_DATA } from "./data/careerIntelligence";
+import { CAREER_INTELLIGENCE_DATA } from "./data/careerIntelligence";
 import { ROADMAP_MODULES } from "./data/roadmapData";
 
 export default function App() {
@@ -36,29 +36,108 @@ export default function App() {
   // Active Career Profile Data
   const careerData = CAREER_INTELLIGENCE_DATA[careerGoal] || CAREER_INTELLIGENCE_DATA["Data Analyst"];
 
-  // Shared Profile State
-  const [profileData, setProfileData] = useState({
-    fullName: "Sachin",
-    email: "sachin.cs@example.edu.in",
-    phone: "+91 98765 43210",
-    college: "ABC Institute of Technology",
-    course: "Computer Science & Engineering",
-    gradYear: "2027",
-    targetRole: "Data Analyst",
-    preferredIndustry: "Artificial Intelligence & Enterprise SaaS",
-    preferredLocation: "Bangalore, Remote",
-    readinessScore: 82,
-    avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80"
+  // Default Avatar Reference
+  const DEFAULT_AVATAR = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80";
+
+  // Central Theme State ("light" | "dark" | "system") with localStorage persistence
+  const [theme, setTheme] = useState(() => {
+    try {
+      const saved = localStorage.getItem("skillbridge-theme");
+      if (saved === "light" || saved === "dark" || saved === "system") {
+        return saved;
+      }
+    } catch (e) {
+      console.error("Failed to load theme from localStorage", e);
+    }
+    return "system";
   });
+
+  // Apply theme to document root and listen to OS changes when theme === "system"
+  useEffect(() => {
+    const applyTheme = () => {
+      let isDark = false;
+      if (theme === "dark") {
+        isDark = true;
+      } else if (theme === "light") {
+        isDark = false;
+      } else {
+        isDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+      }
+
+      if (isDark) {
+        document.documentElement.classList.add("dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+      }
+    };
+
+    applyTheme();
+
+    try {
+      localStorage.setItem("skillbridge-theme", theme);
+    } catch (e) {
+      console.error("Failed to save theme to localStorage", e);
+    }
+
+    if (theme === "system" && window.matchMedia) {
+      const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+      const handler = () => applyTheme();
+      mediaQuery.addEventListener("change", handler);
+      return () => mediaQuery.removeEventListener("change", handler);
+    }
+  }, [theme]);
+
+  // Shared Profile State with localStorage persistence
+  const [profileData, setProfileData] = useState(() => {
+    try {
+      const saved = localStorage.getItem("skillbridge_student_profile");
+      if (saved) {
+        return JSON.parse(saved);
+      }
+    } catch (e) {
+      console.error("Failed to load profile from localStorage", e);
+    }
+    return {
+      fullName: "Sachin",
+      email: "sachin.cs@example.edu.in",
+      phone: "+91 98765 43210",
+      college: "ABC Institute of Technology",
+      course: "Computer Science & Engineering",
+      gradYear: "2027",
+      targetRole: "Data Analyst",
+      preferredIndustry: "Artificial Intelligence & Enterprise SaaS",
+      preferredLocation: "Bangalore, Remote",
+      readinessScore: 82,
+      avatar: DEFAULT_AVATAR
+    };
+  });
+
+  // Central profile update handler with persistence
+  const handleUpdateProfile = (newProfile) => {
+    setProfileData(newProfile);
+    try {
+      localStorage.setItem("skillbridge_student_profile", JSON.stringify(newProfile));
+    } catch (e) {
+      console.error("Failed to persist profile to localStorage", e);
+    }
+  };
 
   // Keep Profile Target Role and Readiness in sync with active Career Goal
   useEffect(() => {
-    setProfileData((prev) => ({
-      ...prev,
-      targetRole: careerGoal,
-      readinessScore: careerData.readinessScore
-    }));
-  }, [careerGoal]);
+    setProfileData((prev) => {
+      const updated = {
+        ...prev,
+        targetRole: careerGoal,
+        readinessScore: careerData.readinessScore
+      };
+      try {
+        localStorage.setItem("skillbridge_student_profile", JSON.stringify(updated));
+      } catch (e) {
+        // ignore
+      }
+      return updated;
+    });
+  }, [careerGoal, careerData.readinessScore]);
 
   // Independent Roadmap Modules Completion State
   const [completedModuleIds, setCompletedModuleIds] = useState({
@@ -560,7 +639,7 @@ export default function App() {
         return (
           <Profile
             profileData={profileData}
-            onUpdateProfile={setProfileData}
+            onUpdateProfile={handleUpdateProfile}
             careerGoal={careerGoal}
             onChangeCareerGoal={handleChangeCareerGoal}
             onNavigate={navigateToScreen}
@@ -570,8 +649,12 @@ export default function App() {
         return (
           <Settings
             onNavigate={navigateToScreen}
+            profileData={profileData}
+            onUpdateProfile={handleUpdateProfile}
             careerGoal={careerGoal}
             onChangeCareerGoal={handleChangeCareerGoal}
+            theme={theme}
+            onThemeChange={setTheme}
           />
         );
       case "skill_assessment":
@@ -624,6 +707,7 @@ export default function App() {
           <LearningResource
             moduleId={activeLearningModuleId}
             onNavigate={navigateToScreen}
+            onOpenResource={handleOpenLearningResource}
             onCompleteModule={handleCompleteModule}
             isCompleted={!!completedModuleIds[activeLearningModuleId]}
             onRecordActivity={(act) => setActivityTimeline((prev) => [act, ...prev])}
@@ -695,7 +779,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] text-slate-900 flex flex-col font-sans relative">
+    <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0B1220] text-slate-900 dark:text-slate-100 flex flex-col font-sans relative transition-colors duration-200">
       {currentScreen === "landing" || currentScreen === "login" ? (
         /* Full-page views for Landing and Login */
         <div className="flex-1">
@@ -722,7 +806,7 @@ export default function App() {
               profileData={profileData}
               onToggleMobileMenu={() => setMobileMenuOpen((prev) => !prev)}
             />
-            <main className="flex-1 overflow-y-auto p-3.5 sm:p-6 lg:p-8 bg-[#F8FAFC]">
+            <main className="flex-1 overflow-y-auto p-3.5 sm:p-6 lg:p-8 bg-[#F8FAFC] dark:bg-[#0B1220] transition-colors duration-200">
               {renderScreenContent()}
             </main>
           </div>

@@ -99,12 +99,12 @@ export default function TopHeader({
   };
 
   return (
-    <header className="h-14 bg-white border-b border-slate-200/80 px-3 sm:px-6 flex items-center justify-between sticky top-0 z-30 select-none shadow-xs">
+    <header className="h-14 bg-white dark:bg-[#111827] border-b border-slate-200/80 dark:border-slate-800 px-3 sm:px-6 flex items-center justify-between sticky top-0 z-30 select-none shadow-xs transition-colors duration-200">
       <div className="flex items-center gap-2 sm:gap-3">
         {/* Mobile Hamburger Button */}
         <button
           onClick={onToggleMobileMenu}
-          className="p-1.5 -ml-1 rounded-xl text-slate-700 hover:text-slate-900 hover:bg-slate-100 lg:hidden cursor-pointer transition flex items-center justify-center min-w-[38px] min-h-[38px]"
+          className="p-1.5 -ml-1 rounded-xl text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 lg:hidden cursor-pointer transition flex items-center justify-center min-w-[38px] min-h-[38px]"
           title="Open Menu"
           aria-label="Open Navigation Menu"
         >
@@ -120,14 +120,14 @@ export default function TopHeader({
             <div className="w-6 h-6 rounded-md bg-gradient-to-tr from-blue-600 via-indigo-600 to-cyan-400 flex items-center justify-center text-white font-black text-xs shadow-xs">
               S
             </div>
-            <span className="font-extrabold text-sm text-slate-900 tracking-tight">
+            <span className="font-extrabold text-sm text-slate-900 dark:text-white tracking-tight">
               Skill<span className="text-blue-600">Bridge</span>
             </span>
           </div>
 
-          <div className="hidden lg:flex items-center gap-2 text-xs font-bold text-slate-700">
+          <div className="hidden lg:flex items-center gap-2 text-xs font-bold text-slate-700 dark:text-slate-300">
             <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-            <span className="text-slate-800">SkillBridge Career Intelligence System</span>
+            <span className="text-slate-800 dark:text-slate-200">SkillBridge Career Intelligence System</span>
           </div>
         </div>
       </div>
@@ -139,7 +139,7 @@ export default function TopHeader({
           <input
             type="text"
             placeholder="Search skills, jobs, roadmaps..."
-            className="w-44 lg:w-56 pl-8 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:bg-white text-slate-700 placeholder-slate-400"
+            className="w-44 lg:w-56 pl-8 pr-3 py-1.5 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:bg-white dark:focus:bg-slate-800 text-slate-700 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500"
           />
         </div>
 
@@ -149,15 +149,15 @@ export default function TopHeader({
             onClick={toggleNotif}
             className={`relative p-2 rounded-xl transition cursor-pointer min-w-[40px] min-h-[40px] flex items-center justify-center ${
               notifOpen
-                ? "bg-blue-50 text-blue-600"
-                : "text-slate-600 hover:text-blue-600 hover:bg-slate-100"
+                ? "bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400"
+                : "text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-800"
             }`}
             title="Notifications"
             aria-expanded={notifOpen}
           >
             <Bell className="w-4 h-4" />
             {unreadCount > 0 && (
-              <span className="absolute top-1 right-1 min-w-[16px] h-4 px-1 bg-rose-500 text-white text-[9.5px] font-black rounded-full flex items-center justify-center ring-2 ring-white">
+              <span className="absolute top-1 right-1 min-w-[16px] h-4 px-1 bg-rose-500 text-white text-[9.5px] font-black rounded-full flex items-center justify-center ring-2 ring-white dark:ring-slate-900">
                 {unreadCount}
               </span>
             )}
@@ -165,17 +165,17 @@ export default function TopHeader({
 
           {/* NOTIFICATION DROPDOWN POPOVER (Bounded to viewport width on mobile) */}
           {notifOpen && (
-            <div className="fixed sm:absolute top-14 sm:top-auto right-2 sm:right-0 mt-1 sm:mt-2 w-[calc(100vw-1rem)] sm:w-96 max-w-sm bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-150">
+            <div className="fixed sm:absolute top-14 sm:top-auto right-2 sm:right-0 mt-1 sm:mt-2 w-[calc(100vw-1rem)] sm:w-96 max-w-sm bg-white dark:bg-[#111827] rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-150">
               {/* Dropdown Header */}
-              <div className="p-3.5 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
+              <div className="p-3.5 bg-slate-50 dark:bg-slate-800/80 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-bold text-slate-900">Notifications</span>
+                  <span className="text-xs font-bold text-slate-900 dark:text-white">Notifications</span>
                   {unreadCount > 0 ? (
-                    <span className="px-2 py-0.5 bg-rose-100 text-rose-700 text-[10px] font-bold rounded-full">
+                    <span className="px-2 py-0.5 bg-rose-100 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 text-[10px] font-bold rounded-full border border-rose-200 dark:border-rose-900/50">
                       {unreadCount} unread
                     </span>
                   ) : (
-                    <span className="px-2 py-0.5 bg-slate-100 text-slate-500 text-[10px] font-semibold rounded-full">
+                    <span className="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-[10px] font-semibold rounded-full">
                       All caught up
                     </span>
                   )}
@@ -186,7 +186,7 @@ export default function TopHeader({
                     onClick={() => {
                       if (onMarkAllAsRead) onMarkAllAsRead();
                     }}
-                    className="text-[11px] font-semibold text-blue-600 hover:underline flex items-center gap-1 cursor-pointer"
+                    className="text-[11px] font-semibold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 cursor-pointer"
                   >
                     <CheckCheck className="w-3.5 h-3.5" />
                     <span>Mark all as read</span>
@@ -195,15 +195,15 @@ export default function TopHeader({
               </div>
 
               {/* Notification Items List */}
-              <div className="divide-y divide-slate-100 max-h-80 overflow-y-auto">
+              <div className="divide-y divide-slate-100 dark:divide-slate-800 max-h-80 overflow-y-auto">
                 {notifications.slice(0, 4).map((item) => (
                   <div
                     key={item.id}
                     onClick={() => handleNotificationClick(item)}
                     className={`p-3 sm:p-3.5 transition cursor-pointer flex items-start gap-3 text-left ${
                       !item.read
-                        ? "bg-blue-50/40 hover:bg-blue-50/80 border-l-3 border-l-blue-600"
-                        : "hover:bg-slate-50/80"
+                        ? "bg-blue-50/40 dark:bg-blue-950/30 hover:bg-blue-50/80 dark:hover:bg-blue-900/40 border-l-3 border-l-blue-600"
+                        : "hover:bg-slate-50/80 dark:hover:bg-slate-800/50"
                     }`}
                   >
                     <div className={`w-8 h-8 rounded-lg ${item.iconBg} flex items-center justify-center shrink-0 mt-0.5 shadow-xs text-xs font-bold`}>
@@ -220,14 +220,14 @@ export default function TopHeader({
 
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-1">
-                        <span className="text-xs font-bold text-slate-900 truncate">
+                        <span className="text-xs font-bold text-slate-900 dark:text-white truncate">
                           {item.title}
                         </span>
-                        <span className="text-[10px] text-slate-400 shrink-0">
+                        <span className="text-[10px] text-slate-400 dark:text-slate-500 shrink-0">
                           {item.timestamp}
                         </span>
                       </div>
-                      <p className="text-[11px] text-slate-500 line-clamp-2 mt-0.5 leading-snug">
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-2 mt-0.5 leading-snug">
                         {item.desc}
                       </p>
                     </div>
@@ -235,20 +235,20 @@ export default function TopHeader({
                 ))}
 
                 {notifications.length === 0 && (
-                  <div className="p-8 text-center text-slate-400 text-xs italic">
+                  <div className="p-8 text-center text-slate-400 dark:text-slate-500 text-xs italic">
                     No notifications available
                   </div>
                 )}
               </div>
 
               {/* Dropdown Footer Action */}
-              <div className="p-2.5 bg-slate-50/80 border-t border-slate-100 text-center">
+              <div className="p-2.5 bg-slate-50/80 dark:bg-slate-800/80 border-t border-slate-100 dark:border-slate-800 text-center">
                 <button
                   onClick={() => {
                     setNotifOpen(false);
                     if (onNavigate) onNavigate("notifications");
                   }}
-                  className="w-full py-1.5 text-xs font-semibold text-blue-600 hover:text-blue-700 hover:bg-blue-50/60 rounded-lg transition flex items-center justify-center gap-1 cursor-pointer"
+                  className="w-full py-1.5 text-xs font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50/60 dark:hover:bg-blue-900/30 rounded-lg transition flex items-center justify-center gap-1 cursor-pointer"
                 >
                   <span>View All Notifications</span>
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -264,33 +264,45 @@ export default function TopHeader({
             onClick={toggleProfile}
             className={`flex items-center gap-2 p-1 pl-1.5 pr-2 rounded-xl transition cursor-pointer border ${
               profileOpen
-                ? "bg-slate-100 border-slate-300 ring-1 ring-blue-500"
-                : "border-transparent hover:bg-slate-100"
+                ? "bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-700 ring-1 ring-blue-500"
+                : "border-transparent hover:bg-slate-100 dark:hover:bg-slate-800"
             }`}
             title="Profile Menu"
             aria-expanded={profileOpen}
           >
-            <img
-              src={profileData.avatar}
-              alt={profileData.fullName}
-              className="w-7 h-7 rounded-full object-cover ring-1 ring-blue-500/40"
-            />
-            <span className="hidden sm:inline text-xs font-semibold text-slate-700">
+            {profileData?.avatar ? (
+              <img
+                src={profileData.avatar}
+                alt={profileData.fullName}
+                className="w-7 h-7 rounded-full object-cover ring-1 ring-blue-500/40"
+              />
+            ) : (
+              <div className="w-7 h-7 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-xs ring-1 ring-blue-500/40">
+                {(profileData?.fullName || "S").charAt(0).toUpperCase()}
+              </div>
+            )}
+            <span className="hidden sm:inline text-xs font-semibold text-slate-700 dark:text-slate-200">
               {profileData.fullName}
             </span>
           </button>
 
           {/* PROFILE DROPDOWN POPOVER (Bounded to viewport on mobile) */}
           {profileOpen && (
-            <div className="fixed sm:absolute top-14 sm:top-auto right-2 sm:right-0 mt-1 sm:mt-2 w-[calc(100vw-1rem)] sm:w-72 max-w-xs bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-150">
+            <div className="fixed sm:absolute top-14 sm:top-auto right-2 sm:right-0 mt-1 sm:mt-2 w-[calc(100vw-1rem)] sm:w-72 max-w-xs bg-white dark:bg-[#111827] rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-150">
               {/* Profile Summary Header */}
               <div className="p-4 bg-gradient-to-br from-slate-900 to-blue-950 text-white">
                 <div className="flex items-center gap-3">
-                  <img
-                    src={profileData.avatar}
-                    alt={profileData.fullName}
-                    className="w-10 h-10 rounded-xl object-cover ring-2 ring-white/30 shrink-0"
-                  />
+                  {profileData?.avatar ? (
+                    <img
+                      src={profileData.avatar}
+                      alt={profileData.fullName}
+                      className="w-10 h-10 rounded-xl object-cover ring-2 ring-white/30 shrink-0"
+                    />
+                  ) : (
+                    <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-sm ring-2 ring-white/30 shrink-0">
+                      {(profileData?.fullName || "S").charAt(0).toUpperCase()}
+                    </div>
+                  )}
                   <div className="overflow-hidden">
                     <h4 className="text-xs font-bold text-white truncate">
                       {profileData.fullName}
@@ -312,13 +324,13 @@ export default function TopHeader({
               </div>
 
               {/* Menu Options */}
-              <div className="p-2 space-y-0.5 text-xs text-slate-700">
+              <div className="p-2 space-y-0.5 text-xs text-slate-700 dark:text-slate-200">
                 <button
                   onClick={() => {
                     setProfileOpen(false);
                     if (onNavigate) onNavigate("profile");
                   }}
-                  className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-slate-100 hover:text-blue-600 transition font-medium text-left cursor-pointer"
+                  className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-blue-600 dark:hover:text-blue-400 transition font-medium text-left cursor-pointer"
                 >
                   <User className="w-4 h-4 text-slate-400" />
                   <span>View Profile</span>
@@ -329,7 +341,7 @@ export default function TopHeader({
                     setProfileOpen(false);
                     if (onNavigate) onNavigate("settings");
                   }}
-                  className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-slate-100 hover:text-blue-600 transition font-medium text-left cursor-pointer"
+                  className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-blue-600 dark:hover:text-blue-400 transition font-medium text-left cursor-pointer"
                 >
                   <SettingsIcon className="w-4 h-4 text-slate-400" />
                   <span>Settings & Preferences</span>
@@ -340,7 +352,7 @@ export default function TopHeader({
                     setProfileOpen(false);
                     if (onNavigate) onNavigate("settings");
                   }}
-                  className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-slate-100 hover:text-blue-600 transition font-medium text-left cursor-pointer"
+                  className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-blue-600 dark:hover:text-blue-400 transition font-medium text-left cursor-pointer"
                 >
                   <Shield className="w-4 h-4 text-slate-400" />
                   <span>Security & 2FA</span>
@@ -348,10 +360,10 @@ export default function TopHeader({
               </div>
 
               {/* Logout Footer */}
-              <div className="p-2 border-t border-slate-100">
+              <div className="p-2 border-t border-slate-100 dark:border-slate-800">
                 <button
                   onClick={handleLogout}
-                  className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-rose-600 hover:bg-rose-50 transition font-semibold text-xs text-left cursor-pointer"
+                  className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition font-semibold text-xs text-left cursor-pointer"
                 >
                   <LogOut className="w-4 h-4 text-rose-500" />
                   <span>Logout</span>

@@ -4,6 +4,7 @@ import {
   CheckCircle2,
   AlertTriangle,
   ArrowRight,
+  ArrowLeft,
   ShieldCheck,
   Calendar,
   Sparkles,
@@ -213,18 +214,39 @@ export default function MySkills({
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto pb-8">
+      {/* Level 2 Breadcrumbs & In-Workspace Navigation */}
+      <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 font-medium">
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => onNavigate("student_dashboard")}
+            className="hover:text-blue-600 dark:hover:text-blue-400 transition cursor-pointer"
+          >
+            Dashboard
+          </button>
+          <span>›</span>
+          <span className="text-slate-900 dark:text-white font-bold">My Skills</span>
+        </div>
+        <button
+          onClick={() => onNavigate("student_dashboard")}
+          className="flex items-center gap-1.5 text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition cursor-pointer"
+        >
+          <ArrowLeft className="w-3.5 h-3.5" />
+          <span>Back to Dashboard</span>
+        </button>
+      </div>
+
       {/* HEADER */}
-      <div className="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-white dark:bg-[#111827] rounded-2xl p-6 border border-slate-200/80 dark:border-slate-800 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+            <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
               My Skills
             </h1>
-            <span className="px-2.5 py-0.5 bg-blue-50 text-blue-700 text-xs font-bold rounded-full border border-blue-200">
+            <span className="px-2.5 py-0.5 bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 text-xs font-bold rounded-full border border-blue-200 dark:border-blue-800">
               Target: {careerGoal}
             </span>
           </div>
-          <p className="text-xs sm:text-sm text-slate-600 mt-1">
+          <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mt-1">
             Track, verify, and measure your competency improvements over time.
           </p>
         </div>
@@ -239,7 +261,7 @@ export default function MySkills({
           </button>
           <button
             onClick={() => onNavigate("skill_passport")}
-            className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition cursor-pointer min-h-[38px]"
+            className="px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold rounded-xl transition cursor-pointer min-h-[38px]"
           >
             Digital Skill Passport
           </button>
@@ -247,33 +269,33 @@ export default function MySkills({
       </div>
 
       {/* 📈 SECTION 8 — SKILL PROGRESS (Before vs After Historical Improvement) */}
-      <div className="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200/80 shadow-xs space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-100">
+      <div className="bg-white dark:bg-[#111827] rounded-2xl p-5 sm:p-6 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-100 dark:border-slate-800">
           <div className="flex items-center gap-2">
-            <TrendingUp className="w-5 h-5 text-emerald-600" />
+            <TrendingUp className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
             <div>
-              <h2 className="text-sm font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
+              <h2 className="text-sm font-extrabold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
                 📈 Skill Progress & Historical Growth
-                <span className="text-[10px] font-bold px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded-full">
+                <span className="text-[10px] font-bold px-2 py-0.5 bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 rounded-full">
                   Verified Trajectory
                 </span>
               </h2>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 SkillBridge helps you systematically improve, not just evaluate. ({readinessHistory.duration})
               </p>
             </div>
           </div>
 
           {/* Composite Readiness Lift Card */}
-          <div className="p-3 bg-linear-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-xl flex items-center gap-3 shrink-0 self-start sm:self-auto">
+          <div className="p-3 bg-linear-to-r from-emerald-50 to-teal-50 dark:from-emerald-950/40 dark:to-teal-950/40 border border-emerald-200 dark:border-emerald-800/60 rounded-xl flex items-center gap-3 shrink-0 self-start sm:self-auto">
             <div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-800 block">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-800 dark:text-emerald-300 block">
                 Industry Readiness Gain
               </span>
               <div className="flex items-baseline gap-2">
-                <span className="text-xs text-slate-500 line-through">Before: {readinessHistory.before}%</span>
-                <span className="text-lg font-black text-emerald-900">Now: {readinessHistory.current}%</span>
-                <span className="text-xs font-black text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded">
+                <span className="text-xs text-slate-500 dark:text-slate-400 line-through">Before: {readinessHistory.before}%</span>
+                <span className="text-lg font-black text-emerald-900 dark:text-emerald-200">Now: {readinessHistory.current}%</span>
+                <span className="text-xs font-black text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-950/80 px-1.5 py-0.5 rounded">
                   +{readinessHistory.delta}%
                 </span>
               </div>
@@ -286,22 +308,22 @@ export default function MySkills({
           {skillProgressHistory.map((item, idx) => (
             <div
               key={idx}
-              className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 hover:bg-emerald-50/30 hover:border-emerald-200 transition flex flex-col justify-between space-y-2"
+              className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700 hover:bg-emerald-50/30 dark:hover:bg-slate-800 hover:border-emerald-200 dark:hover:border-emerald-800/60 transition flex flex-col justify-between space-y-2"
             >
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-slate-900">{item.skill}</span>
-                <span className="text-[11px] font-black text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded-md">
+                <span className="text-xs font-bold text-slate-900 dark:text-white">{item.skill}</span>
+                <span className="text-[11px] font-black text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-950/80 px-1.5 py-0.5 rounded-md">
                   +{item.delta}%
                 </span>
               </div>
 
               <div className="space-y-1">
-                <div className="flex justify-between text-[11px] text-slate-500">
+                <div className="flex justify-between text-[11px] text-slate-500 dark:text-slate-400">
                   <span>Before: <strong>{item.before}%</strong></span>
-                  <span className="text-slate-900 font-bold">Now: {item.current}%</span>
+                  <span className="text-slate-900 dark:text-slate-200 font-bold">Now: {item.current}%</span>
                 </div>
 
-                <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden relative">
+                <div className="w-full bg-slate-200 dark:bg-slate-700 h-2 rounded-full overflow-hidden relative">
                   {/* Baseline marker */}
                   <div
                     className="absolute top-0 bottom-0 bg-slate-400 w-0.5 z-10"
@@ -315,9 +337,9 @@ export default function MySkills({
                 </div>
               </div>
 
-              <div className="text-[10px] text-slate-400 font-medium pt-1 border-t border-slate-200/60 flex items-center justify-between">
+              <div className="text-[10px] text-slate-400 dark:text-slate-500 font-medium pt-1 border-t border-slate-200/60 dark:border-slate-700 flex items-center justify-between">
                 <span>Assessment Validated</span>
-                {item.verified && <span className="text-emerald-600 font-bold">✓ Verified</span>}
+                {item.verified && <span className="text-emerald-600 dark:text-emerald-400 font-bold">✓ Verified</span>}
               </div>
             </div>
           ))}
@@ -325,12 +347,12 @@ export default function MySkills({
       </div>
 
       {/* CATEGORY FILTER */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-3">
         <div>
-          <h2 className="text-xs font-bold text-slate-400 tracking-wider uppercase">
+          <h2 className="text-xs font-bold text-slate-400 dark:text-slate-500 tracking-wider uppercase">
             Competency Breakdown by Category
           </h2>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-slate-500 dark:text-slate-400">
             Click categories to filter your verified skills
           </p>
         </div>
@@ -343,8 +365,8 @@ export default function MySkills({
               onClick={() => setSelectedCategory(cat)}
               className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition whitespace-nowrap cursor-pointer ${
                 selectedCategory === cat
-                  ? "bg-slate-900 text-white shadow-xs"
-                  : "bg-white text-slate-600 hover:bg-slate-100 border border-slate-200/80"
+                  ? "bg-slate-900 dark:bg-blue-600 text-white shadow-xs"
+                  : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200/80 dark:border-slate-700"
               }`}
             >
               {cat}
@@ -358,14 +380,14 @@ export default function MySkills({
         {displayedCategories.map((category) => (
           <div
             key={category.name}
-            className="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200/80 shadow-xs space-y-4"
+            className="bg-white dark:bg-[#111827] rounded-2xl p-4 sm:p-6 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-4"
           >
-            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-              <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
+              <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-blue-600"></span>
                 <span>{category.name}</span>
               </h3>
-              <span className="text-xs font-semibold text-slate-400">
+              <span className="text-xs font-semibold text-slate-400 dark:text-slate-500">
                 {category.skills.length} Competencies
               </span>
             </div>
@@ -376,24 +398,24 @@ export default function MySkills({
                 return (
                   <div
                     key={sIdx}
-                    className="p-4 rounded-xl border border-slate-200/80 bg-slate-50/40 hover:bg-white hover:border-blue-300 hover:shadow-xs transition flex flex-col justify-between"
+                    className="p-4 rounded-xl border border-slate-200/80 dark:border-slate-700 bg-slate-50/40 dark:bg-slate-800/60 hover:bg-white dark:hover:bg-slate-800/90 hover:border-blue-300 dark:hover:border-blue-500 hover:shadow-xs transition flex flex-col justify-between"
                   >
                     <div>
                       {/* Skill Header */}
                       <div className="flex items-start justify-between gap-2">
                         <div>
-                          <h4 className="text-sm font-bold text-slate-900">{skill.name}</h4>
-                          <span className="text-[11px] text-slate-400 block mt-0.5">
+                          <h4 className="text-sm font-bold text-slate-900 dark:text-white">{skill.name}</h4>
+                          <span className="text-[11px] text-slate-400 dark:text-slate-500 block mt-0.5">
                             Last assessed: {skill.lastAssessed}
                           </span>
                         </div>
                         {skill.verified ? (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-50 text-emerald-700 text-[10px] font-bold rounded-md border border-emerald-200">
-                            <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 text-[10px] font-bold rounded-md border border-emerald-200 dark:border-emerald-800">
+                            <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
                             Verified ✓
                           </span>
                         ) : (
-                          <span className="px-2 py-0.5 bg-slate-100 text-slate-500 text-[10px] font-semibold rounded-md">
+                          <span className="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-[10px] font-semibold rounded-md">
                             Self-Reported
                           </span>
                         )}
@@ -401,13 +423,13 @@ export default function MySkills({
 
                       {/* Proficiency & Requirement Comparison */}
                       <div className="mt-4 space-y-1.5">
-                        <div className="flex justify-between text-xs font-semibold text-slate-700">
-                          <span>Current: <strong className="text-slate-900">{skill.proficiency}%</strong></span>
-                          <span>Industry Req: <strong className="text-slate-600">{skill.industryReq}%</strong></span>
+                        <div className="flex justify-between text-xs font-semibold text-slate-700 dark:text-slate-300">
+                          <span>Current: <strong className="text-slate-900 dark:text-white">{skill.proficiency}%</strong></span>
+                          <span>Industry Req: <strong className="text-slate-600 dark:text-slate-400">{skill.industryReq}%</strong></span>
                         </div>
 
                         {/* Visual Progress Bar */}
-                        <div className="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden relative">
+                        <div className="w-full bg-slate-200 dark:bg-slate-700 h-2.5 rounded-full overflow-hidden relative">
                           <div
                             className="absolute top-0 bottom-0 bg-slate-400 w-0.5 z-10"
                             style={{ left: `${skill.industryReq}%` }}
@@ -425,14 +447,14 @@ export default function MySkills({
                           <span
                             className={`font-bold px-1.5 py-0.5 rounded ${
                               isGap
-                                ? "bg-rose-50 text-rose-700 border border-rose-200"
-                                : "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                                ? "bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800"
+                                : "bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800"
                             }`}
                           >
                             {skill.status}
                           </span>
                           {isGap && (
-                            <span className="text-rose-600 font-bold">
+                            <span className="text-rose-600 dark:text-rose-400 font-bold">
                               Gap: -{skill.gap}%
                             </span>
                           )}
@@ -441,7 +463,7 @@ export default function MySkills({
                     </div>
 
                     {/* Actions */}
-                    <div className="mt-4 pt-3 border-t border-slate-200/60 space-y-2">
+                    <div className="mt-4 pt-3 border-t border-slate-200/60 dark:border-slate-700 space-y-2">
                       {isGap ? (
                         <div className="flex gap-2">
                           <button
@@ -452,7 +474,7 @@ export default function MySkills({
                           </button>
                           <button
                             onClick={() => onNavigate("roadmap")}
-                            className="flex-1 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg text-xs font-semibold transition cursor-pointer"
+                            className="flex-1 py-1.5 bg-blue-50 dark:bg-blue-950/60 hover:bg-blue-100 dark:hover:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-lg text-xs font-semibold transition cursor-pointer"
                           >
                             Start Learning
                           </button>
@@ -460,7 +482,7 @@ export default function MySkills({
                       ) : (
                         <button
                           onClick={() => onNavigate("skill_passport")}
-                          className="w-full py-1.5 bg-emerald-50 text-emerald-700 rounded-lg text-xs font-semibold border border-emerald-200 cursor-pointer"
+                          className="w-full py-1.5 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 rounded-lg text-xs font-semibold border border-emerald-200 dark:border-emerald-800/60 cursor-pointer"
                         >
                           View in Digital Passport ✓
                         </button>

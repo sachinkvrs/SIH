@@ -136,11 +136,11 @@ export default function StudentDashboard({
       {/* 1. WELCOME HEADER */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
+          <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
             Welcome back, {studentName}! <span className="inline-block animate-bounce">👋</span>
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            Keep learning, keep growing. You're <span className="font-bold text-blue-600">{readiness}%</span> industry ready for <strong className="text-slate-700">{careerGoal}</strong>!
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
+            Keep learning, keep growing. You're <span className="font-bold text-blue-600 dark:text-blue-400">{readiness}%</span> industry ready for <strong className="text-slate-700 dark:text-slate-200">{careerGoal}</strong>!
           </p>
         </div>
 
@@ -155,7 +155,7 @@ export default function StudentDashboard({
           </button>
           <button
             onClick={() => onNavigate("skill_gap")}
-            className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 cursor-pointer min-h-[38px]"
+            className="px-3.5 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 cursor-pointer min-h-[38px]"
           >
             <AlertCircle className="w-3.5 h-3.5" />
             <span>View Skill Gap</span>
@@ -171,13 +171,13 @@ export default function StudentDashboard({
             <div
               key={idx}
               onClick={metric.onClick}
-              className={`bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs flex items-center justify-between ${
-                metric.onClick ? "cursor-pointer hover:border-blue-300 hover:shadow-sm transition" : ""
+              className={`bg-white dark:bg-[#111827] rounded-2xl p-4 border border-slate-200/80 dark:border-slate-800 shadow-xs flex items-center justify-between transition ${
+                metric.onClick ? "cursor-pointer hover:border-blue-300 dark:hover:border-blue-700 hover:shadow-sm" : ""
               }`}
             >
               <div>
-                <span className="text-xs font-semibold text-slate-500 block">{metric.title}</span>
-                <span className="text-2xl font-black text-slate-900 mt-0.5 block">{metric.value}</span>
+                <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 block">{metric.title}</span>
+                <span className="text-2xl font-black text-slate-900 dark:text-white mt-0.5 block">{metric.value}</span>
                 <span className={`text-[11px] font-medium ${metric.subColor} mt-0.5 block`}>
                   {metric.subtitle}
                 </span>
@@ -193,18 +193,18 @@ export default function StudentDashboard({
       {/* 2. INDUSTRY READINESS & 5. CAREER GOAL & 4. SKILL SNAPSHOT */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
         {/* Col 1: 2. Explainable Industry Readiness */}
-        <div className="lg:col-span-5 bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs flex flex-col justify-between">
+        <div className="lg:col-span-5 bg-white dark:bg-[#111827] rounded-2xl p-5 border border-slate-200/80 dark:border-slate-800 shadow-xs flex flex-col justify-between">
           <div>
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
               <div>
-                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 block">
                   Pillar Analysis
                 </span>
-                <h3 className="text-sm font-bold text-slate-900">Industry Readiness</h3>
+                <h3 className="text-sm font-bold text-slate-900 dark:text-white">Industry Readiness</h3>
               </div>
               <button
                 onClick={() => setReadinessModalOpen(true)}
-                className="text-xs font-semibold text-blue-600 hover:underline flex items-center gap-1 cursor-pointer"
+                className="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 cursor-pointer"
               >
                 <span>View Analysis</span>
                 <ChevronRight className="w-3.5 h-3.5" />
@@ -215,7 +215,7 @@ export default function StudentDashboard({
             <div className="flex items-center gap-5 my-4">
               <div className="relative w-28 h-28 shrink-0 flex items-center justify-center">
                 <svg className="w-28 h-28 -rotate-90 transform" viewBox="0 0 120 120">
-                  <circle cx="60" cy="60" r="48" stroke="#E2E8F0" strokeWidth="10" fill="none" />
+                  <circle cx="60" cy="60" r="48" stroke="currentColor" className="text-slate-200 dark:text-slate-800" strokeWidth="10" fill="none" />
                   <circle
                     cx="60"
                     cy="60"
@@ -230,30 +230,30 @@ export default function StudentDashboard({
                   />
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-                  <span className="text-2xl font-black text-slate-900 leading-none">{readiness}%</span>
-                  <span className="text-[10px] font-bold text-emerald-600 mt-0.5">Ready</span>
+                  <span className="text-2xl font-black text-slate-900 dark:text-white leading-none">{readiness}%</span>
+                  <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">Ready</span>
                 </div>
               </div>
 
               <div className="space-y-1.5 flex-1">
-                <span className="inline-block px-2.5 py-0.5 bg-emerald-50 text-emerald-700 text-[11px] font-bold rounded-md border border-emerald-200">
+                <span className="inline-block px-2.5 py-0.5 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 text-[11px] font-bold rounded-md border border-emerald-200 dark:border-emerald-800">
                   {careerData?.readinessStatus || "Industry Ready"}
                 </span>
-                <p className="text-[11px] text-slate-500 leading-relaxed font-medium">
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
                   {careerData?.readinessSummary || "You have strong foundational skills. Bridging high-priority gaps will unlock top opportunities."}
                 </p>
               </div>
             </div>
 
             {/* Explainable 5-Pillar Breakdown Bars */}
-            <div className="space-y-2.5 pt-2 border-t border-slate-100">
+            <div className="space-y-2.5 pt-2 border-t border-slate-100 dark:border-slate-800">
               {careerData?.readinessBreakdown?.map((pillar, idx) => (
                 <div key={idx}>
-                  <div className="flex justify-between text-xs font-semibold text-slate-700 mb-1">
-                    <span className="text-[11.5px] text-slate-600">{pillar.name}</span>
-                    <span className="text-slate-800 font-bold">{pillar.score}%</span>
+                  <div className="flex justify-between text-xs font-semibold mb-1">
+                    <span className="text-[11.5px] text-slate-600 dark:text-slate-400">{pillar.name}</span>
+                    <span className="text-slate-800 dark:text-slate-200 font-bold">{pillar.score}%</span>
                   </div>
-                  <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                  <div className="w-full bg-slate-100 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden">
                     <div
                       className="bg-blue-600 h-full rounded-full transition-all duration-500"
                       style={{ width: `${pillar.score}%` }}
@@ -264,11 +264,11 @@ export default function StudentDashboard({
             </div>
           </div>
 
-          <div className="pt-3 mt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
-            <span>Overall: <strong className="text-blue-600">{readiness}% Industry Ready</strong></span>
+          <div className="pt-3 mt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
+            <span>Overall: <strong className="text-blue-600 dark:text-blue-400">{readiness}% Industry Ready</strong></span>
             <button
               onClick={() => onNavigate("skill_gap")}
-              className="text-xs font-bold text-blue-600 hover:text-blue-700 cursor-pointer"
+              className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 cursor-pointer"
             >
               How it's calculated →
             </button>
@@ -311,15 +311,15 @@ export default function StudentDashboard({
           </div>
 
           {/* 4. SKILL SNAPSHOT */}
-          <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs">
+          <div className="bg-white dark:bg-[#111827] rounded-2xl p-5 border border-slate-200/80 dark:border-slate-800 shadow-xs">
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h3 className="text-sm font-bold text-slate-900">Skill Snapshot & Priority Gaps</h3>
-                <p className="text-[11px] text-slate-500">Compare your proficiency against {careerGoal} standards</p>
+                <h3 className="text-sm font-bold text-slate-900 dark:text-white">Skill Snapshot & Priority Gaps</h3>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400">Compare your proficiency against {careerGoal} standards</p>
               </div>
               <button
                 onClick={() => onNavigate("my_skills")}
-                className="text-xs font-semibold text-blue-600 hover:underline cursor-pointer"
+                className="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
               >
                 View All Skills
               </button>
@@ -329,10 +329,10 @@ export default function StudentDashboard({
               {careerData?.skillGaps?.slice(0, 4).map((gap, idx) => (
                 <div
                   key={idx}
-                  className="p-3 bg-slate-50/80 rounded-xl border border-slate-200/70 flex flex-col justify-between space-y-2"
+                  className="p-3 bg-slate-50/80 dark:bg-slate-800/70 rounded-xl border border-slate-200/70 dark:border-slate-700/70 flex flex-col justify-between space-y-2"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-slate-900">{gap.name}</span>
+                    <span className="text-xs font-bold text-slate-900 dark:text-white">{gap.name}</span>
                     <span
                       className={`text-[10px] font-bold px-2 py-0.5 rounded-md border ${gap.gapColor}`}
                     >
@@ -340,7 +340,7 @@ export default function StudentDashboard({
                     </span>
                   </div>
 
-                  <div className="w-full bg-slate-200/80 h-2 rounded-full overflow-hidden relative">
+                  <div className="w-full bg-slate-200/80 dark:bg-slate-700 h-2 rounded-full overflow-hidden relative">
                     <div
                       className={`h-full rounded-full ${
                         gap.gap === 0 ? "bg-emerald-500" : gap.gap > 15 ? "bg-rose-500" : "bg-amber-500"
@@ -349,9 +349,9 @@ export default function StudentDashboard({
                     />
                   </div>
 
-                  <div className="flex items-center justify-between text-[10.5px] text-slate-500 pt-0.5">
-                    <span>You: <strong className="text-slate-800">{gap.current}%</strong></span>
-                    <span>Required: <strong className="text-slate-800">{gap.required}%</strong></span>
+                  <div className="flex items-center justify-between text-[10.5px] text-slate-500 dark:text-slate-400 pt-0.5">
+                    <span>You: <strong className="text-slate-800 dark:text-slate-200">{gap.current}%</strong></span>
+                    <span>Required: <strong className="text-slate-800 dark:text-slate-200">{gap.required}%</strong></span>
                   </div>
                 </div>
               ))}
@@ -361,20 +361,20 @@ export default function StudentDashboard({
       </div>
 
       {/* 3. YOUR NEXT BEST ACTION */}
-      <div className="bg-linear-to-r from-blue-50/70 via-indigo-50/40 to-slate-50 rounded-2xl p-5 border border-blue-100 shadow-xs space-y-3.5">
+      <div className="bg-linear-to-r from-blue-50/70 via-indigo-50/40 to-slate-50 dark:from-blue-950/40 dark:via-indigo-950/30 dark:to-slate-900/60 rounded-2xl p-5 border border-blue-100 dark:border-blue-900/40 shadow-xs space-y-3.5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <div className="w-7 h-7 rounded-lg bg-blue-600 text-white flex items-center justify-center font-bold text-xs shadow-xs">
               <Zap className="w-4 h-4" />
             </div>
             <div>
-              <h2 className="text-sm font-black text-slate-900 tracking-tight flex items-center gap-2">
+              <h2 className="text-sm font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
                 YOUR NEXT BEST ACTION
                 <span className="px-2 py-0.5 bg-blue-600 text-white text-[10px] font-bold rounded-full">
                   AI Prioritized
                 </span>
               </h2>
-              <p className="text-[11px] text-slate-500">
+              <p className="text-[11px] text-slate-500 dark:text-slate-400">
                 Actionable steps calculated to maximize your {careerGoal} hiring readiness
               </p>
             </div>
@@ -385,7 +385,7 @@ export default function StudentDashboard({
           {careerData?.nextBestActions?.map((action, idx) => (
             <div
               key={idx}
-              className="bg-white rounded-xl p-4 border border-slate-200/80 shadow-xs flex flex-col justify-between hover:border-blue-300 hover:shadow-md transition"
+              className="bg-white dark:bg-[#111827] rounded-xl p-4 border border-slate-200/80 dark:border-slate-800 shadow-xs flex flex-col justify-between hover:border-blue-300 dark:hover:border-blue-600 hover:shadow-md transition"
             >
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
@@ -396,14 +396,14 @@ export default function StudentDashboard({
                     {action.priority}
                   </span>
                 </div>
-                <h4 className="text-xs font-bold text-slate-900 leading-snug">{action.title}</h4>
-                <p className="text-[11px] text-slate-500 leading-relaxed">{action.reason}</p>
+                <h4 className="text-xs font-bold text-slate-900 dark:text-white leading-snug">{action.title}</h4>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">{action.reason}</p>
               </div>
 
-              <div className="mt-4 pt-3 border-t border-slate-100">
+              <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800">
                 <button
                   onClick={() => onNavigate(action.targetScreen)}
-                  className="w-full py-2 bg-blue-50 hover:bg-[#1E60D5] hover:text-white text-blue-700 text-xs font-bold rounded-lg transition flex items-center justify-center gap-1.5 cursor-pointer"
+                  className="w-full py-2 bg-blue-50 dark:bg-blue-950/60 hover:bg-[#1E60D5] hover:text-white dark:hover:bg-blue-600 text-blue-700 dark:text-blue-300 text-xs font-bold rounded-lg transition flex items-center justify-center gap-1.5 cursor-pointer"
                 >
                   <span>{action.actionText}</span>
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -417,16 +417,16 @@ export default function StudentDashboard({
       {/* 6. RECOMMENDED OPPORTUNITIES & 7. LEARNING ROADMAP PROGRESS */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
         {/* 6. RECOMMENDED OPPORTUNITIES (Explainable match) */}
-        <div className="lg:col-span-7 bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs flex flex-col justify-between">
+        <div className="lg:col-span-7 bg-white dark:bg-[#111827] rounded-2xl p-5 border border-slate-200/80 dark:border-slate-800 shadow-xs flex flex-col justify-between">
           <div>
-            <div className="flex items-center justify-between mb-3.5 pb-2 border-b border-slate-100">
+            <div className="flex items-center justify-between mb-3.5 pb-2 border-b border-slate-100 dark:border-slate-800">
               <div>
-                <h3 className="text-sm font-bold text-slate-900">Recommended Opportunities</h3>
-                <p className="text-[11px] text-slate-500">Explainable matching powered by SkillBridge competency analysis</p>
+                <h3 className="text-sm font-bold text-slate-900 dark:text-white">Recommended Opportunities</h3>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400">Explainable matching powered by SkillBridge competency analysis</p>
               </div>
               <button
                 onClick={() => onNavigate("opportunities")}
-                className="text-xs font-semibold text-blue-600 hover:underline cursor-pointer"
+                className="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
               >
                 View All Opportunities
               </button>
@@ -436,7 +436,7 @@ export default function StudentDashboard({
               {careerData?.opportunities?.slice(0, 2).map((opp, idx) => (
                 <div
                   key={idx}
-                  className="p-3.5 bg-slate-50/70 hover:bg-blue-50/30 rounded-xl border border-slate-200/80 transition flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                  className="p-3.5 bg-slate-50/70 dark:bg-slate-800/60 hover:bg-blue-50/30 dark:hover:bg-slate-800 rounded-xl border border-slate-200/80 dark:border-slate-700/70 transition flex flex-col sm:flex-row sm:items-center justify-between gap-3"
                 >
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
@@ -444,33 +444,33 @@ export default function StudentDashboard({
                         {opp.company.charAt(0)}
                       </div>
                       <div>
-                        <h4 className="text-xs font-bold text-slate-900">{opp.role}</h4>
-                        <p className="text-[11px] text-slate-600 font-medium">{opp.company} • {opp.location}</p>
+                        <h4 className="text-xs font-bold text-slate-900 dark:text-white">{opp.role}</h4>
+                        <p className="text-[11px] text-slate-600 dark:text-slate-300 font-medium">{opp.company} • {opp.location}</p>
                       </div>
                     </div>
 
                     {/* Why this match summary preview */}
                     <div className="pt-1.5 flex flex-wrap items-center gap-1.5 text-[10px]">
-                      <span className="font-bold text-slate-500">Why match:</span>
+                      <span className="font-bold text-slate-500 dark:text-slate-400">Why match:</span>
                       {opp.matchingSkills?.slice(0, 3).map((m, mIdx) => (
-                        <span key={mIdx} className="px-1.5 py-0.5 bg-emerald-50 text-emerald-700 font-semibold rounded border border-emerald-200">
+                        <span key={mIdx} className="px-1.5 py-0.5 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 font-semibold rounded border border-emerald-200 dark:border-emerald-800/60">
                           ✓ {m.skill}
                         </span>
                       ))}
                       {opp.missingSkills?.length > 0 && (
-                        <span className="px-1.5 py-0.5 bg-rose-50 text-rose-700 font-semibold rounded border border-rose-200">
+                        <span className="px-1.5 py-0.5 bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 font-semibold rounded border border-rose-200 dark:border-rose-800/60">
                           ⚠ {opp.missingSkills[0].skill} gap
                         </span>
                       )}
                     </div>
                   </div>
 
-                  <div className="text-right flex flex-row sm:flex-col items-center sm:items-end justify-between sm:justify-center gap-2 shrink-0 pt-2 sm:pt-0 border-t sm:border-0 border-slate-200/60">
+                  <div className="text-right flex flex-row sm:flex-col items-center sm:items-end justify-between sm:justify-center gap-2 shrink-0 pt-2 sm:pt-0 border-t sm:border-0 border-slate-200/60 dark:border-slate-700">
                     <div className="text-left sm:text-right">
-                      <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 text-[11px] font-bold rounded-md border border-emerald-200 block">
+                      <span className="px-2 py-0.5 bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-200 text-[11px] font-bold rounded-md border border-emerald-200 dark:border-emerald-800 block">
                         {opp.matchPercentage}% Match
                       </span>
-                      <span className="text-[9.5px] text-slate-400 mt-0.5 block">
+                      <span className="text-[9.5px] text-slate-400 dark:text-slate-500 mt-0.5 block">
                         → {opp.potentialMatchPercentage}% after roadmap
                       </span>
                     </div>
@@ -491,11 +491,11 @@ export default function StudentDashboard({
             </div>
           </div>
 
-          <div className="pt-3 mt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+          <div className="pt-3 mt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
             <span>Verified candidate priority queue enabled</span>
             <button
               onClick={() => onNavigate("opportunities")}
-              className="text-xs font-bold text-blue-600 hover:text-blue-700 cursor-pointer"
+              className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 cursor-pointer"
             >
               See Match Explanations →
             </button>
@@ -503,48 +503,48 @@ export default function StudentDashboard({
         </div>
 
         {/* 7. LEARNING ROADMAP PROGRESS */}
-        <div className="lg:col-span-5 bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs flex flex-col justify-between">
+        <div className="lg:col-span-5 bg-white dark:bg-[#111827] rounded-2xl p-5 border border-slate-200/80 dark:border-slate-800 shadow-xs flex flex-col justify-between">
           <div>
-            <div className="flex items-center justify-between mb-3 pb-2 border-b border-slate-100">
+            <div className="flex items-center justify-between mb-3 pb-2 border-b border-slate-100 dark:border-slate-800">
               <div>
-                <h3 className="text-sm font-bold text-slate-900">Career Roadmap Progress</h3>
-                <p className="text-[11px] text-slate-500">Current Milestone in {careerGoal} path</p>
+                <h3 className="text-sm font-bold text-slate-900 dark:text-white">Career Roadmap Progress</h3>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400">Current Milestone in {careerGoal} path</p>
               </div>
               <button
                 onClick={() => onNavigate("roadmap")}
-                className="text-xs font-semibold text-blue-600 hover:underline cursor-pointer"
+                className="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
               >
                 View Full Roadmap
               </button>
             </div>
 
             {activeMilestone && (
-              <div className="p-4 rounded-xl bg-blue-50/50 border border-blue-200/80 space-y-3">
+              <div className="p-4 rounded-xl bg-blue-50/50 dark:bg-blue-950/30 border border-blue-200/80 dark:border-blue-900/60 space-y-3">
                 <div className="flex items-start justify-between gap-2">
                   <div>
-                    <span className="text-[10px] font-bold px-2 py-0.5 bg-blue-100 text-blue-800 rounded-full uppercase tracking-wide">
+                    <span className="text-[10px] font-bold px-2 py-0.5 bg-blue-100 dark:bg-blue-900/60 text-blue-800 dark:text-blue-200 rounded-full uppercase tracking-wide">
                       Active Milestone
                     </span>
-                    <h4 className="text-sm font-extrabold text-blue-950 mt-1">
+                    <h4 className="text-sm font-extrabold text-blue-950 dark:text-blue-200 mt-1">
                       {activeMilestone.title}
                     </h4>
-                    <span className="text-[11px] text-slate-500 font-medium block">
+                    <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium block">
                       {activeMilestone.duration} • {activeMilestone.difficulty}
                     </span>
                   </div>
-                  <span className="text-xs font-black text-blue-600">
+                  <span className="text-xs font-black text-blue-600 dark:text-blue-400">
                     {completedCoursesCount} / {learningCourses.length} Done ({roadmapProgressPct}%)
                   </span>
                 </div>
 
-                <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+                <div className="w-full bg-slate-200 dark:bg-slate-700 h-2 rounded-full overflow-hidden">
                   <div
                     className="bg-blue-600 h-full rounded-full transition-all duration-500"
                     style={{ width: `${roadmapProgressPct}%` }}
                   />
                 </div>
 
-                <p className="text-[11px] text-slate-600 leading-relaxed font-medium">
+                <p className="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed font-medium">
                   {activeMilestone.reason}
                 </p>
 
@@ -562,7 +562,7 @@ export default function StudentDashboard({
                     <span>{completedModuleIds[activeMilestone.id] ? "Review Course" : "Continue Learning"}</span>
                     <ArrowRight className="w-3.5 h-3.5" />
                   </button>
-                  <span className="text-[10.5px] text-slate-400">
+                  <span className="text-[10.5px] text-slate-400 dark:text-slate-500">
                     Milestone {activeMilestoneIndex + 1} of {ROADMAP_MODULES.length}
                   </span>
                 </div>
@@ -570,11 +570,11 @@ export default function StudentDashboard({
             )}
           </div>
 
-          <div className="pt-3 mt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+          <div className="pt-3 mt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
             <span>
-              Next: <strong className="text-slate-800">{nextMilestone ? nextMilestone.title : "Internship Applications"}</strong>
+              Next: <strong className="text-slate-800 dark:text-slate-200">{nextMilestone ? nextMilestone.title : "Internship Applications"}</strong>
             </span>
-            <span className="text-emerald-600 font-bold">On Schedule</span>
+            <span className="text-emerald-600 dark:text-emerald-400 font-bold">On Schedule</span>
           </div>
         </div>
       </div>
@@ -582,16 +582,16 @@ export default function StudentDashboard({
       {/* 8. RECENT ACTIVITY & 9. RECOMMENDATIONS */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
         {/* 8. RECENT ACTIVITY (Live Feed) */}
-        <div className="lg:col-span-6 bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs flex flex-col justify-between">
+        <div className="lg:col-span-6 bg-white dark:bg-[#111827] rounded-2xl p-5 border border-slate-200/80 dark:border-slate-800 shadow-xs flex flex-col justify-between">
           <div>
-            <div className="flex items-center justify-between mb-3.5 pb-2 border-b border-slate-100">
+            <div className="flex items-center justify-between mb-3.5 pb-2 border-b border-slate-100 dark:border-slate-800">
               <div className="flex items-center gap-2">
-                <History className="w-4 h-4 text-slate-500" />
-                <h3 className="text-sm font-bold text-slate-900">Recent Activity</h3>
+                <History className="w-4 h-4 text-slate-500 dark:text-slate-400" />
+                <h3 className="text-sm font-bold text-slate-900 dark:text-white">Recent Activity</h3>
               </div>
               <button
                 onClick={() => onNavigate("activity")}
-                className="text-xs font-semibold text-blue-600 hover:underline cursor-pointer"
+                className="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
               >
                 View Full Timeline
               </button>
@@ -601,14 +601,14 @@ export default function StudentDashboard({
               {recentActivities.slice(0, 3).map((act, idx) => (
                 <div
                   key={idx}
-                  className="p-3 bg-slate-50/60 rounded-xl border border-slate-100 flex items-start justify-between gap-3 text-xs"
+                  className="p-3 bg-slate-50/60 dark:bg-slate-800/60 rounded-xl border border-slate-100 dark:border-slate-700/60 flex items-start justify-between gap-3 text-xs"
                 >
                   <div className="space-y-0.5">
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-slate-900">{act.title}</span>
+                      <span className="font-bold text-slate-900 dark:text-white">{act.title}</span>
                       <span className="text-[10px] text-slate-400">• {act.time}</span>
                     </div>
-                    <p className="text-[11px] text-slate-500 leading-relaxed">{act.desc}</p>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">{act.desc}</p>
                   </div>
                   <span className={`px-2 py-0.5 text-[10px] font-bold rounded-md border shrink-0 ${act.metaColor}`}>
                     {act.meta}
@@ -618,11 +618,11 @@ export default function StudentDashboard({
             </div>
           </div>
 
-          <div className="pt-3 mt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+          <div className="pt-3 mt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
             <span>Actions automatically recorded into your portfolio</span>
             <button
               onClick={() => onNavigate("activity")}
-              className="text-xs font-bold text-blue-600 hover:text-blue-700 cursor-pointer"
+              className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 cursor-pointer"
             >
               Activity History →
             </button>
@@ -630,12 +630,12 @@ export default function StudentDashboard({
         </div>
 
         {/* 9. RECOMMENDATIONS (Courses / Projects / Resources) */}
-        <div className="lg:col-span-6 bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs flex flex-col justify-between">
+        <div className="lg:col-span-6 bg-white dark:bg-[#111827] rounded-2xl p-5 border border-slate-200/80 dark:border-slate-800 shadow-xs flex flex-col justify-between">
           <div>
-            <div className="flex items-center justify-between mb-3.5 pb-2 border-b border-slate-100">
+            <div className="flex items-center justify-between mb-3.5 pb-2 border-b border-slate-100 dark:border-slate-800">
               <div className="flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-amber-500" />
-                <h3 className="text-sm font-bold text-slate-900">Curated Learning Recommendations</h3>
+                <h3 className="text-sm font-bold text-slate-900 dark:text-white">Curated Learning Recommendations</h3>
               </div>
               <span className="text-[11px] text-slate-400 font-medium">Industry Partner Verified</span>
             </div>
@@ -644,14 +644,14 @@ export default function StudentDashboard({
               {recommendations.map((rec, idx) => (
                 <div
                   key={idx}
-                  className="p-3 bg-slate-50/60 rounded-xl border border-slate-100 flex items-center justify-between gap-3"
+                  className="p-3 bg-slate-50/60 dark:bg-slate-800/60 rounded-xl border border-slate-100 dark:border-slate-700/60 flex items-center justify-between gap-3"
                 >
                   <div className="flex items-center gap-3">
                     <div className={`w-8 h-8 rounded-lg ${rec.iconBg} flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs`}>
                       {idx === 0 ? <BookOpen className="w-4 h-4" /> : idx === 1 ? <FolderKanban className="w-4 h-4" /> : <Award className="w-4 h-4" />}
                     </div>
                     <div>
-                      <h4 className="text-xs font-bold text-slate-900 leading-snug">{rec.title}</h4>
+                      <h4 className="text-xs font-bold text-slate-900 dark:text-white leading-snug">{rec.title}</h4>
                       <div className="flex items-center gap-2 mt-0.5 text-[10.5px] text-slate-400 font-medium">
                         <span>{rec.type}</span>
                         <span>•</span>
@@ -664,7 +664,7 @@ export default function StudentDashboard({
 
                   <button
                     onClick={rec.action}
-                    className="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold rounded-lg transition shrink-0 cursor-pointer"
+                    className="px-3 py-1.5 bg-blue-50 dark:bg-blue-950/60 hover:bg-blue-100 dark:hover:bg-blue-900/80 text-blue-700 dark:text-blue-300 text-xs font-bold rounded-lg transition shrink-0 cursor-pointer"
                   >
                     {rec.btnText}
                   </button>
@@ -673,11 +673,11 @@ export default function StudentDashboard({
             </div>
           </div>
 
-          <div className="pt-3 mt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+          <div className="pt-3 mt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
             <span>Aligned with {careerGoal} qualification matrix</span>
             <button
               onClick={() => onNavigate("roadmap")}
-              className="text-xs font-bold text-blue-600 hover:text-blue-700 cursor-pointer"
+              className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 cursor-pointer"
             >
               Roadmap Sync →
             </button>
@@ -688,21 +688,21 @@ export default function StudentDashboard({
       {/* CHANGE CAREER GOAL MODAL */}
       {goalModalOpen && (
         <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-lg w-full p-6 space-y-5 animate-in zoom-in-95 duration-150">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+          <div className="bg-white dark:bg-[#111827] rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 max-w-lg w-full p-6 space-y-5 animate-in zoom-in-95 duration-150">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
               <div className="flex items-center gap-2">
-                <Target className="w-5 h-5 text-blue-600" />
-                <h3 className="text-base font-bold text-slate-900">Select Target Career Goal</h3>
+                <Target className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                <h3 className="text-base font-bold text-slate-900 dark:text-white">Select Target Career Goal</h3>
               </div>
               <button
                 onClick={() => setGoalModalOpen(false)}
-                className="p-1 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-slate-700 cursor-pointer"
+                className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <p className="text-xs text-slate-500 leading-relaxed">
+            <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
               Choosing a new career goal dynamically recalculates your <strong>Industry Readiness</strong> score, highlights relevant <strong>Skill Gaps</strong>, adjusts your <strong>Learning Roadmap</strong>, and tailors <strong>Internship Recommendations</strong>.
             </p>
 
@@ -718,13 +718,13 @@ export default function StudentDashboard({
                     }}
                     className={`w-full p-3 rounded-xl border text-left text-xs font-bold transition flex items-center justify-between cursor-pointer ${
                       isSelected
-                        ? "bg-blue-50 border-blue-300 text-blue-900 shadow-xs"
-                        : "bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-700"
+                        ? "bg-blue-50 dark:bg-blue-950/60 border-blue-300 dark:border-blue-700 text-blue-900 dark:text-blue-200 shadow-xs"
+                        : "bg-slate-50 dark:bg-slate-800/70 hover:bg-slate-100 dark:hover:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300"
                     }`}
                   >
                     <span>{role}</span>
                     {isSelected && (
-                      <span className="flex items-center gap-1 text-[11px] text-blue-700 font-extrabold">
+                      <span className="flex items-center gap-1 text-[11px] text-blue-700 dark:text-blue-300 font-extrabold">
                         <CheckCircle2 className="w-4 h-4" /> Current Target
                       </span>
                     )}
@@ -733,10 +733,10 @@ export default function StudentDashboard({
               })}
             </div>
 
-            <div className="pt-3 border-t border-slate-100 flex justify-end">
+            <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex justify-end">
               <button
                 onClick={() => setGoalModalOpen(false)}
-                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg cursor-pointer"
+                className="px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold rounded-lg cursor-pointer"
               >
                 Cancel
               </button>
@@ -748,31 +748,31 @@ export default function StudentDashboard({
       {/* EXPLAINABLE INDUSTRY READINESS BREAKDOWN MODAL */}
       {readinessModalOpen && (
         <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-xl w-full p-6 space-y-5 animate-in zoom-in-95 duration-150 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+          <div className="bg-white dark:bg-[#111827] rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 max-w-xl w-full p-6 space-y-5 animate-in zoom-in-95 duration-150 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
               <div className="flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-emerald-600" />
+                <TrendingUp className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                 <div>
-                  <h3 className="text-base font-bold text-slate-900">Explainable Industry Readiness</h3>
-                  <span className="text-xs text-slate-500">Target Role: <strong>{careerGoal}</strong></span>
+                  <h3 className="text-base font-bold text-slate-900 dark:text-white">Explainable Industry Readiness</h3>
+                  <span className="text-xs text-slate-500 dark:text-slate-400">Target Role: <strong>{careerGoal}</strong></span>
                 </div>
               </div>
               <button
                 onClick={() => setReadinessModalOpen(false)}
-                className="p-1 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-slate-700 cursor-pointer"
+                className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {/* Score Highlight Box */}
-            <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center justify-between">
+            <div className="p-4 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 rounded-xl flex items-center justify-between">
               <div>
-                <span className="text-xs font-bold text-emerald-800 uppercase tracking-wider block">
+                <span className="text-xs font-bold text-emerald-800 dark:text-emerald-300 uppercase tracking-wider block">
                   Overall Composite Readiness
                 </span>
-                <span className="text-3xl font-black text-emerald-900">{readiness}% Industry Ready</span>
-                <p className="text-xs text-emerald-700 mt-1">
+                <span className="text-3xl font-black text-emerald-900 dark:text-emerald-200">{readiness}% Industry Ready</span>
+                <p className="text-xs text-emerald-700 dark:text-emerald-400 mt-1">
                   {careerData?.readinessSummary}
                 </p>
               </div>
@@ -787,23 +787,23 @@ export default function StudentDashboard({
                 Score Pillar Calculation Breakdown
               </h4>
               {careerData?.readinessBreakdown?.map((pillar, idx) => (
-                <div key={idx} className="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5">
+                <div key={idx} className="p-3 bg-slate-50 dark:bg-slate-800/70 rounded-xl border border-slate-200 dark:border-slate-700 space-y-1.5">
                   <div className="flex justify-between items-center text-xs font-bold">
-                    <span className="text-slate-900">{pillar.name}</span>
-                    <span className="text-blue-600 text-sm">{pillar.score}%</span>
+                    <span className="text-slate-900 dark:text-white">{pillar.name}</span>
+                    <span className="text-blue-600 dark:text-blue-400 text-sm">{pillar.score}%</span>
                   </div>
-                  <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+                  <div className="w-full bg-slate-200 dark:bg-slate-700 h-2 rounded-full overflow-hidden">
                     <div
                       className="bg-blue-600 h-full rounded-full"
                       style={{ width: `${pillar.score}%` }}
                     />
                   </div>
-                  <p className="text-[11px] text-slate-500">{pillar.desc}</p>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400">{pillar.desc}</p>
                 </div>
               ))}
             </div>
 
-            <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
+            <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
               <button
                 onClick={() => {
                   setReadinessModalOpen(false);
@@ -815,7 +815,7 @@ export default function StudentDashboard({
               </button>
               <button
                 onClick={() => setReadinessModalOpen(false)}
-                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg cursor-pointer"
+                className="px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold rounded-lg cursor-pointer"
               >
                 Close
               </button>
